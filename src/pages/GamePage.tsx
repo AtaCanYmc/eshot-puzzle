@@ -314,6 +314,19 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
             setGameState={setGameState}
             theme={theme}
             toggleTheme={toggleTheme}
+            onStopClick={(stop) => {
+              if (stop.durak_id === gameState.currentStop.durak_id) return;
+              setGameState(prev => ({
+                ...prev,
+                currentStop: stop,
+                history: [...prev.history, { stop }],
+                steps: prev.steps + 1,
+                selectedLine: null,
+                selectedDirection: null,
+                lineStops: [],
+                isWalking: false
+              }));
+            }}
           />
         </div>
 

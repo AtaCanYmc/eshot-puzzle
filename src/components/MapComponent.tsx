@@ -1,8 +1,9 @@
 import * as React from 'react';
-import {MapContainer, TileLayer, Marker, Popup, Polyline} from 'react-leaflet';
+import {MapContainer, TileLayer, Marker, Popup} from 'react-leaflet';
 import L from 'leaflet';
 import type {Stop} from '../types/supabaseTypes';
 import {eshotService} from "../service/eshotService";
+
 
 interface MapComponentProps {
     currentStop: Stop;
@@ -11,6 +12,7 @@ interface MapComponentProps {
     setGameState: (fn: (prev: any) => any) => void;
     theme: string;
     toggleTheme: () => void;
+    onStopClick?: (stop: Stop) => void;
 }
 
 const currentIcon = new L.DivIcon({
@@ -41,7 +43,7 @@ const walkIcon = new L.DivIcon({
     iconAnchor: [12, 12]
 });
 
-const MapComponent: React.FC<MapComponentProps> = ({currentStop, stops, gameState, setGameState, theme}) => {
+const MapComponent: React.FC<MapComponentProps> = ({currentStop, stops, gameState, setGameState, theme, onStopClick}) => {
     // Harita merkezini güncelle
     const darkTile = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
     const lightTile = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
@@ -55,16 +57,15 @@ const MapComponent: React.FC<MapComponentProps> = ({currentStop, stops, gameStat
         async function fetchNearby() {
             try {
                 const data = await eshotService.getNearbyStops(currentStop.enlem, currentStop.boylam, 200); // 200m
-                // Kendisini ve history'de olanları çıkar
-                const filtered = data.filter((s: Stop) => s.durak_id !== currentStop.durak_id && !gameState.history.some((h: any) => h.stop.durak_id === s.durak_id));
+                const filtered = data.filter((s: Stop) => s.durak_id !== currentStop.durak_id);
                 if (!cancelled) setNearbyStops(filtered);
             } catch (e) {
                 setNearbyStops([]);
             }
         }
-        fetchNearby();
+        fetchNearby().then(r => r);
         return () => { cancelled = true; };
-    }, [currentStop, gameState.history]);
+    }, [currentStop]);
 
     // Yürüyerek gidilen durağa geçiş
     const handleWalkToStop = (stop: Stop) => {
@@ -119,7 +120,12 @@ const MapComponent: React.FC<MapComponentProps> = ({currentStop, stops, gameStat
                 if (isPast) return null;
                 return (
                     // @ts-ignore
-                    <Marker key={stop.durak_id} position={[stop.enlem, stop.boylam]} icon={stopIcon}>
+                    <Marker
+                        key={stop.durak_id}
+                        position={[stop.enlem, stop.boylam]}
+                        icon={stopIcon}
+                        eventHandlers={onStopClick ? { click: () => onStopClick(stop) } : undefined}
+                    >
                         <Popup>{stop.durak_adi}</Popup>
                     </Marker>
                 );
@@ -139,14 +145,6 @@ const MapComponent: React.FC<MapComponentProps> = ({currentStop, stops, gameStat
                     </Popup>
                 </Marker>
             ))}
-
-            {/* Gidilen yol */}
-            {gameState.history && gameState.history.length > 1 && false && (
-                <Polyline
-                    pathOptions={{color: theme === 'dark' ? '#38bdf8' : '#0ea5e9', weight: 6, opacity: 0.7}}
-                    positions={gameState.history.map((h: any) => [h.stop.enlem, h.stop.boylam])}
-                />
-            )}
         </MapContainer>
     );
 };
