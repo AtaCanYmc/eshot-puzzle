@@ -53,28 +53,25 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
     fetchLines().then(r => r);
   }, [gameState.currentStop]);
 
-  // Hat seçildiğinde yön seçimi
-  const handleSelectLine = (hatNo: string) => {
-    setGameState(prev => ({
-      ...prev,
-      selectedLine: hatNo,
-      selectedDirection: null,
-      lineStops: []
-    }));
-  };
-
-  // Yön seçildiğinde durakları getir
-  const handleSelectDirection = async (direction: number) => {
+  // Hat seçildiğinde yönü otomatik bul ve durakları getir
+  const handleSelectLine = async (hatNo: string) => {
     setLoading(true);
     try {
-      let lineStops = await eshotService.getOrderedStops(gameState.selectedLine!, direction);
+      // Yönleri getir
+      const directions = await eshotService.getAvailableDirections(gameState.currentStop.durak_id, hatNo);
+      if (!directions.length) throw new Error('Yön bulunamadı');
+      const selectedDirection = directions[0].yon;
+      // Durakları getir
+      let lineStops = await eshotService.getOrderedStops(hatNo, selectedDirection);
       setGameState(prev => ({
         ...prev,
-        selectedDirection: direction,
-        lineStops
+        selectedLine: hatNo,
+        selectedDirection,
+        lineStops,
+        isWalking: false
       }));
     } catch (error) {
-      console.error("Line stops fetch failed", error);
+      setGameState(prev => ({ ...prev, selectedLine: null, selectedDirection: null, lineStops: [] }));
     } finally {
       setLoading(false);
     }
@@ -179,7 +176,7 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
                       availableLines.map(line => (
                         <button
                           key={line.hat_no}
-                          onClick={() => setGameState(prev => ({ ...prev, selectedLine: line.hat_no, isWalking: false }))}
+                          onClick={() => handleSelectLine(line.hat_no)}
                           className={`p-3 rounded-xl border-2 transition-all text-center group
                             ${gameState.selectedLine === line.hat_no
                               ? 'bg-primary/10 border-primary text-primary font-black'
@@ -194,41 +191,12 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
                     )}
                   </div>
                 </section>
-              ) : !gameState.selectedDirection ? (
-                <section className="animate-fade-in flex flex-col items-center justify-center h-full">
-                  <h3 className="text-lg font-bold mb-6">Yön Seç</h3>
-                  <div className="flex flex-col gap-6 mb-8">
-                    <button
-                      className={`px-8 py-4 rounded-xl text-2xl font-black shadow-lg border-2 transition-all ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'} ${gameState.selectedDirection === 1 ? 'bg-primary text-white border-primary' : 'bg-white text-primary border-primary/30'}`}
-                      onClick={() => handleSelectDirection(1)}
-                      disabled={loading}
-                    >
-                      Gidiş
-                    </button>
-                    <button
-                      className={`px-8 py-4 rounded-xl text-2xl font-black shadow-lg border-2 transition-all ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'} ${gameState.selectedDirection === 2 ? 'bg-primary text-white border-primary' : 'bg-white text-primary border-primary/30'}`}
-                      onClick={() => handleSelectDirection(2)}
-                      disabled={loading}
-                    >
-                      Dönüş
-                    </button>
-                  </div>
-                  <button
-                    className="text-xs underline text-slate-400 hover:text-primary font-bold"
-                    onClick={() => setGameState(prev => ({ ...prev, selectedLine: null, selectedDirection: null, lineStops: [] }))}
-                    disabled={loading}
-                  >
-                    Hat Seçimini Değiştir
-                  </button>
-                </section>
               ) : (
-                <section className="animate-fade-in">
+                <section>
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className={`text-xs font-bold uppercase tracking-widest ${theme === 'dark' ? 'text-secondary' : 'text-blue-700'}`}>
-                       {gameState.selectedLine} Hattı Durakları (Yön {gameState.selectedDirection})
-                    </h3>
+                    <h3 className={`text-xs font-bold uppercase tracking-widest ${theme === 'dark' ? 'text-secondary' : 'text-blue-700'}`}>{gameState.selectedLine} Hattı Durakları</h3>
                     <button
-                      onClick={() => setGameState(prev => ({ ...prev, selectedLine: null, lineStops: [] }))}
+                      onClick={() => setGameState(prev => ({ ...prev, selectedLine: null, selectedDirection: null, lineStops: [] }))}
                       className="text-[10px] font-bold text-slate-400 hover:text-white underline"
                     >
                       GERİ DÖN
@@ -240,7 +208,6 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
                       return gameState.lineStops.map((stop, idx) => {
                         const isCurrent = stop.durak_id === gameState.currentStop.durak_id;
                         const isPast = idx <= currentIndex;
-                        // Yürüyerek gidildiğinde veya hat seçildiğinde yürüme modu kapansın
                         const handleTravelToStop = (targetStop: Stop) => {
                           if (!gameState.lineStops.length) return;
                           const currentIndex = gameState.lineStops.findIndex(s => s.durak_id === gameState.currentStop.durak_id);
@@ -276,14 +243,6 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
                       });
                     })()}
                   </div>
-                  {/* Yönü değiştirmek için buton */}
-                  <button
-                    className="text-xs underline text-slate-400 hover:text-primary font-bold mt-2"
-                    onClick={() => setGameState(prev => ({ ...prev, selectedDirection: null, lineStops: [] }))}
-                    disabled={loading}
-                  >
-                    Yönü Değiştir
-                  </button>
                 </section>
               )}
             </div>
