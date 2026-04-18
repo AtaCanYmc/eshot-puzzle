@@ -9,7 +9,7 @@ import { useTheme } from '../ThemeContext';
 // Custom Icons
 const currentIcon = new L.DivIcon({
   className: 'custom-marker-current',
-  html: '<div class="w-8 h-8 rounded-full bg-primary border-4 border-white shadow-lg animate-pulse"></div>',
+  html: '<div class="w-8 h-8 rounded-full bg-green-500 border-4 border-white shadow-lg animate-pulse"></div>',
   iconSize: [32, 32],
   iconAnchor: [16, 16]
 });
