@@ -1,189 +1,108 @@
-import { useState, useEffect } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+import { useState, useCallback } from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
+import GamePage from './pages/GamePage';
 import { eshotService } from './service/eshotService';
 import type { Stop } from './types/supabaseTypes';
 
-const markerIcon = new L.Icon({
-  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-  shadowSize: [41, 41]
-});
-
-function RandomStopsMap() {
-  const [stops, setStops] = useState<Stop[] | null>(null);
+function MainApp() {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [stops, setStops] = useState<[Stop, Stop] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
-  const fetchStops = async () => {
+  // Rastgele durakları getiren fonksiyon
+  const fetchTwoRandomStops = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const [stop1, stop2] = await eshotService.getTwoRandomStops();
-      setStops([stop1, stop2]);
-    } catch (e: any) {
-      setError(e.message || 'Bir hata oluştu');
+      const result = await eshotService.getTwoRandomStops();
+      setStops(result);
+    } catch (e) {
+      setError('Bir hata oluştu');
+      setStops(null);
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchStops();
   }, []);
 
+  const handleOpenModal = () => {
+    setModalOpen(true);
+    fetchTwoRandomStops();
+  };
+
+  const handleRefreshStops = () => {
+    fetchTwoRandomStops();
+  };
+
+  const handleStartGame = () => {
+    setModalOpen(false);
+    if (stops) {
+      navigate('/oyun', { state: { stops } });
+    }
+  };
+
   return (
-    <div style={{ width: '100%', height: '500px', margin: '2rem 0' }}>
-      <button onClick={fetchStops} disabled={loading} style={{ marginBottom: 10 }}>
-        {loading ? 'Yükleniyor...' : 'Yeni Rastgele Duraklar Üret'}
-      </button>
-      {error && <div style={{ color: 'red' }}>{error}</div>}
-      {stops && (
-        <MapContainer
-          center={[(stops[0].enlem + stops[1].enlem) / 2, (stops[0].boylam + stops[1].boylam) / 2]}
-          zoom={10}
-          style={{ width: '100%', height: '400px' }}
+    <div className="w-screen h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-blue-300">
+      <div className="flex flex-col items-center gap-6 p-8 rounded-2xl shadow-xl bg-white/80 backdrop-blur">
+        <h1 className="text-4xl font-extrabold text-blue-700 tracking-tight">ESHOT Puzzle</h1>
+        <button
+          className="px-8 py-3 rounded-full bg-gradient-to-r from-blue-500 to-blue-700 text-white font-bold shadow-lg hover:scale-105 hover:from-blue-600 hover:to-blue-800 transition-all duration-200"
+          onClick={handleOpenModal}
         >
-          <TileLayer
-            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          {stops.map((stop, idx) => (
-            <Marker key={stop.durak_id} position={[stop.enlem, stop.boylam]} icon={markerIcon}>
-              <Popup>
-                <b>{stop.durak_adi}</b><br />
-                Enlem: {stop.enlem}<br />
-                Boylam: {stop.boylam}
-              </Popup>
-            </Marker>
-          ))}
-        </MapContainer>
+          Oyuna Başla
+        </button>
+      </div>
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md relative flex flex-col items-center gap-4">
+            <button onClick={() => setModalOpen(false)} className="absolute top-3 right-4 text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
+            <h2 className="text-2xl font-bold text-blue-700 mb-2">Rastgele Duraklar</h2>
+            {error && <div className="text-red-600 mb-2 font-semibold">{error}</div>}
+            {loading ? (
+              <div className="flex items-center justify-center h-24">
+                <svg className="animate-spin h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                </svg>
+              </div>
+            ) : stops ? (
+              <div className="w-full flex flex-col gap-2 mb-2">
+                <div className="p-3 rounded-lg bg-blue-50 border border-blue-200 flex flex-col items-center">
+                  <span className="text-blue-700 font-bold">Başlangıç</span>
+                  <span className="font-semibold text-gray-800">{stops[0].durak_adi}</span>
+                </div>
+                <div className="p-3 rounded-lg bg-red-50 border border-red-200 flex flex-col items-center">
+                  <span className="text-red-700 font-bold">Varış</span>
+                  <span className="font-semibold text-gray-800">{stops[1].durak_adi}</span>
+                </div>
+              </div>
+            ) : null}
+            <div className="flex gap-2 justify-end mt-2 w-full">
+              <button onClick={handleRefreshStops} disabled={loading} className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold disabled:opacity-60">Yenile</button>
+              <button onClick={handleStartGame} disabled={loading || !stops} className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-bold disabled:opacity-60">Devam Et</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
 }
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-      <RandomStopsMap />
-    </>
-  )
+function GamePageWrapper() {
+  const location = useLocation();
+  const stops = location.state?.stops as [Stop, Stop] | undefined;
+  if (!stops) return <Navigate to="/" replace />;
+  return <GamePage stops={stops} />;
 }
 
-export default App
+export default function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<MainApp />} />
+        <Route path="/oyun" element={<GamePageWrapper />} />
+      </Routes>
+    </Router>
+  );
+}

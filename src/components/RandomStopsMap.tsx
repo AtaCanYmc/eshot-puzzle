@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import {useState, useEffect, useCallback} from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import type { Stop } from '../types/supabaseTypes';
@@ -13,15 +13,15 @@ const markerIcon = new L.Icon({
 });
 
 interface RandomStopsMapProps {
-  fetchStops: () => Promise<Stop[]>;
+  fetchStops: () => Promise<[Stop, Stop]>;
 }
 
 export default function RandomStopsMap({ fetchStops }: RandomStopsMapProps) {
-  const [stops, setStops] = useState<Stop[] | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [stops, setStops] = useState<[Stop, Stop] | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const handleFetch = async () => {
+  const handleFetch = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -29,17 +29,18 @@ export default function RandomStopsMap({ fetchStops }: RandomStopsMapProps) {
       setStops([stop1, stop2]);
     } catch (e) {
       setError((e as Error).message || 'Bir hata oluştu');
+      setStops(null);
     } finally {
       setLoading(false);
     }
-  };
+  }, [fetchStops]);
 
   useEffect(() => {
-    setTimeout(() => { void handleFetch(); }, 0);
-  }, []);
+    handleFetch();
+  }, [handleFetch]);
 
   return (
-    <div className="w-full max-w-xl mx-auto my-8 p-4 bg-white rounded-2xl shadow-lg border border-gray-200">
+    <div style={{ width: '100%', maxWidth: 600, margin: '2rem auto', padding: '1rem', background: 'white', borderRadius: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.07)', border: '1px solid #e5e7eb' }}>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <h2 className="text-2xl font-extrabold text-blue-800 tracking-tight">Birbirinden Uzak Rastgele 2 Durak</h2>
         <button
@@ -53,13 +54,17 @@ export default function RandomStopsMap({ fetchStops }: RandomStopsMapProps) {
         </button>
       </div>
       {error && <div className="text-red-600 mb-2 font-semibold">{error}</div>}
-      {stops && (
-        <div className="rounded-2xl overflow-hidden border border-gray-300 shadow-lg">
+      {loading && (
+        <div className="flex items-center justify-center h-[400px] w-full">
+          <svg className="animate-spin h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
+        </div>
+      )}
+      {stops && !loading && (
+        <div style={{ borderRadius: '1rem', overflow: 'hidden', border: '1px solid #d1d5db', boxShadow: '0 2px 8px rgba(0,0,0,0.07)' }}>
           <MapContainer
             center={[(stops[0].enlem + stops[1].enlem) / 2, (stops[0].boylam + stops[1].boylam) / 2]}
             zoom={11}
-            style={{ width: '100%', height: '400px', borderRadius: '1rem' }}
-            className="w-full h-[400px] z-0"
+            style={{ width: '100%', height: 400, borderRadius: '1rem' }}
           >
             <TileLayer
               attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -68,14 +73,14 @@ export default function RandomStopsMap({ fetchStops }: RandomStopsMapProps) {
             {stops.map((stop, i) => (
               <Marker key={stop.durak_id} position={[stop.enlem, stop.boylam]} icon={markerIcon}>
                 <Popup>
-                  <div className="min-w-[180px] p-2">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className={`inline-block w-3 h-3 rounded-full ${i === 0 ? 'bg-blue-600' : 'bg-green-600'}`}></span>
-                      <span className="font-bold text-base text-gray-800">{stop.durak_adi}</span>
+                  <div style={{ minWidth: 180, padding: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                      <span style={{ display: 'inline-block', width: 12, height: 12, borderRadius: 6, background: i === 0 ? '#2563eb' : '#16a34a' }}></span>
+                      <span style={{ fontWeight: 700, fontSize: 16, color: '#1e293b' }}>{stop.durak_adi}</span>
                     </div>
-                    <div className="text-xs text-gray-600 mb-1">Enlem: <span className="font-mono">{stop.enlem}</span></div>
-                    <div className="text-xs text-gray-600 mb-1">Boylam: <span className="font-mono">{stop.boylam}</span></div>
-                    <div className="mt-2 text-xs text-gray-500 font-semibold">Durak #{i + 1}</div>
+                    <div style={{ fontSize: 12, color: '#64748b', marginBottom: 4 }}>Enlem: <span style={{ fontFamily: 'monospace' }}>{stop.enlem}</span></div>
+                    <div style={{ fontSize: 12, color: '#64748b', marginBottom: 4 }}>Boylam: <span style={{ fontFamily: 'monospace' }}>{stop.boylam}</span></div>
+                    <div style={{ marginTop: 8, fontSize: 12, color: '#64748b', fontWeight: 600 }}>Durak #{i + 1}</div>
                   </div>
                 </Popup>
               </Marker>
@@ -86,4 +91,3 @@ export default function RandomStopsMap({ fetchStops }: RandomStopsMapProps) {
     </div>
   );
 }
-
