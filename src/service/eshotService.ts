@@ -78,4 +78,31 @@ export const eshotService = {
         const stop2 = await this.getRandomDurakFarAway(stop1.enlem, stop1.boylam, distance);
         return [stop1, stop2];
     },
+
+    /**
+     * Verilen koordinatın X metre yakınındaki durakları mesafesiyle birlikte getirir.
+     */
+    async getNearbyStops(lat: number, lon: number, radius = 100): Promise<any[]> {
+        const { data, error } = await supabase.rpc('get_nearby_stops', {
+            target_lat: lat,
+            target_lon: lon,
+            radius_meters: radius
+        });
+
+        if (error) throw error;
+        return data || [];
+    },
+
+    /**
+     * Belirli bir duraktan geçen hattın hangi yöne/yönlere gittiğini döndürür.
+     */
+    async getAvailableDirections(durakId: number, hatNo: string): Promise<{ yon: number, yon_adi: string }[]> {
+        const { data, error } = await supabase.rpc('get_direction_by_stop_and_line', {
+            p_durak_id: durakId,
+            p_hat_no: hatNo
+        });
+
+        if (error) throw error;
+        return data || [];
+    }
 };

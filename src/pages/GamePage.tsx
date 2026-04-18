@@ -1,32 +1,10 @@
 import * as React from 'react';
-import { MapContainer, TileLayer, Marker as RLMarker, Popup as RLPopup, useMap, Polyline } from 'react-leaflet';
-import L from 'leaflet';
 import { useNavigate } from 'react-router-dom';
 import { eshotService } from '../service/eshotService';
 import type { Stop } from '../types/supabaseTypes';
 import { useTheme } from '../ThemeContext';
+import MapComponent from '../components/MapComponent';
 
-// Custom Icons
-const currentIcon = new L.DivIcon({
-  className: 'custom-marker-current',
-  html: '<div class="w-8 h-8 rounded-full bg-green-500 border-4 border-white shadow-lg animate-pulse"></div>',
-  iconSize: [32, 32],
-  iconAnchor: [16, 16]
-});
-
-const targetIcon = new L.DivIcon({
-  className: 'custom-marker-target',
-  html: '<div class="w-8 h-8 rounded-full bg-orange-500 border-4 border-white shadow-lg"></div>',
-  iconSize: [32, 32],
-  iconAnchor: [16, 16]
-});
-
-const stopIcon = new L.DivIcon({
-  className: 'custom-marker-stop',
-  html: '<div class="w-4 h-4 rounded-full bg-slate-400 border-2 border-white shadow-sm hover:scale-150 transition-transform"></div>',
-  iconSize: [16, 16],
-  iconAnchor: [8, 8]
-});
 
 interface GamePageProps {
   stops: [Stop, Stop];
@@ -41,27 +19,20 @@ interface TravelState {
   lineStops: Stop[];
 }
 
-// Map Helper Component to handle view changes
-function MapController({ center, zoom }: { center: [number, number], zoom: number }) {
-  const map = useMap();
-  React.useEffect(() => {
-    map.flyTo(center, zoom, { duration: 1.5 });
-  }, [center, zoom, map]);
-  return null;
-}
 
 const GamePage: React.FC<GamePageProps> = ({ stops }) => {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
-  const [gameState, setGameState] = React.useState<TravelState>({
+  const [gameState, setGameState] = React.useState<TravelState & { isWalking?: boolean }>({
     currentStop: stops[0],
     history: [{ stop: stops[0] }],
     steps: 0,
     selectedLine: null,
     selectedDirection: null,
-    lineStops: []
+    lineStops: [],
+    isWalking: false
   });
-  
+
   const [availableLines, setAvailableLines] = React.useState<{ hat_no: string }[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [isSidebarOpen, setSidebarOpen] = React.useState(true);
@@ -171,7 +142,7 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
 
       <div className="flex-1 flex relative overflow-hidden transition-colors duration-300">
         {/* Sidebar */}
-        <aside 
+        <aside
           className={`absolute left-0 top-0 bottom-0 z-[999] w-80 glass border-r transition-transform duration-500 ease-in-out
             ${theme === 'dark' ? 'border-white/10 bg-slate-950' : 'border-slate-200 bg-white'}
             ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
@@ -194,12 +165,21 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M7 20h10"/><path d="M9 16v4"/><path d="M15 16v4"/></svg>
                     Geçen Hatlar
                   </h3>
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    {/* Yürüme butonu */}
+                    <button
+                      className={`p-3 rounded-xl border-2 transition-all text-center group col-span-2 flex items-center justify-center gap-2 ${gameState.isWalking ? 'bg-yellow-100 border-yellow-400 text-yellow-700 font-black' : 'bg-white/5 border-yellow-400 text-yellow-700 hover:bg-yellow-50'}`}
+                      onClick={() => setGameState(prev => ({ ...prev, isWalking: !prev.isWalking, selectedLine: null, selectedDirection: null, lineStops: [] }))}
+                    >
+                      <span className="text-xl">🚶‍♂️</span> Yürü
+                    </button>
+                  </div>
                   <div className="grid grid-cols-2 gap-3">
                     {availableLines.length > 0 ? (
                       availableLines.map(line => (
                         <button
                           key={line.hat_no}
-                          onClick={() => handleSelectLine(line.hat_no)}
+                          onClick={() => setGameState(prev => ({ ...prev, selectedLine: line.hat_no, isWalking: false }))}
                           className={`p-3 rounded-xl border-2 transition-all text-center group
                             ${gameState.selectedLine === line.hat_no
                               ? 'bg-primary/10 border-primary text-primary font-black'
@@ -244,10 +224,10 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
               ) : (
                 <section className="animate-fade-in">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className={`text-xs font-bold uppercase tracking-widest ${theme === 'dark' ? 'text-secondary' : 'text-blue-700'}`}> 
+                    <h3 className={`text-xs font-bold uppercase tracking-widest ${theme === 'dark' ? 'text-secondary' : 'text-blue-700'}`}>
                        {gameState.selectedLine} Hattı Durakları (Yön {gameState.selectedDirection})
                     </h3>
-                    <button 
+                    <button
                       onClick={() => setGameState(prev => ({ ...prev, selectedLine: null, lineStops: [] }))}
                       className="text-[10px] font-bold text-slate-400 hover:text-white underline"
                     >
@@ -260,6 +240,22 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
                       return gameState.lineStops.map((stop, idx) => {
                         const isCurrent = stop.durak_id === gameState.currentStop.durak_id;
                         const isPast = idx <= currentIndex;
+                        // Yürüyerek gidildiğinde veya hat seçildiğinde yürüme modu kapansın
+                        const handleTravelToStop = (targetStop: Stop) => {
+                          if (!gameState.lineStops.length) return;
+                          const currentIndex = gameState.lineStops.findIndex(s => s.durak_id === gameState.currentStop.durak_id);
+                          const targetIndex = gameState.lineStops.findIndex(s => s.durak_id === targetStop.durak_id);
+                          if (targetStop.durak_id === gameState.currentStop.durak_id || targetIndex <= currentIndex) return;
+                          setGameState(prev => ({
+                            currentStop: targetStop,
+                            history: [...prev.history, { stop: targetStop, line: prev.selectedLine!, direction: prev.selectedDirection! }],
+                            steps: prev.steps + 1,
+                            selectedLine: null,
+                            selectedDirection: null,
+                            lineStops: [],
+                            isWalking: false
+                          }));
+                        };
                         return (
                           <button
                             key={`${stop.durak_id}-${idx}`}
@@ -299,7 +295,7 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
           </div>
 
           {/* Toggle Button */}
-          <button 
+          <button
             onClick={() => setSidebarOpen(!isSidebarOpen)}
             className="absolute -right-10 top-1/2 -translate-y-1/2 w-10 h-20 glass border-l-0 border-white/10 rounded-r-2xl flex items-center justify-center hover:bg-white/5 transition-colors"
           >
@@ -311,78 +307,14 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
 
         {/* Map */}
         <div className={`flex-1 h-full w-full min-h-[400px] relative cursor-crosshair ${theme === 'dark' ? '' : 'bg-slate-100'}`}>
-          <MapContainer
-            className="h-full w-full min-h-[400px]"
-            center={[gameState.currentStop.enlem, gameState.currentStop.boylam]}
-            zoom={15}
-            zoomControl={false}
-            style={{ width: '100%', height: '100%', background: '#0f172a' }}
-          >
-            <TileLayer
-              attribution={theme === 'dark' ? '&copy; CARTO' : '&copy; OpenStreetMap'}
-              url={theme === 'dark'
-                ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-                : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'}
-            />
-            
-            <MapController center={[gameState.currentStop.enlem, gameState.currentStop.boylam]} zoom={15} />
-
-            {/* Current Position */}
-            <RLMarker position={[gameState.currentStop.enlem, gameState.currentStop.boylam]} icon={currentIcon}>
-              <RLPopup className="premium-popup">
-                <div className="p-2">
-                  <p className="text-[10px] font-bold text-primary uppercase">Şu An Buradasın</p>
-                  <p className="font-bold">{gameState.currentStop.durak_adi}</p>
-                </div>
-              </RLPopup>
-            </RLMarker>
-
-            {/* Target Position */}
-            <RLMarker position={[stops[1].enlem, stops[1].boylam]} icon={targetIcon}>
-              <RLPopup>
-                <div className="p-2">
-                  <p className="text-[10px] font-bold text-orange-500 uppercase">Hedef Durak</p>
-                  <p className="font-bold">{stops[1].durak_adi}</p>
-                </div>
-              </RLPopup>
-            </RLMarker>
-
-            {/* Line Stops Markers (when line selected) */}
-            {(() => {
-              const currentIndex = gameState.lineStops.findIndex(st => st.durak_id === gameState.currentStop.durak_id);
-              return gameState.lineStops
-                .map((s, idx) => ({ s, idx }))
-                .filter(({ idx }) => idx > currentIndex)
-                .map(({ s, idx }) => (
-                  <RLMarker
-                    key={s.durak_id}
-                    position={[s.enlem, s.boylam]}
-                    icon={stopIcon}
-                    eventHandlers={{ click: () => handleTravelToStop(s) }}
-                  >
-                    <RLPopup>
-                      <div className="p-2 text-center">
-                        <p className="font-bold text-sm mb-2">{s.durak_adi}</p>
-                        <button
-                          onClick={() => handleTravelToStop(s)}
-                          className="px-3 py-1 rounded-lg text-xs font-bold bg-primary text-white"
-                        >
-                          Buran İle Devam Et
-                        </button>
-                      </div>
-                    </RLPopup>
-                  </RLMarker>
-                ));
-            })()}
-
-            {/* Path visualization */}
-            {gameState.lineStops.length > 1 && (
-              <Polyline 
-                positions={gameState.lineStops.map(s => [s.enlem, s.boylam])} 
-                pathOptions={{ color: '#005FB8', weight: 4, opacity: 0.6, dashArray: '10, 10' }} 
-              />
-            )}
-          </MapContainer>
+          <MapComponent
+            currentStop={gameState.currentStop}
+            stops={stops}
+            gameState={gameState}
+            setGameState={setGameState}
+            theme={theme}
+            toggleTheme={toggleTheme}
+          />
         </div>
 
         {/* Win Modal */}
