@@ -150,7 +150,10 @@ const Sidebar: React.FC<SidebarProps> = ({
                     className="w-full p-3 rounded-xl text-left border border-yellow-400 bg-yellow-50 hover:bg-yellow-100 text-yellow-900 flex items-center gap-3"
                   >
                     <span className="w-2 h-2 rounded-full bg-yellow-400 shrink-0"></span>
-                    <span className="text-sm font-semibold truncate">{stop.durak_adi}</span>
+                    <span className="flex flex-col text-sm font-semibold truncate">
+                      {stop.durak_adi}
+                      <span className="text-xs font-mono text-yellow-700 opacity-70">{stop.durak_id}</span>
+                    </span>
                   </button>
                 ))}
               </div>
