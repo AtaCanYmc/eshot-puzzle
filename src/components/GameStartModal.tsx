@@ -17,7 +17,7 @@ const GameStartModal: React.FC<GameStartModalProps> = ({ open, stops, loading, e
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
       <div className="glass-card w-full max-w-lg overflow-hidden shadow-2xl">
-        <div className="p-10">
+        <div className="px-6 md:px-12 py-10">
           <div className="flex justify-between items-start mb-8">
             <div>
               <h2 className="text-3xl font-extrabold text-white tracking-tight">Yeni Görev</h2>

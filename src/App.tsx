@@ -79,7 +79,7 @@ function MainApp() {
                     rotayı bul, aktarmaları doğru yap.
                 </p>
 
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 p-6">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 p-6 px-4 md:px-8 w-full">
                     {/* Ana Buton: İçeriğe göre genişler, mobilde de devasa olmaz */}
                     <Button
                         variant="primary"
@@ -110,6 +110,7 @@ function MainApp() {
                 onRefresh={handleRefreshStops}
                 onStart={handleStartGame}
                 onClose={() => setModalOpen(false)}
+                className="px-4 md:px-8"
             />
 
             {/* Decorative Blur Orbs */}

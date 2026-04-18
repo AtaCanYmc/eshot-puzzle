@@ -19,7 +19,7 @@ const Button: React.FC<ButtonProps> = ({
         className={`relative cursor-pointer opacity-90 hover:opacity-100 transition-opacity p-[2px] bg-black rounded-[16px] bg-gradient-to-t from-[#8122b0] to-[#dc98fd] active:scale-95 ${className}`}
         {...props}
       >
-        <span className="w-full h-full flex items-center gap-3 px-10 py-4 bg-[#B931FC] text-white rounded-[14px] bg-gradient-to-t from-[#a62ce2] to-[#c045fc] font-bold text-lg md:text-xl">
+        <span className="flex items-center gap-3 p-6 md:p-8 bg-[#B931FC] text-white rounded-[14px] bg-gradient-to-t from-[#a62ce2] to-[#c045fc] font-bold text-lg md:text-xl">
           {icon && <span className="w-6 h-6 flex items-center">{icon}</span>}
           {children}
         </span>
@@ -39,4 +39,3 @@ const Button: React.FC<ButtonProps> = ({
 };
 
 export default Button;
-
