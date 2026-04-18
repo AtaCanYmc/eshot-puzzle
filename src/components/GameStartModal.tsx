@@ -9,13 +9,14 @@ interface GameStartModalProps {
   onRefresh: () => void;
   onStart: () => void;
   onClose: () => void;
+  className?: string;
 }
 
-const GameStartModal: React.FC<GameStartModalProps> = ({ open, stops, loading, error, onRefresh, onStart, onClose }) => {
+const GameStartModal: React.FC<GameStartModalProps> = ({ open, stops, loading, error, onRefresh, onStart, onClose, className = "" }) => {
   if (!open) return null;
   
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+    <div className={`fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in ${className}`}>
       <div className="glass-card w-full max-w-lg overflow-hidden shadow-2xl">
         <div className="px-6 md:px-12 py-10">
           <div className="flex justify-between items-start mb-8">
