@@ -1,3 +1,20 @@
+// Rastgele iki durak döndüren dummy fonksiyon
+export async function fetchRandomStops(): Promise<[Stop, Stop]> {
+  return [
+    {
+      durak_id: 1,
+      durak_adi: 'Evka 3 Aktarma Merkezi',
+      enlem: 38.465658,
+      boylam: 27.22856
+    },
+    {
+      durak_id: 2,
+      durak_adi: 'Buca Belediye Sarayı',
+      enlem: 38.3904,
+      boylam: 27.163
+    }
+  ];
+}
 import { supabase } from './supabaseClient'; // Kendi supabase client dosyan
 import type {Stop, RoutePoint, DepartureTime} from '../types/supabaseTypes.ts';
 

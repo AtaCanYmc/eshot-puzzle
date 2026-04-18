@@ -1,29 +1,27 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import GamePage from './pages/GamePage';
+import HomePage from './pages/HomePage';
+import { useLocation } from 'react-router-dom';
 import './index.css';
 
 
+
+function GamePageWithState() {
+  const location = useLocation();
+  const stops = location.state?.stops;
+  if (!stops) {
+    return <div className="flex items-center justify-center min-h-screen text-2xl font-bold">Duraklar bulunamadı. Lütfen ana sayfadan oyuna başlayın.</div>;
+  }
+  return <GamePage stops={stops} />;
+}
+
 function App() {
-  // Dummy stops
-  const stops = [
-    {
-      durak_id: 1,
-      durak_adi: 'Dummy Başlangıç',
-      enlem: 38.4192,
-      boylam: 27.1287
-    },
-    {
-      durak_id: 2,
-      durak_adi: 'Dummy Hedef',
-      enlem: 38.4292,
-      boylam: 27.1387
-    }
-  ];
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<GamePage stops={stops} />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/game" element={<GamePageWithState />} />
       </Routes>
     </Router>
   );
