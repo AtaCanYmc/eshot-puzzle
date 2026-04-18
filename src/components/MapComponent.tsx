@@ -3,7 +3,6 @@ import {MapContainer, TileLayer, Marker, Popup, Polyline} from 'react-leaflet';
 import { DivIcon } from 'leaflet';
 import type {Stop} from '../types/supabaseTypes';
 import {eshotService} from "../service/eshotService";
-import type { MarkerProps } from 'react-leaflet';
 
 
 interface MapComponentProps {
