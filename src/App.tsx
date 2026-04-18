@@ -4,6 +4,7 @@ import GamePage from './pages/GamePage';
 import GameStartModal from './components/GameStartModal';
 import {eshotService} from './service/eshotService';
 import type {Stop} from './types/supabaseTypes';
+import Button from './components/Button';
 
 function MainApp() {
     const [modalOpen, setModalOpen] = useState(false);
@@ -19,7 +20,7 @@ function MainApp() {
             const result = await eshotService.getTwoRandomStops();
             setStops(result);
         } catch (e) {
-            setError('Duraklar yüklenirken bir sorun oluştu. Lütfen tekrar deneyin.');
+            setError('Duraklar yüklenirken bir sorun oluştu. Lütfen tekrar deneyin.'.concat(e.message));
             setStops(null);
         } finally {
             setLoading(false);
@@ -28,11 +29,11 @@ function MainApp() {
 
     const handleOpenModal = () => {
         setModalOpen(true);
-        fetchTwoRandomStops();
+        fetchTwoRandomStops().then(r => r);
     };
 
     const handleRefreshStops = () => {
-        fetchTwoRandomStops();
+        fetchTwoRandomStops().then(r => r);
     };
 
     const handleStartGame = () => {
@@ -78,21 +79,26 @@ function MainApp() {
                     rotayı bul, aktarmaları doğru yap.
                 </p>
 
-                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                    <button
-                        className="group relative w-auto px-8 py-3 md:px-10 md:py-4 rounded-2xl bg-primary text-white font-black text-base md:text-lg shadow-[0_20px_50px_rgba(0,95,184,0.3)] hover:shadow-[0_20px_50px_rgba(0,95,184,0.5)] hover:-translate-y-1 active:translate-y-0 transition-all duration-300 overflow-hidden"
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 p-6">
+                    {/* Ana Buton: İçeriğe göre genişler, mobilde de devasa olmaz */}
+                    <Button
+                        variant="primary"
+                        icon={
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2">
+                            <path d="M8 13V9m-2 2h4m5-2v.001M18 12v.001m4-.334v5.243a3.09 3.09 0 0 1-5.854 1.382L16 18a3.618 3.618 0 0 0-3.236-2h-1.528c-1.37 0-2.623.774-3.236 2l-.146.292A3.09 3.09 0 0 1 2 16.91v-5.243A6.667 6.667 0 0 1 8.667 5h6.666A6.667 6.667 0 0 1 22 11.667Z" />
+                          </svg>
+                        }
                         onClick={handleOpenModal}
                     >
-                        <div
-                            className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                         OYUNA BAŞLA
-                    </button>
+                    </Button>
 
-                    <button
-                        className="px-10 py-5 rounded-2xl glass text-white font-bold text-xl hover:bg-white/10 transition-all duration-300 border-white/10"
+                    {/* İkincil Buton: Cam efekti, aynı yükseklik */}
+                    <Button
+                        variant="secondary"
                     >
                         NASIL OYNANIR?
-                    </button>
+                    </Button>
                 </div>
             </div>
 
