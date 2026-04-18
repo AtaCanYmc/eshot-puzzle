@@ -141,7 +141,7 @@ const MapComponent: React.FC<MapComponentProps> = ({currentStop, stops, gameStat
             ))}
 
             {/* Gidilen yol */}
-            {gameState.history && gameState.history.length > 1 && (
+            {gameState.history && gameState.history.length > 1 && false && (
                 <Polyline
                     pathOptions={{color: theme === 'dark' ? '#38bdf8' : '#0ea5e9', weight: 6, opacity: 0.7}}
                     positions={gameState.history.map((h: any) => [h.stop.enlem, h.stop.boylam])}
