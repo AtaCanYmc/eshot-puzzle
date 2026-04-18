@@ -60,7 +60,7 @@ const HomePage: React.FC = () => {
               </div>
               <div className="flex gap-4 justify-center">
                 <button
-                  className="px-6 py-3 rounded-xl bg-primary text-white font-bold text-lg shadow hover:scale-105 transition-transform"
+                  className="px-6 py-3 rounded-xl bg-green-200 text-gray-700 font-bold text-lg shadow hover:scale-105 transition-transform"
                   onClick={handleGoToGame}
                 >
                   Başla
