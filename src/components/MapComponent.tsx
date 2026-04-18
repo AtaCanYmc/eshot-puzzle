@@ -95,12 +95,6 @@ const MapComponent: React.FC<MapComponentProps> = ({currentStop, stops, gameStat
                 url={theme === 'dark' ? darkTile : lightTile}
             />
 
-            {/* Başlangıç noktası */}
-            {/* @ts-ignore */}
-            <Marker position={[stops[0].enlem, stops[0].boylam]} icon={currentIcon}>
-                <Popup>Başlangıç: {stops[0].durak_adi}</Popup>
-            </Marker>
-
             {/* Hedef noktası */}
             {/* @ts-ignore */}
             <Marker position={[stops[1].enlem, stops[1].boylam]} icon={targetIcon}>
