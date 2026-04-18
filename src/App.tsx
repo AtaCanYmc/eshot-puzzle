@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import GamePage from './pages/GamePage';
+import GameStartModal from './components/GameStartModal';
 import { eshotService } from './service/eshotService';
 import type { Stop } from './types/supabaseTypes';
 
@@ -11,7 +12,6 @@ function MainApp() {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // Rastgele durakları getiren fonksiyon
   const fetchTwoRandomStops = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -19,7 +19,7 @@ function MainApp() {
       const result = await eshotService.getTwoRandomStops();
       setStops(result);
     } catch (e) {
-      setError('Bir hata oluştu');
+      setError('Duraklar yüklenirken bir sorun oluştu. Lütfen tekrar deneyin.');
       setStops(null);
     } finally {
       setLoading(false);
@@ -43,48 +43,73 @@ function MainApp() {
   };
 
   return (
-    <div className="w-screen h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-blue-300">
-      <div className="flex flex-col items-center gap-6 p-8 rounded-2xl shadow-xl bg-white/80 backdrop-blur">
-        <h1 className="text-4xl font-extrabold text-blue-700 tracking-tight">ESHOT Puzzle</h1>
-        <button
-          className="px-8 py-3 rounded-full bg-gradient-to-r from-blue-500 to-blue-700 text-white font-bold shadow-lg hover:scale-105 hover:from-blue-600 hover:to-blue-800 transition-all duration-200"
-          onClick={handleOpenModal}
-        >
-          Oyuna Başla
-        </button>
-      </div>
-      {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md relative flex flex-col items-center gap-4">
-            <button onClick={() => setModalOpen(false)} className="absolute top-3 right-4 text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
-            <h2 className="text-2xl font-bold text-blue-700 mb-2">Rastgele Duraklar</h2>
-            {error && <div className="text-red-600 mb-2 font-semibold">{error}</div>}
-            {loading ? (
-              <div className="flex items-center justify-center h-24">
-                <svg className="animate-spin h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-                </svg>
-              </div>
-            ) : stops ? (
-              <div className="w-full flex flex-col gap-2 mb-2">
-                <div className="p-3 rounded-lg bg-blue-50 border border-blue-200 flex flex-col items-center">
-                  <span className="text-blue-700 font-bold">Başlangıç</span>
-                  <span className="font-semibold text-gray-800">{stops[0].durak_adi}</span>
-                </div>
-                <div className="p-3 rounded-lg bg-red-50 border border-red-200 flex flex-col items-center">
-                  <span className="text-red-700 font-bold">Varış</span>
-                  <span className="font-semibold text-gray-800">{stops[1].durak_adi}</span>
-                </div>
-              </div>
-            ) : null}
-            <div className="flex gap-2 justify-end mt-2 w-full">
-              <button onClick={handleRefreshStops} disabled={loading} className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold disabled:opacity-60">Yenile</button>
-              <button onClick={handleStartGame} disabled={loading || !stops} className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-bold disabled:opacity-60">Devam Et</button>
-            </div>
-          </div>
+    <div 
+      className="relative w-screen h-screen flex flex-col items-center justify-center overflow-hidden bg-slate-950"
+      style={{
+        backgroundImage: 'linear-gradient(to bottom, rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.9)), url("/hero-bg.png")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
+      }}
+    >
+      {/* Animated Overlay */}
+      <div className="absolute inset-0 bg-primary/10 mix-blend-overlay"></div>
+      
+      <div className="relative z-10 flex flex-col items-center max-w-2xl px-6 text-center animate-fade-in">
+        <div className="mb-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass border-white/10 text-primary-light text-sm font-bold tracking-widest uppercase">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+          </span>
+          İzmir Ulaşım Simülasyonu
         </div>
-      )}
+
+        <h1 className="text-6xl md:text-8xl font-black text-white tracking-tighter mb-6 leading-[0.9]">
+          ESHOT<br/>
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-primary font-outline-2">PUZZLE</span>
+        </h1>
+        
+        <p className="text-slate-300 text-lg md:text-xl mb-10 leading-relaxed font-light">
+          İzmir'in labirent gibi sokaklarında doğru otobüsleri kullanarak hedefe ulaşabilir misin? En kısa rotayı bul, aktarmaları doğru yap.
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+          <button
+            className="group relative px-10 py-5 rounded-2xl bg-primary text-white font-black text-xl shadow-[0_20px_50px_rgba(0,95,184,0.3)] hover:shadow-[0_20px_50px_rgba(0,95,184,0.5)] hover:-translate-y-1 active:translate-y-0 transition-all duration-300 overflow-hidden"
+            onClick={handleOpenModal}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+            OYUNA BAŞLA
+          </button>
+          
+          <button
+            className="px-10 py-5 rounded-2xl glass text-white font-bold text-xl hover:bg-white/10 transition-all duration-300 border-white/10"
+          >
+            NASIL OYNANIR?
+          </button>
+        </div>
+        
+        <div className="mt-16 flex items-center gap-8 text-slate-400 text-sm font-bold tracking-widest uppercase opacity-60">
+          <span>90 DAKİKA</span>
+          <span className="w-1 h-1 rounded-full bg-slate-600"></span>
+          <span>SINIRSIZ AKTARMA</span>
+          <span className="w-1 h-1 rounded-full bg-slate-600"></span>
+          <span>GERÇEK VERİ</span>
+        </div>
+      </div>
+
+      <GameStartModal 
+        open={modalOpen}
+        loading={loading}
+        stops={stops}
+        error={error}
+        onRefresh={handleRefreshStops}
+        onStart={handleStartGame}
+        onClose={() => setModalOpen(false)}
+      />
+
+      {/* Decorative Blur Orbs */}
+      <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary/20 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-orange-500/10 rounded-full blur-[120px] pointer-events-none"></div>
     </div>
   );
 }
