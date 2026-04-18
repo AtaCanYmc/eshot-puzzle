@@ -236,8 +236,9 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
         </aside>
 
         {/* Map */}
-        <div className="flex-1 h-full relative cursor-crosshair">
+        <div className="flex-1 h-full w-full min-h-[400px] relative cursor-crosshair">
           <MapContainer
+            className="h-full w-full min-h-[400px]"
             center={[gameState.currentStop.enlem, gameState.currentStop.boylam]}
             zoom={15}
             zoomControl={false}
