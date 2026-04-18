@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchRandomStops } from '../service/eshotService';
 import type { Stop } from '../types/supabaseTypes';
+import { useTheme } from '../ThemeContext';
 
 const HomePage: React.FC = () => {
   const [modalOpen, setModalOpen] = React.useState(false);
@@ -9,6 +10,7 @@ const HomePage: React.FC = () => {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
 
   const handleStart = async () => {
     setLoading(true);
@@ -75,6 +77,13 @@ const HomePage: React.FC = () => {
             </div>
           </div>
         )}
+        <button
+          className="absolute top-8 right-8 z-20 px-4 py-2 rounded-xl bg-white/80 text-slate-800 font-bold shadow hover:bg-white"
+          onClick={toggleTheme}
+          aria-label="Tema Değiştir"
+        >
+          {theme === 'dark' ? '☀️ Aydınlık' : '🌙 Karanlık'}
+        </button>
       </div>
     </div>
   );

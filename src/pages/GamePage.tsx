@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline } from 'react-leaflet';
+import * as React from 'react';
+import { MapContainer, TileLayer, Marker as RLMarker, Popup as RLPopup, useMap, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 import { useNavigate } from 'react-router-dom';
 import { eshotService } from '../service/eshotService';
 import type { Stop } from '../types/supabaseTypes';
+import { useTheme } from '../ThemeContext';
 
 // Custom Icons
 const currentIcon = new L.DivIcon({
@@ -42,7 +43,7 @@ interface TravelState {
 // Map Helper Component to handle view changes
 function MapController({ center, zoom }: { center: [number, number], zoom: number }) {
   const map = useMap();
-  useEffect(() => {
+  React.useEffect(() => {
     map.flyTo(center, zoom, { duration: 1.5 });
   }, [center, zoom, map]);
   return null;
@@ -50,7 +51,8 @@ function MapController({ center, zoom }: { center: [number, number], zoom: numbe
 
 const GamePage: React.FC<GamePageProps> = ({ stops }) => {
   const navigate = useNavigate();
-  const [gameState, setGameState] = useState<TravelState>({
+  const { theme, toggleTheme } = useTheme();
+  const [gameState, setGameState] = React.useState<TravelState>({
     currentStop: stops[0],
     history: [{ stop: stops[0] }],
     steps: 0,
@@ -58,12 +60,12 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
     lineStops: []
   });
   
-  const [availableLines, setAvailableLines] = useState<{ hat_no: string }[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
+  const [availableLines, setAvailableLines] = React.useState<{ hat_no: string }[]>([]);
+  const [loading, setLoading] = React.useState(false);
+  const [isSidebarOpen, setSidebarOpen] = React.useState(true);
 
   // Fetch lines for current stop
-  useEffect(() => {
+  React.useEffect(() => {
     const fetchLines = async () => {
       setLoading(true);
       try {
@@ -110,7 +112,7 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
     }));
   };
 
-  const isGameWon = useMemo(() => {
+  const isGameWon = React.useMemo(() => {
     return gameState.currentStop.durak_id === stops[1].durak_id;
   }, [gameState.currentStop, stops]);
 
@@ -125,12 +127,19 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
             <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Aktarma Simülasyonu</p>
           </div>
         </div>
-        
         <div className="flex items-center gap-8">
           <div className="flex flex-col items-center">
             <span className="text-[10px] uppercase font-black text-slate-500 tracking-tighter">ADIMLAR</span>
             <span className="text-xl font-black text-primary leading-none">{gameState.steps}</span>
           </div>
+          {/* Tema Değiştir Butonu */}
+          <button
+            onClick={toggleTheme}
+            className="px-4 py-2 rounded-xl bg-white/80 text-slate-800 font-bold shadow hover:bg-white"
+            aria-label="Tema Değiştir"
+          >
+            {theme === 'dark' ? '☀️ Aydınlık' : '🌙 Karanlık'}
+          </button>
           <button
             onClick={() => navigate('/')}
             className="px-4 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-500 font-bold text-sm transition-all"
@@ -245,43 +254,44 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
             style={{ width: '100%', height: '100%', background: '#0f172a' }}
           >
             <TileLayer
-              attribution='&copy; CARTO'
-              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+              attribution={theme === 'dark' ? '&copy; CARTO' : '&copy; OpenStreetMap'}
+              url={theme === 'dark'
+                ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+                : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'}
             />
             
             <MapController center={[gameState.currentStop.enlem, gameState.currentStop.boylam]} zoom={15} />
 
             {/* Current Position */}
-            <Marker position={[gameState.currentStop.enlem, gameState.currentStop.boylam]} icon={currentIcon}>
-              <Popup className="premium-popup">
+            <RLMarker position={[gameState.currentStop.enlem, gameState.currentStop.boylam]} icon={currentIcon}>
+              <RLPopup className="premium-popup">
                 <div className="p-2">
                   <p className="text-[10px] font-bold text-primary uppercase">Şu An Buradasın</p>
                   <p className="font-bold">{gameState.currentStop.durak_adi}</p>
                 </div>
-              </Popup>
-            </Marker>
+              </RLPopup>
+            </RLMarker>
 
             {/* Target Position */}
-            <Marker position={[stops[1].enlem, stops[1].boylam]} icon={targetIcon}>
-              <Popup>
+            <RLMarker position={[stops[1].enlem, stops[1].boylam]} icon={targetIcon}>
+              <RLPopup>
                 <div className="p-2">
                   <p className="text-[10px] font-bold text-orange-500 uppercase">Hedef Durak</p>
                   <p className="font-bold">{stops[1].durak_adi}</p>
                 </div>
-              </Popup>
-            </Marker>
+              </RLPopup>
+            </RLMarker>
 
             {/* Line Stops Markers (when line selected) */}
             {gameState.lineStops.map(s => (
-              <Marker 
+              // @ts-expect-error RLMarker icon prop is not in type but works in runtime
+              <RLMarker 
                 key={s.durak_id} 
                 position={[s.enlem, s.boylam]} 
                 icon={stopIcon}
-                eventHandlers={{
-                  click: () => handleTravelToStop(s)
-                }}
+                eventHandlers={{ click: () => handleTravelToStop(s) }}
               >
-                <Popup>
+                <RLPopup>
                   <div className="p-2 text-center">
                     <p className="font-bold text-sm mb-2">{s.durak_adi}</p>
                     <button 
@@ -291,8 +301,8 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
                       Buran İle Devam Et
                     </button>
                   </div>
-                </Popup>
-              </Marker>
+                </RLPopup>
+              </RLMarker>
             ))}
 
             {/* Path visualization */}
