@@ -17,8 +17,8 @@ const GameStartModal: React.FC<GameStartModalProps> = ({ open, stops, loading, e
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
       <div className="glass-card w-full max-w-lg overflow-hidden shadow-2xl">
-        <div className="p-8">
-          <div className="flex justify-between items-start mb-6">
+        <div className="p-10">
+          <div className="flex justify-between items-start mb-8">
             <div>
               <h2 className="text-3xl font-extrabold text-white tracking-tight">Yeni Görev</h2>
               <p className="text-slate-400 mt-1 uppercase text-xs font-bold tracking-widest">Rota Brifingi</p>
@@ -44,7 +44,7 @@ const GameStartModal: React.FC<GameStartModalProps> = ({ open, stops, loading, e
               <p className="text-slate-400 text-sm animate-pulse">Duraklar aranıyor...</p>
             </div>
           ) : stops ? (
-            <div className="space-y-6">
+            <div className="space-y-8">
               <div className="relative">
                 <div className="absolute left-[19px] top-6 bottom-6 w-0.5 bg-gradient-to-b from-blue-500 to-orange-500 opacity-30"></div>
                 
@@ -79,11 +79,11 @@ const GameStartModal: React.FC<GameStartModalProps> = ({ open, stops, loading, e
           ) : null}
         </div>
 
-        <div className="p-6 bg-white/5 border-t border-white/5 flex gap-3">
+        <div className="p-8 bg-white/5 border-t border-white/5 flex gap-4">
           <button 
             onClick={onRefresh} 
             disabled={loading} 
-            className="flex-1 px-6 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
+            className="flex-1 px-8 py-4 rounded-xl bg-white/5 hover:bg-white/10 text-white font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>
             Yenile
@@ -91,7 +91,7 @@ const GameStartModal: React.FC<GameStartModalProps> = ({ open, stops, loading, e
           <button 
             onClick={onStart} 
             disabled={loading || !stops} 
-            className="flex-[2] px-6 py-3 rounded-xl bg-primary hover:bg-primary-dark text-white font-extrabold shadow-lg shadow-primary/20 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:grayscale flex items-center justify-center gap-2"
+            className="flex-[2] px-8 py-4 rounded-xl bg-primary hover:bg-primary-dark text-white font-extrabold shadow-lg shadow-primary/20 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:grayscale flex items-center justify-center gap-2"
           >
             Görevi Başlat
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
