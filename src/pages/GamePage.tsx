@@ -34,9 +34,10 @@ interface GamePageProps {
 
 interface TravelState {
   currentStop: Stop;
-  history: { stop: Stop; line?: string }[];
+  history: { stop: Stop; line?: string; direction?: number }[];
   steps: number;
   selectedLine: string | null;
+  selectedDirection: number | null;
   lineStops: Stop[];
 }
 
@@ -57,6 +58,7 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
     history: [{ stop: stops[0] }],
     steps: 0,
     selectedLine: null,
+    selectedDirection: null,
     lineStops: []
   });
   
@@ -80,19 +82,26 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
     fetchLines().then(r => r);
   }, [gameState.currentStop]);
 
-  const handleSelectLine = async (hatNo: string) => {
+  // Hat seçildiğinde yön seçimi
+  const handleSelectLine = (hatNo: string) => {
+    setGameState(prev => ({
+      ...prev,
+      selectedLine: hatNo,
+      selectedDirection: null,
+      lineStops: []
+    }));
+  };
+
+  // Yön seçildiğinde durakları getir
+  const handleSelectDirection = async (direction: number) => {
     setLoading(true);
     try {
-      // Directions: Try to find which direction might lead closer or just show both
-      // For simplicity, we'll fetch stops for direction 1 and see if current stop is in it
-      let lineStops = await eshotService.getOrderedStops(hatNo, 1);
-      
-      // If current stop is not in direction 1, try direction 2
-      if (!lineStops.some(s => s.durak_id === gameState.currentStop.durak_id)) {
-        lineStops = await eshotService.getOrderedStops(hatNo, 2);
-      }
-
-      setGameState(prev => ({ ...prev, selectedLine: hatNo, lineStops }));
+      let lineStops = await eshotService.getOrderedStops(gameState.selectedLine!, direction);
+      setGameState(prev => ({
+        ...prev,
+        selectedDirection: direction,
+        lineStops
+      }));
     } catch (error) {
       console.error("Line stops fetch failed", error);
     } finally {
@@ -100,14 +109,19 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
     }
   };
 
+  // Sadece ileriye gidilebilen duraklara geçiş izni
   const handleTravelToStop = (targetStop: Stop) => {
-    if (targetStop.durak_id === gameState.currentStop.durak_id) return;
-    
+    if (!gameState.lineStops.length) return;
+    const currentIndex = gameState.lineStops.findIndex(s => s.durak_id === gameState.currentStop.durak_id);
+    const targetIndex = gameState.lineStops.findIndex(s => s.durak_id === targetStop.durak_id);
+    // Sadece ileriye (currentIndex < targetIndex) gidilebilir
+    if (targetStop.durak_id === gameState.currentStop.durak_id || targetIndex <= currentIndex) return;
     setGameState(prev => ({
       currentStop: targetStop,
-      history: [...prev.history, { stop: targetStop, line: prev.selectedLine! }],
+      history: [...prev.history, { stop: targetStop, line: prev.selectedLine!, direction: prev.selectedDirection! }],
       steps: prev.steps + 1,
       selectedLine: null,
+      selectedDirection: null,
       lineStops: []
     }));
   };
@@ -186,7 +200,11 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
                         <button
                           key={line.hat_no}
                           onClick={() => handleSelectLine(line.hat_no)}
-                          className="p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-primary/20 hover:border-primary/40 transition-all text-center group"
+                          className={`p-3 rounded-xl border-2 transition-all text-center group
+                            ${gameState.selectedLine === line.hat_no
+                              ? 'bg-primary/10 border-primary text-primary font-black'
+                              : 'bg-white/5 border-primary/60 text-slate-800 hover:bg-primary/10 hover:border-primary'}
+                          `}
                         >
                           <span className="block text-lg font-black group-hover:scale-110 transition-transform">{line.hat_no}</span>
                         </button>
@@ -196,11 +214,38 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
                     )}
                   </div>
                 </section>
+              ) : !gameState.selectedDirection ? (
+                <section className="animate-fade-in flex flex-col items-center justify-center h-full">
+                  <h3 className="text-lg font-bold mb-6">Yön Seç</h3>
+                  <div className="flex flex-col gap-6 mb-8">
+                    <button
+                      className={`px-8 py-4 rounded-xl text-2xl font-black shadow-lg border-2 transition-all ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'} ${gameState.selectedDirection === 1 ? 'bg-primary text-white border-primary' : 'bg-white text-primary border-primary/30'}`}
+                      onClick={() => handleSelectDirection(1)}
+                      disabled={loading}
+                    >
+                      Gidiş
+                    </button>
+                    <button
+                      className={`px-8 py-4 rounded-xl text-2xl font-black shadow-lg border-2 transition-all ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'} ${gameState.selectedDirection === 2 ? 'bg-primary text-white border-primary' : 'bg-white text-primary border-primary/30'}`}
+                      onClick={() => handleSelectDirection(2)}
+                      disabled={loading}
+                    >
+                      Dönüş
+                    </button>
+                  </div>
+                  <button
+                    className="text-xs underline text-slate-400 hover:text-primary font-bold"
+                    onClick={() => setGameState(prev => ({ ...prev, selectedLine: null, selectedDirection: null, lineStops: [] }))}
+                    disabled={loading}
+                  >
+                    Hat Seçimini Değiştir
+                  </button>
+                </section>
               ) : (
                 <section className="animate-fade-in">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className={`text-xs font-bold uppercase tracking-widest ${theme === 'dark' ? 'text-secondary' : 'text-blue-700'}`}> 
-                       {gameState.selectedLine} Hattı Durakları
+                       {gameState.selectedLine} Hattı Durakları (Yön {gameState.selectedDirection})
                     </h3>
                     <button 
                       onClick={() => setGameState(prev => ({ ...prev, selectedLine: null, lineStops: [] }))}
@@ -210,25 +255,39 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
                     </button>
                   </div>
                   <div className="space-y-2">
-                    {gameState.lineStops.map((stop, idx) => {
-                      const isCurrent = stop.durak_id === gameState.currentStop.durak_id;
-                      return (
-                        <button
-                          key={`${stop.durak_id}-${idx}`}
-                          disabled={isCurrent}
-                          onClick={() => handleTravelToStop(stop)}
-                          className={`w-full p-3 rounded-xl text-left border transition-all flex items-center gap-3 ${
-                            isCurrent 
-                              ? 'bg-primary/10 border-primary/20 opacity-50 cursor-default' 
-                              : 'bg-white/5 border-transparent hover:border-white/20'
-                          }`}
-                        >
-                          <div className={`w-2 h-2 rounded-full shrink-0 ${isCurrent ? 'bg-primary shadow-[0_0_8px_rgba(0,95,184,1)]' : 'bg-slate-600'}`}></div>
-                          <span className={`text-sm font-semibold truncate ${theme === 'dark' ? '' : 'text-slate-900'}`}>{stop.durak_adi}</span>
-                        </button>
-                      );
-                    })}
+                    {(() => {
+                      const currentIndex = gameState.lineStops.findIndex(s => s.durak_id === gameState.currentStop.durak_id);
+                      return gameState.lineStops.map((stop, idx) => {
+                        const isCurrent = stop.durak_id === gameState.currentStop.durak_id;
+                        const isPast = idx <= currentIndex;
+                        return (
+                          <button
+                            key={`${stop.durak_id}-${idx}`}
+                            disabled={isPast}
+                            onClick={() => handleTravelToStop(stop)}
+                            className={`w-full p-3 rounded-xl text-left border transition-all flex items-center gap-3 ${
+                              isCurrent
+                                ? 'bg-primary/10 border-primary/20 opacity-50 cursor-default'
+                                : isPast
+                                  ? 'bg-white/5 border-transparent opacity-40 cursor-not-allowed'
+                                  : 'bg-white/5 border-transparent hover:border-white/20'
+                            }`}
+                          >
+                            <div className={`w-2 h-2 rounded-full shrink-0 ${isCurrent ? 'bg-primary shadow-[0_0_8px_rgba(0,95,184,1)]' : 'bg-slate-600'}`}></div>
+                            <span className={`text-sm font-semibold truncate ${theme === 'dark' ? '' : 'text-slate-900'}`}>{stop.durak_adi}</span>
+                          </button>
+                        );
+                      });
+                    })()}
                   </div>
+                  {/* Yönü değiştirmek için buton */}
+                  <button
+                    className="text-xs underline text-slate-400 hover:text-primary font-bold mt-2"
+                    onClick={() => setGameState(prev => ({ ...prev, selectedDirection: null, lineStops: [] }))}
+                    disabled={loading}
+                  >
+                    Yönü Değiştir
+                  </button>
                 </section>
               )}
             </div>
@@ -289,27 +348,32 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
             </RLMarker>
 
             {/* Line Stops Markers (when line selected) */}
-            {gameState.lineStops.map(s => (
-              // @ts-expect-error RLMarker icon prop is not in type but works in runtime
-              <RLMarker 
-                key={s.durak_id} 
-                position={[s.enlem, s.boylam]} 
-                icon={stopIcon}
-                eventHandlers={{ click: () => handleTravelToStop(s) }}
-              >
-                <RLPopup>
-                  <div className="p-2 text-center">
-                    <p className="font-bold text-sm mb-2">{s.durak_adi}</p>
-                    <button 
-                      onClick={() => handleTravelToStop(s)}
-                      className="px-3 py-1 bg-primary rounded-lg text-xs font-bold"
-                    >
-                      Buran İle Devam Et
-                    </button>
-                  </div>
-                </RLPopup>
-              </RLMarker>
-            ))}
+            {(() => {
+              const currentIndex = gameState.lineStops.findIndex(st => st.durak_id === gameState.currentStop.durak_id);
+              return gameState.lineStops
+                .map((s, idx) => ({ s, idx }))
+                .filter(({ idx }) => idx > currentIndex)
+                .map(({ s, idx }) => (
+                  <RLMarker
+                    key={s.durak_id}
+                    position={[s.enlem, s.boylam]}
+                    icon={stopIcon}
+                    eventHandlers={{ click: () => handleTravelToStop(s) }}
+                  >
+                    <RLPopup>
+                      <div className="p-2 text-center">
+                        <p className="font-bold text-sm mb-2">{s.durak_adi}</p>
+                        <button
+                          onClick={() => handleTravelToStop(s)}
+                          className="px-3 py-1 rounded-lg text-xs font-bold bg-primary text-white"
+                        >
+                          Buran İle Devam Et
+                        </button>
+                      </div>
+                    </RLPopup>
+                  </RLMarker>
+                ));
+            })()}
 
             {/* Path visualization */}
             {gameState.lineStops.length > 1 && (
