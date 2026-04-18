@@ -1,8 +1,9 @@
 import * as React from 'react';
-import {MapContainer, TileLayer, Marker, Popup} from 'react-leaflet';
-import L from 'leaflet';
+import {MapContainer, TileLayer, Marker, Popup, Polyline} from 'react-leaflet';
+import { DivIcon } from 'leaflet';
 import type {Stop} from '../types/supabaseTypes';
 import {eshotService} from "../service/eshotService";
+import type { MarkerProps } from 'react-leaflet';
 
 
 interface MapComponentProps {
@@ -13,37 +14,42 @@ interface MapComponentProps {
     theme: string;
     toggleTheme: () => void;
     onStopClick?: (stop: Stop) => void;
+    lineStops?: Stop[];
 }
 
-const currentIcon = new L.DivIcon({
+const currentIcon = new DivIcon({
     className: 'custom-marker-current',
     html: '<div class="w-8 h-8 rounded-full bg-green-500 border-4 border-white shadow-lg animate-pulse"></div>',
     iconSize: [32, 32],
     iconAnchor: [16, 16]
 });
 
-const targetIcon = new L.DivIcon({
+const targetIcon = new DivIcon({
     className: 'custom-marker-target',
     html: '<div class="w-8 h-8 rounded-full bg-orange-500 border-4 border-white shadow-lg"></div>',
     iconSize: [32, 32],
     iconAnchor: [16, 16]
 });
 
-const stopIcon = new L.DivIcon({
+const stopIcon = new DivIcon({
     className: 'custom-marker-stop',
     html: '<div class="w-4 h-4 rounded-full bg-slate-400 border-2 border-white shadow-sm hover:scale-150 transition-transform"></div>',
     iconSize: [16, 16],
     iconAnchor: [8, 8]
 });
 
-const walkIcon = new L.DivIcon({
+const walkIcon = new DivIcon({
     className: 'custom-marker-walk',
     html: '<div class="w-6 h-6 rounded-full bg-yellow-400 border-4 border-white shadow"></div>',
     iconSize: [24, 24],
     iconAnchor: [12, 12]
 });
 
-const MapComponent: React.FC<MapComponentProps> = ({currentStop, stops, gameState, setGameState, theme, onStopClick}) => {
+const MapComponent: React.FC<MapComponentProps> = ({currentStop, stops, gameState, setGameState, theme, onStopClick, lineStops}) => {
+            // Hat güzergahı için Polyline koordinatları
+            const polylinePositions = (lineStops && lineStops.length > 1)
+                ? lineStops.map(stop => [stop.enlem, stop.boylam])
+                : [];
     // Harita merkezini güncelle
     const darkTile = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
     const lightTile = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
@@ -94,6 +100,14 @@ const MapComponent: React.FC<MapComponentProps> = ({currentStop, stops, gameStat
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url={theme === 'dark' ? darkTile : lightTile}
             />
+
+            {/* Seçili hat güzergahı */}
+            {polylinePositions.length > 1 && (
+                <Polyline
+                    positions={polylinePositions as [number, number][]}
+                    pathOptions={{color: theme === 'dark' ? '#38bdf8' : '#0ea5e9', weight: 6, opacity: 0.7}}
+                />
+            )}
 
             {/* Hedef noktası */}
             {/* @ts-ignore */}

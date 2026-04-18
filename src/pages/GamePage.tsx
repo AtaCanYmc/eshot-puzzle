@@ -314,6 +314,7 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
             setGameState={setGameState}
             theme={theme}
             toggleTheme={toggleTheme}
+            lineStops={gameState.lineStops}
             onStopClick={(stop) => {
               if (stop.durak_id === gameState.currentStop.durak_id) return;
               setGameState(prev => ({
