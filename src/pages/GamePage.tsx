@@ -36,6 +36,7 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
   const [availableLines, setAvailableLines] = React.useState<{ hat_no: string }[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [isSidebarOpen, setSidebarOpen] = React.useState(true);
+  const [nearbyStops, setNearbyStops] = React.useState<Stop[]>([]);
 
   // Fetch lines for current stop
   React.useEffect(() => {
@@ -52,6 +53,24 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
     };
     fetchLines().then(r => r);
   }, [gameState.currentStop]);
+
+  // YAKIN DURAKLARI ÇEK
+  React.useEffect(() => {
+    if (!gameState.isWalking) return;
+    let cancelled = false;
+    async function fetchNearby() {
+      try {
+        const data = await eshotService.getNearbyStops(gameState.currentStop.enlem, gameState.currentStop.boylam, 200);
+        // Sadece kendisini çıkar, history'de olanlar tekrar seçilebilir
+        const filtered = data.filter((s: Stop) => s.durak_id !== gameState.currentStop.durak_id);
+        if (!cancelled) setNearbyStops(filtered);
+      } catch (e) {
+        setNearbyStops([]);
+      }
+    }
+    fetchNearby().then(r => r);
+    return () => { cancelled = true; };
+  }, [gameState.isWalking, gameState.currentStop, gameState.history]);
 
   // Hat seçildiğinde yönü otomatik bul ve durakları getir
   const handleSelectLine = async (hatNo: string) => {
@@ -91,6 +110,19 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
       selectedLine: null,
       selectedDirection: null,
       lineStops: []
+    }));
+  };
+
+  // Yürüyerek gidilecek duraklara geçiş
+  const handleWalkToStop = (targetStop: Stop) => {
+    setGameState(prev => ({
+      currentStop: targetStop,
+      history: [...prev.history, { stop: targetStop, line: null, direction: null }],
+      steps: prev.steps + 1,
+      selectedLine: null,
+      selectedDirection: null,
+      lineStops: [],
+      isWalking: false
     }));
   };
 
@@ -156,9 +188,11 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
                   <div className="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin"></div>
                 </div>
               )}
-              {!gameState.selectedLine ? (
+
+              {/* Hat/yürüme seçimi ekranı */}
+              {!gameState.selectedLine && !gameState.isWalking && (
                 <section>
-                  <h3 className={`text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2 ${theme === 'dark' ? 'text-primary' : 'text-blue-700'}`}> 
+                  <h3 className={`text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2 ${theme === 'dark' ? 'text-primary' : 'text-blue-700'}`}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M7 20h10"/><path d="M9 16v4"/><path d="M15 16v4"/></svg>
                     Geçen Hatlar
                   </h3>
@@ -191,57 +225,64 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
                     )}
                   </div>
                 </section>
-              ) : (
+              )}
+
+              {/* Hat seçildiyse duraklar ve geri butonu */}
+              {gameState.selectedLine && !gameState.isWalking && (
                 <section>
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className={`text-xs font-bold uppercase tracking-widest ${theme === 'dark' ? 'text-secondary' : 'text-blue-700'}`}>{gameState.selectedLine} Hattı Durakları</h3>
+                    <h3 className={`text-xs font-bold uppercase tracking-widest ${theme === 'dark' ? 'text-primary' : 'text-blue-700'}`}>Hat Durakları</h3>
                     <button
                       onClick={() => setGameState(prev => ({ ...prev, selectedLine: null, selectedDirection: null, lineStops: [] }))}
-                      className="text-[10px] font-bold text-slate-400 hover:text-white underline"
+                      className="text-[10px] font-bold text-slate-400 hover:text-primary underline"
+                    >
+                      GERİ
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    {gameState.lineStops.length === 0 && (
+                      <div className={`text-xs italic ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>Duraklar yükleniyor veya bulunamadı.</div>
+                    )}
+                    {gameState.lineStops.length > 0 && gameState.lineStops.map((stop) => (
+                      <button
+                        key={stop.durak_id}
+                        onClick={() => handleTravelToStop(stop)}
+                        className={`w-full p-3 rounded-xl text-left border border-primary bg-primary/10 hover:bg-primary/20 text-primary flex items-center gap-3 ${stop.durak_id === gameState.currentStop.durak_id ? 'opacity-50 pointer-events-none' : ''}`}
+                      >
+                        <span className="w-2 h-2 rounded-full bg-primary shrink-0"></span>
+                        <span className="text-sm font-semibold truncate">{stop.durak_adi}</span>
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {/* Yürüme modu aktifse yakındaki durakları listele */}
+              {gameState.isWalking && !gameState.selectedLine && (
+                <section>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className={`text-xs font-bold uppercase tracking-widest ${theme === 'dark' ? 'text-yellow-400' : 'text-yellow-700'}`}>Yakındaki Duraklar</h3>
+                    <button
+                      onClick={() => setGameState(prev => ({ ...prev, isWalking: false }))}
+                      className="text-[10px] font-bold text-slate-400 hover:text-yellow-500 underline"
                     >
                       GERİ DÖN
                     </button>
                   </div>
                   <div className="space-y-2">
-                    {(() => {
-                      const currentIndex = gameState.lineStops.findIndex(s => s.durak_id === gameState.currentStop.durak_id);
-                      return gameState.lineStops.map((stop, idx) => {
-                        const isCurrent = stop.durak_id === gameState.currentStop.durak_id;
-                        const isPast = idx <= currentIndex;
-                        const handleTravelToStop = (targetStop: Stop) => {
-                          if (!gameState.lineStops.length) return;
-                          const currentIndex = gameState.lineStops.findIndex(s => s.durak_id === gameState.currentStop.durak_id);
-                          const targetIndex = gameState.lineStops.findIndex(s => s.durak_id === targetStop.durak_id);
-                          if (targetStop.durak_id === gameState.currentStop.durak_id || targetIndex <= currentIndex) return;
-                          setGameState(prev => ({
-                            currentStop: targetStop,
-                            history: [...prev.history, { stop: targetStop, line: prev.selectedLine!, direction: prev.selectedDirection! }],
-                            steps: prev.steps + 1,
-                            selectedLine: null,
-                            selectedDirection: null,
-                            lineStops: [],
-                            isWalking: false
-                          }));
-                        };
-                        return (
-                          <button
-                            key={`${stop.durak_id}-${idx}`}
-                            disabled={isPast}
-                            onClick={() => handleTravelToStop(stop)}
-                            className={`w-full p-3 rounded-xl text-left border transition-all flex items-center gap-3 ${
-                              isCurrent
-                                ? 'bg-primary/10 border-primary/20 opacity-50 cursor-default'
-                                : isPast
-                                  ? 'bg-white/5 border-transparent opacity-40 cursor-not-allowed'
-                                  : 'bg-white/5 border-transparent hover:border-white/20'
-                            }`}
-                          >
-                            <div className={`w-2 h-2 rounded-full shrink-0 ${isCurrent ? 'bg-primary shadow-[0_0_8px_rgba(0,95,184,1)]' : 'bg-slate-600'}`}></div>
-                            <span className={`text-sm font-semibold truncate ${theme === 'dark' ? '' : 'text-slate-900'}`}>{stop.durak_adi}</span>
-                          </button>
-                        );
-                      });
-                    })()}
+                    {nearbyStops.length === 0 && (
+                      <div className={`text-xs italic ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>Yakında durak yok.</div>
+                    )}
+                    {nearbyStops.map((stop) => (
+                      <button
+                        key={stop.durak_id}
+                        onClick={() => handleWalkToStop(stop)}
+                        className="w-full p-3 rounded-xl text-left border border-yellow-400 bg-yellow-50 hover:bg-yellow-100 text-yellow-900 flex items-center gap-3"
+                      >
+                        <span className="w-2 h-2 rounded-full bg-yellow-400 shrink-0"></span>
+                        <span className="text-sm font-semibold truncate">{stop.durak_adi}</span>
+                      </button>
+                    ))}
                   </div>
                 </section>
               )}
