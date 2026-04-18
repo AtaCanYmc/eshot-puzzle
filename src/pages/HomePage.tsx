@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchRandomStops } from '../service/eshotService';
+import { eshotService } from '../service/eshotService';
 import type { Stop } from '../types/supabaseTypes';
 import { useTheme } from '../ThemeContext';
 import StartModal from '../components/StartModal';
@@ -17,7 +17,7 @@ const HomePage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const result = await fetchRandomStops();
+      const result = await eshotService.getTwoRandomStops();
       setStops(result as [Stop, Stop]);
       setModalOpen(true);
     } catch (e) {
