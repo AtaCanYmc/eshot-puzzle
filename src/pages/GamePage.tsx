@@ -77,7 +77,7 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
         setLoading(false);
       }
     };
-    fetchLines();
+    fetchLines().then(r => r);
   }, [gameState.currentStop]);
 
   const handleSelectLine = async (hatNo: string) => {
