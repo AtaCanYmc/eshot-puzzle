@@ -89,3 +89,12 @@ Workflow dosyanıza aşağıdaki adımı ekleyin:
 ```
 
 Bu adım, sadece CI ortamında geçici bir `.env` dosyası oluşturur. Dosya repoya eklenmez ve build sırasında kullanılır.
+
+## GitHub Actions ve GITHUB_TOKEN Hakkında
+
+- Deploy işlemi için ek bir token eklemenize gerek yoktur.
+- `github_token: ${{ secrets.GITHUB_TOKEN }}` satırı, GitHub Actions tarafından otomatik olarak sağlanır.
+- Sadece repo ayarlarından **Settings → Actions → General → Workflow permissions** kısmında "Read and write permissions" seçili olmalıdır.
+- Bu ayar sayesinde workflow dosyanız otomatik olarak gh-pages branch'ine deploy işlemini yapabilir.
+
+Özetle: GITHUB_TOKEN'ı manuel eklemenize gerek yok, GitHub Actions otomatik olarak sağlar.
