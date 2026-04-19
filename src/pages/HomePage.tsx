@@ -4,6 +4,8 @@ import { eshotService } from '../service/eshotService';
 import type { Stop } from '../types/supabaseTypes';
 import { useTheme } from '../ThemeContext';
 import StartModal from '../components/modal/StartModal';
+import HomeMenuBar from '../components/HomeMenuBar';
+import MobilMenuBar from '../components/MobilMenuBar';
 
 const HomePage: React.FC = () => {
   const [modalOpen, setModalOpen] = React.useState(false);
@@ -12,6 +14,20 @@ const HomePage: React.FC = () => {
   const [error, setError] = React.useState<string | null>(null);
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
+
+  // Yardımcı fonksiyon: mobil mi?
+  function useIsMobile() {
+    const [isMobile, setIsMobile] = React.useState(false);
+    React.useEffect(() => {
+      const check = () => setIsMobile(window.innerWidth <= 768);
+      check();
+      window.addEventListener('resize', check);
+      return () => window.removeEventListener('resize', check);
+    }, []);
+    return isMobile;
+  }
+
+  const isMobile = useIsMobile();
 
   const handleStart = async () => {
     setLoading(true);
@@ -56,13 +72,12 @@ const HomePage: React.FC = () => {
           onCancel={() => setModalOpen(false)}
         />
 
-        <button
-          className="absolute top-8 right-8 z-20 px-4 py-2 rounded-xl bg-white/80 text-slate-800 font-bold shadow hover:bg-white"
-          onClick={toggleTheme}
-          aria-label="Tema Değiştir"
-        >
-          {theme === 'dark' ? '☀️ Aydınlık' : '🌙 Karanlık'}
-        </button>
+        {/* Menü Bar */}
+        {isMobile ? (
+          <MobilMenuBar onToggleTheme={toggleTheme} theme={theme} />
+        ) : (
+          <HomeMenuBar onToggleTheme={toggleTheme} theme={theme} />
+        )}
       </div>
     </div>
   );
