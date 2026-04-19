@@ -59,11 +59,10 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
         if (gameState.selectedLine || gameState.isWalking) return <></>;
         return (
             <section>
-                <h3 className={`text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2 ${theme === 'dark' ? 'text-primary' : 'text-blue-700'}`}>Geçen
-                    Hatlar</h3>
+                <h3 className={`text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2 ${theme === 'dark' ? 'text-primary' : 'text-blue-700'}`}>Geçen Hatlar</h3>
                 <div className="grid grid-cols-2 gap-2 mb-2">
                     <button
-                        className={`p-2 rounded-xl border-2 text-center group col-span-2 flex items-center justify-center gap-2 ${gameState.isWalking ? 'bg-yellow-100 border-yellow-400 text-yellow-700 font-black' : 'bg-white/5 border-yellow-400 text-yellow-700 hover:bg-yellow-50'}`}
+                        className={`p-2 rounded-xl border-2 text-center group col-span-2 flex items-center justify-center gap-2 ${gameState.isWalking ? 'bg-yellow-100 text-slate-800 font-black' : 'bg-white/5 text-slate-800 hover:bg-yellow-50'}`}
                         onClick={() => setGameState((prev: any) => ({
                             ...prev,
                             isWalking: !prev.isWalking,
@@ -72,7 +71,8 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
                             lineStops: []
                         }))}
                     >
-                        <span className="text-xl">🚶‍♂️</span> Yürü
+                        <span className="text-xl">🚶‍♂️</span>
+                        <span className="block text-base font-black group-hover:scale-110 transition-transform"> Yürü </span>
                     </button>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
@@ -81,19 +81,18 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
                             <button
                                 key={line.hat_no}
                                 onClick={() => handleSelectLine(line.hat_no)}
-                                className={`p-2 rounded-xl border-2 text-center group
+                                className={`p-2 rounded-xl border-2 text-center group flex gap-2 items-center justify-center
                         ${gameState.selectedLine === line.hat_no
                                     ? 'bg-primary/10 border-primary text-primary font-black'
                                     : 'bg-white/5 border-primary/60 text-slate-800 hover:bg-primary/10 hover:border-primary'}
                       `}
                             >
-                                            <span
-                                                className="block text-base font-black group-hover:scale-110 transition-transform">{line.hat_no}</span>
+                                <span className="text-xl">{'🚌'}</span>
+                                <span className="block text-base font-black group-hover:scale-110 transition-transform">{line.hat_no}</span>
                             </button>
                         ))
                     ) : (
-                        <p className={`col-span-2 text-xs italic py-2 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>Bu
-                            durakta hat bulunamadı.</p>
+                        <p className={`col-span-2 text-xs italic py-2 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>Bu durakta hat bulunamadı.</p>
                     )}
                 </div>
             </section>
