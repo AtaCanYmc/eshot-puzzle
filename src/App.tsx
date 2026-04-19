@@ -17,7 +17,7 @@ function GamePageWithState() {
 
 function App() {
     return (
-        <Router basename="/eshot-puzzle">
+        <Router>
             <Routes>
                 <Route path="/" element={<HomePage/>}/>
                 <Route path="/game" element={<GamePageWithState/>}/>
