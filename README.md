@@ -1,73 +1,71 @@
-# React + TypeScript + Vite
+# ESHOT Puzzle
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+ESHOT Puzzle, İzmir toplu taşıma durakları ve hatlarıyla oynanan bir bulmaca/oyun uygulamasıdır. Kullanıcılar, başlangıç ve hedef duraklar arasında en kısa veya en ilginç rotayı bulmaya çalışır.
 
-Currently, two official plugins are available:
+## Özellikler
+- React + TypeScript + Vite altyapısı
+- Leaflet ile interaktif harita
+- Gerçek ESHOT durak ve hat verileri
+- Mobil ve masaüstü uyumlu arayüz
+- Tema (açık/koyu) desteği
+- Otomatik GitHub Pages deploy (CI)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Kurulum
 
-## React Compiler
+Projeyi klonladıktan sonra bağımlılıkları yükleyin:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Geliştirme sunucusunu başlatmak için:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev
 ```
+
+## Build
+
+Prodüksiyon için derleme almak için:
+
+```bash
+npm run build
+```
+
+Çıktılar `dist/` klasöründe oluşur.
+
+## Otomatik Deploy (GitHub Pages)
+
+Ana branch'e (main/master) pushladığınızda, proje otomatik olarak GitHub Pages'a deploy edilir. Yeni branch açılmaz, mevcut branch üzerinden çalışır.
+
+- CI/CD pipeline: `.github/workflows/deploy-pages.yml`
+- Build edilen dosyalar otomatik olarak `gh-pages` branch'ine aktarılır.
+
+## Proje Yapısı
+
+```
+src/
+  components/   # React bileşenleri
+  hooks/        # Özel React hook'ları
+  pages/        # Sayfa bileşenleri
+  service/      # API ve servis katmanı
+  types/        # Tip tanımları
+  utils/        # Yardımcı fonksiyonlar
+  assets/       # Görseller
+public/         # Statik dosyalar
+```
+
+## Katkı Sağlama
+
+Pull request'ler ve issue'lar açıktır. Katkıda bulunmak için lütfen fork'layıp PR gönderin.
+
+## Lisans
+
+MIT
+
+---
+
+### Teknik Notlar
+- Proje Vite ile başlatıldı.
+- Harita için [react-leaflet](https://react-leaflet.js.org/) ve [leaflet](https://leafletjs.com/) kullanılır.
+- Otomatik deploy için [peaceiris/actions-gh-pages](https://github.com/peaceiris/actions-gh-pages) kullanılır.
