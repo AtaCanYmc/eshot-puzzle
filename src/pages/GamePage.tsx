@@ -89,9 +89,10 @@ const GamePage: React.FC<GamePageProps> = ({stops}) => {
             const directions = await eshotService.getAvailableDirections(gameState.currentStop.durak_id, hatNo);
             if (!directions.length) throw new Error('Yön bulunamadı');
             const selectedDirection = directions[0].smart_yon;
-            const currentDurakSira = gameState.currentStop.sira;
+            const currentDurakId = gameState.currentStop.durak_id;
+            console.log('currentDurakId', currentDurakId);
             // Durakları getir
-            let lineStops = await eshotService.getOrderedStops(hatNo, selectedDirection, currentDurakSira);
+            let lineStops = await eshotService.getOrderedStops(hatNo, selectedDirection, currentDurakId);
             setGameState(prev => ({
                 ...prev,
                 selectedLine: hatNo,

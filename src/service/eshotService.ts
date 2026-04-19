@@ -5,13 +5,13 @@ export const eshotService = {
     /**
      * Belirli bir hattın ve yönün duraklarını sıralı olarak getirir.
      */
-    async getOrderedStops(hatNo: string, yon: number, current_durak_sira?: number): Promise<Stop[]> {
+    async getOrderedStops(hatNo: string, yon: number, current_durak_id?: number): Promise<Stop[]> {
         const { data, error } = await supabase.rpc('get_smart_ordered_stops', {
             p_hat_no: hatNo,
             p_yon: yon,
-            current_durak_sira: current_durak_sira || 0
+            p_current_durak_id: current_durak_id || null
         });
-
+        console.log(`getOrderedStops (${hatNo}, ${yon}, ${current_durak_id}):`, data, error);
         if (error) throw error;
         return data || [];
     },
@@ -77,6 +77,7 @@ export const eshotService = {
         const stop1 = await this.getRandomDurakFarAway(null, null, 0);
         // 2. durak: 25km (25000m) uzağında rastgele bir durak
         const stop2 = await this.getRandomDurakFarAway(stop1.enlem, stop1.boylam, distance);
+        console.log(stop1, stop2);
         return [stop1, stop2];
     },
 
