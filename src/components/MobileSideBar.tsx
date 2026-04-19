@@ -156,12 +156,11 @@ const MobileSideBar: React.FC<MobileSideBarProps> = ({
       </div>
       {/* Toggle Button */}
       <button
-        onClick={() => setSidebarOpen(!isSidebarOpen)}
+        onClick={() => setSidebarOpen(false)}
         className="absolute right-4 top-2 w-8 h-8 glass border border-white/10 rounded-full flex items-center justify-center hover:bg-white/5 transition-colors"
+        aria-label="Menüyü Kapat"
       >
-        <div className={`transition-transform duration-500 ${isSidebarOpen ? '' : 'rotate-180'}`}> 
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-        </div>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </aside>
   );

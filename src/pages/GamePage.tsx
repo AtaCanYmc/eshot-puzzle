@@ -147,6 +147,7 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
           toggleTheme={toggleTheme}
           steps={gameState.steps}
           onExit={() => navigate('/')}
+          setSidebarOpen={setSidebarOpen}
         />
       ) : (
         <GameTopBar
