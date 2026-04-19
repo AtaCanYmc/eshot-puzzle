@@ -205,8 +205,7 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
         <aside
             className={`fixed left-0 bottom-0 z-[999] w-full max-w-full glass border-t transition-transform duration-500 ease-in-out
         ${theme === 'dark' ? 'border-white/10 bg-slate-900' : 'border-slate-200 bg-white'}
-        ${isSidebarOpen ? 'translate-y-1/2' : 'h-200'}`}
-            style={{height: 'calc(100vh - 56px)'}}
+        ${isSidebarOpen ? 'translate-y-1/2 h-[calc(100vh-56px)]' : 'translate-y-[calc(100%-80px)] h-[calc(100vh-56px)]'}`}
         >
             <div className="p-4 h-full flex flex-col">
                 {getHeader()}
