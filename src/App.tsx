@@ -17,7 +17,7 @@ function GamePageWithState() {
 
 function App() {
     return (
-        <Router>
+        <Router basename={import.meta.env.BASE_URL}>
             <Routes>
                 <Route path="/" element={<HomePage/>}/>
                 <Route path="/game" element={<GamePageWithState/>}/>

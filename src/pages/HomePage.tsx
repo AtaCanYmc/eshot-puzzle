@@ -7,6 +7,7 @@ import StartModal from '../components/modal/StartModal';
 import HomeMenuBar from '../components/menubar/HomeMenuBar';
 import MobilMenuBar from '../components/menubar/MobilMenuBar';
 import useIsMobile from '../hooks/useIsMobile';
+import heroBg from '../assets/hero-bg.png';
 
 const HomePage: React.FC = () => {
   const [modalOpen, setModalOpen] = React.useState(false);
@@ -39,7 +40,7 @@ const HomePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-center bg-no-repeat bg-cover relative" style={{backgroundImage: `url('/src/assets/hero-bg.png')`}}>
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-center bg-no-repeat bg-cover relative" style={{backgroundImage: `url(${heroBg})`}}>
       <div className="absolute inset-0 w-full h-full bg-black/40 backdrop-blur-sm z-0" />
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen w-full">
         <h1 className="text-4xl font-black text-white mb-8 drop-shadow">ESHOT Puzzle</h1>
