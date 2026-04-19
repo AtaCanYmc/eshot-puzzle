@@ -5,10 +5,11 @@ export const eshotService = {
     /**
      * Belirli bir hattın ve yönün duraklarını sıralı olarak getirir.
      */
-    async getOrderedStops(hatNo: string, yon: number): Promise<Stop[]> {
-        const { data, error } = await supabase.rpc('get_ordered_stops', {
+    async getOrderedStops(hatNo: string, yon: number, current_durak_sira?: number): Promise<Stop[]> {
+        const { data, error } = await supabase.rpc('get_smart_ordered_stops', {
             p_hat_no: hatNo,
-            p_yon: yon
+            p_yon: yon,
+            current_durak_sira: current_durak_sira || 0
         });
 
         if (error) throw error;
@@ -111,7 +112,7 @@ export const eshotService = {
             console.error(`Smart Direction Hatası (${hatNo}):`, error.message);
             throw new Error("Yön bilgisi alınırken bir sorun oluştu.");
         }
-        
+
         return data || [];
     }
 };

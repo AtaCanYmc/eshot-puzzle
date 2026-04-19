@@ -111,7 +111,10 @@ const MobileSideBar: React.FC<MobileSideBarProps> = ({
                       `}
                     >
                       <span className={`w-2 h-2 rounded-full shrink-0 ${isCurrent ? 'bg-green-500' : 'bg-primary'}`}></span>
-                      <span className="text-xs font-semibold truncate">{stop.durak_adi}</span>
+                      <span className="flex flex-col">
+                        <span className="text-xs font-semibold truncate">{stop.durak_adi}</span>
+                        <span className="text-[10px] font-mono text-primary opacity-70">{stop.durak_id}</span>
+                      </span>
                     </button>
                   );
                 })}

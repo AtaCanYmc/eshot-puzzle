@@ -4,6 +4,7 @@ export interface Stop {
     enlem: number;
     boylam: number;
     sira?: number;
+    is_available?: number;
 }
 
 export interface RoutePoint {

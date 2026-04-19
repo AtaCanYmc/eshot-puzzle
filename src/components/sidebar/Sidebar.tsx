@@ -134,7 +134,7 @@ const Sidebar: React.FC<SidebarProps> = (props: SidebarProps) => {
                     )}
                     {gameState.lineStops.length > 0 && gameState.lineStops.map((stop: Stop) => {
                         const isCurrent = stop.durak_id === gameState.currentStop.durak_id;
-                        const isPast = stop.sira < gameState.currentStop.sira;
+                        const isAvailable = stop.is_available === 1;
                         return (
                             <button
                                 key={stop.durak_id}
@@ -142,14 +142,17 @@ const Sidebar: React.FC<SidebarProps> = (props: SidebarProps) => {
                                 className={`w-full p-3 rounded-xl text-left border flex items-center gap-3 transition-all
                         ${isCurrent
                                     ? 'bg-green-100 border-green-500 text-green-700 font-black'
-                                    : isPast
+                                    : !isAvailable
                                         ? 'bg-primary/10 border-primary text-red-500 pointer-events-none'
                                         : 'bg-primary/10 border-primary text-primary hover:bg-primary/20'}
                       `}
                             >
-                                            <span
-                                                className={`w-2 h-2 rounded-full shrink-0 ${isCurrent ? 'bg-green-500' : isPast ? 'bg-red-500' : 'bg-primary'}`}></span>
-                                <span className="text-sm font-semibold truncate">{stop.durak_adi}</span>
+                                <span
+                                    className={`w-2 h-2 rounded-full shrink-0 ${isCurrent ? 'bg-green-500' : !isAvailable ? 'bg-red-500' : 'bg-primary'}`}></span>
+                                <span className="flex flex-col text-sm font-semibold truncate">
+                                    {stop.durak_adi}
+                                    <span className="text-xs font-mono text-primary opacity-70">{stop.durak_id}</span>
+                                </span>
                             </button>
                         );
                     })}
