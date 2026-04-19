@@ -1,8 +1,9 @@
 import * as React from 'react';
 import {MapContainer, TileLayer, Marker, Popup, Polyline} from 'react-leaflet';
-import { DivIcon } from 'leaflet';
+import {DivIcon} from 'leaflet';
 import type {Stop} from '../../types/supabaseTypes';
 import {eshotService} from "../../service/eshotService";
+import {filterPastStops} from "../../utils/eshotUtils";
 
 
 interface MapComponentProps {
@@ -44,21 +45,86 @@ const walkIcon = new DivIcon({
     iconAnchor: [12, 12]
 });
 
-const MapComponent: React.FC<MapComponentProps> = ({currentStop, stops, gameState, setGameState, theme, onStopClick, lineStops}) => {
-            // Hat güzergahı için Polyline koordinatları
-            const polylinePositions = (lineStops && lineStops.length > 1)
-                ? lineStops.map(stop => [stop.enlem, stop.boylam])
-                : [];
-    // Harita merkezini güncelle
+const MapComponent: React.FC<MapComponentProps> = (props: MapComponentProps) => {
+    const {
+        currentStop,
+        stops,
+        gameState,
+        setGameState,
+        theme,
+        onStopClick,
+        lineStops
+    } = props;
+
+    const polylinePositions = (lineStops && lineStops.length > 1) ? lineStops.map(stop => [stop.enlem, stop.boylam]) : [];
     const darkTile = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
     const lightTile = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+    const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
     const center = [currentStop.enlem, currentStop.boylam] as [number, number];
     const zoom = 14;
-
     const [nearbyStops, setNearbyStops] = React.useState<Stop[]>([]);
+
+    const getGuzergah = () => {
+        if (polylinePositions.length < 1) return <></>;
+        const color = theme === 'dark' ? '#38bdf8' : '#0ea5e9';
+        return (
+            <Polyline
+                positions={polylinePositions as [number, number][]}
+                pathOptions={{color: color, weight: 6, opacity: 0.7}}
+            />
+        );
+    };
+
+    const getAvailableDurakMarkers = () => {
+        if (!gameState.lineStops || gameState.lineStops.length === 0) return <></>;
+        const availableStops = filterPastStops(gameState.lineStops, currentStop);
+        return (
+            <>
+                {
+                    availableStops.map((stop: Stop) => {
+                        return (
+                            <Marker
+                                key={stop.durak_id}
+                                position={[stop.enlem, stop.boylam]}
+                                // @ts-ignore
+                                icon={stopIcon}
+                                eventHandlers={onStopClick ? {click: () => onStopClick(stop)} : undefined}
+                            >
+                                <Popup>{stop.durak_adi}</Popup>
+                            </Marker>
+                        );
+                    })
+                }
+            </>
+        );
+    };
+
+    const getWalkableDurakMarkers = () => {
+        if (!gameState.isWalking || !nearbyStops) return <></>;
+        return (
+            <>
+                {nearbyStops.map((stop) => (
+                    // @ts-ignore
+                    <Marker key={"walk-" + stop.durak_id} position={[stop.enlem, stop.boylam]} icon={walkIcon}
+                            eventHandlers={{click: () => handleWalkToStop(stop)}}>
+                        <Popup>
+                            <div>
+                                <div className="font-bold">{stop.durak_adi}</div>
+                                <button className="mt-2 px-3 py-1 rounded bg-yellow-400 text-black font-bold"
+                                        onClick={() => handleWalkToStop(stop)}>
+                                    Buraya Yürü
+                                </button>
+                            </div>
+                        </Popup>
+                    </Marker>
+                ))}
+            </>
+        );
+    };
 
     React.useEffect(() => {
         let cancelled = false;
+
         async function fetchNearby() {
             try {
                 const data = await eshotService.getNearbyStops(currentStop.enlem, currentStop.boylam, 200); // 200m
@@ -68,8 +134,11 @@ const MapComponent: React.FC<MapComponentProps> = ({currentStop, stops, gameStat
                 setNearbyStops([]);
             }
         }
+
         fetchNearby().then(r => r);
-        return () => { cancelled = true; };
+        return () => {
+            cancelled = true;
+        };
     }, [currentStop]);
 
     // Yürüyerek gidilen durağa geçiş
@@ -77,7 +146,7 @@ const MapComponent: React.FC<MapComponentProps> = ({currentStop, stops, gameStat
         setGameState((prev: any) => ({
             ...prev,
             currentStop: stop,
-            history: [...prev.history, { stop, walk: true }],
+            history: [...prev.history, {stop, walk: true}],
             steps: prev.steps + 1,
             selectedLine: null,
             selectedDirection: null,
@@ -96,17 +165,12 @@ const MapComponent: React.FC<MapComponentProps> = ({currentStop, stops, gameStat
         >
             <TileLayer
                 // @ts-ignore
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                attribution={attribution}
                 url={theme === 'dark' ? darkTile : lightTile}
             />
 
             {/* Seçili hat güzergahı */}
-            {polylinePositions.length > 1 && (
-                <Polyline
-                    positions={polylinePositions as [number, number][]}
-                    pathOptions={{color: theme === 'dark' ? '#38bdf8' : '#0ea5e9', weight: 6, opacity: 0.7}}
-                />
-            )}
+            {getGuzergah()}
 
             {/* Hedef noktası */}
             {/* @ts-ignore */}
@@ -121,37 +185,10 @@ const MapComponent: React.FC<MapComponentProps> = ({currentStop, stops, gameStat
             </Marker>
 
             {/* Gidilebilecek duraklar */}
-            {gameState.lineStops && gameState.lineStops.length > 0 && gameState.lineStops.map((stop: Stop, idx: number) => {
-                const currentIndex = gameState.lineStops.findIndex((s: Stop) => s.durak_id === currentStop.durak_id);
-                const isPast = idx <= currentIndex;
-                if (isPast) return null;
-                return (
-                    // @ts-ignore
-                    <Marker
-                        key={stop.durak_id}
-                        position={[stop.enlem, stop.boylam]}
-                        icon={stopIcon}
-                        eventHandlers={onStopClick ? { click: () => onStopClick(stop) } : undefined}
-                    >
-                        <Popup>{stop.durak_adi}</Popup>
-                    </Marker>
-                );
-            })}
+            {getAvailableDurakMarkers()}
 
             {/* Yakındaki duraklar (yürüyerek gidilebilir) */}
-            {gameState.isWalking && nearbyStops.map((stop) => (
-                // @ts-ignore
-                <Marker key={"walk-"+stop.durak_id} position={[stop.enlem, stop.boylam]} icon={walkIcon} eventHandlers={{ click: () => handleWalkToStop(stop) }}>
-                    <Popup>
-                        <div>
-                            <div className="font-bold">{stop.durak_adi}</div>
-                            <button className="mt-2 px-3 py-1 rounded bg-yellow-400 text-black font-bold" onClick={() => handleWalkToStop(stop)}>
-                                Buraya Yürü
-                            </button>
-                        </div>
-                    </Popup>
-                </Marker>
-            ))}
+            {getWalkableDurakMarkers()}
         </MapContainer>
     );
 };
