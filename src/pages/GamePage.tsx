@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { eshotService } from '../service/eshotService';
 import type { Stop } from '../types/supabaseTypes';
 import { useTheme } from '../ThemeContext';
-import MapComponent from '../components/MapComponent';
-import Sidebar from '../components/Sidebar';
+import MapComponent from '../components/map/MapComponent';
+import Sidebar from '../components/sidebar/Sidebar';
 
 
 interface GamePageProps {

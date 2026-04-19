@@ -1,8 +1,8 @@
 import * as React from 'react';
 import {MapContainer, TileLayer, Marker, Popup, Polyline} from 'react-leaflet';
 import { DivIcon } from 'leaflet';
-import type {Stop} from '../types/supabaseTypes';
-import {eshotService} from "../service/eshotService";
+import type {Stop} from '../../types/supabaseTypes';
+import {eshotService} from "../../service/eshotService";
 
 
 interface MapComponentProps {

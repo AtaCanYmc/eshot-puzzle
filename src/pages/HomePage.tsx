@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { eshotService } from '../service/eshotService';
 import type { Stop } from '../types/supabaseTypes';
 import { useTheme } from '../ThemeContext';
-import StartModal from '../components/StartModal';
+import StartModal from '../components/modal/StartModal';
 
 const HomePage: React.FC = () => {
   const [modalOpen, setModalOpen] = React.useState(false);

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import type {Stop} from '../types/supabaseTypes';
+import type {Stop} from '../../types/supabaseTypes';
 
 interface SidebarProps {
     gameState: any;
