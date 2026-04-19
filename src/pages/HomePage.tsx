@@ -6,6 +6,7 @@ import { useTheme } from '../ThemeContext';
 import StartModal from '../components/modal/StartModal';
 import HomeMenuBar from '../components/menubar/HomeMenuBar';
 import MobilMenuBar from '../components/menubar/MobilMenuBar';
+import useIsMobile from '../hooks/useIsMobile';
 
 const HomePage: React.FC = () => {
   const [modalOpen, setModalOpen] = React.useState(false);
@@ -14,18 +15,6 @@ const HomePage: React.FC = () => {
   const [error, setError] = React.useState<string | null>(null);
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
-
-  // Yardımcı fonksiyon: mobil mi?
-  function useIsMobile() {
-    const [isMobile, setIsMobile] = React.useState(false);
-    React.useEffect(() => {
-      const check = () => setIsMobile(window.innerWidth <= 768);
-      check();
-      window.addEventListener('resize', check);
-      return () => window.removeEventListener('resize', check);
-    }, []);
-    return isMobile;
-  }
 
   const isMobile = useIsMobile();
 
