@@ -5,10 +5,10 @@ import type { Stop } from '../types/supabaseTypes';
 import { useTheme } from '../ThemeContext';
 import MapComponent from '../components/map/MapComponent';
 import Sidebar from '../components/sidebar/Sidebar';
-import GameTopBar from '../components/GameTopBar';
+import GameTopBar from '../components/topbar/GameTopBar';
 import useIsMobile from '../hooks/useIsMobile';
-import MobileTopBar from '../components/MobileTopBar';
-import MobileSideBar from '../components/MobileSideBar';
+import MobileTopBar from '../components/topbar/MobileTopBar';
+import MobileSideBar from '../components/sidebar/MobileSideBar';
 
 
 interface GamePageProps {

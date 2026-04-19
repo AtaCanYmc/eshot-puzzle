@@ -160,6 +160,7 @@ const MapComponent: React.FC<MapComponentProps> = (props: MapComponentProps) => 
             center={center}
             zoom={zoom}
             scrollWheelZoom={true}
+            zoomControl={false}
             className="w-full h-full z-0"
             style={{background: theme === 'dark' ? '#0f172a' : '#f1f5f9'}}
         >
