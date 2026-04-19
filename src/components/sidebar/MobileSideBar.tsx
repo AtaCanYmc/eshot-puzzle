@@ -32,6 +32,10 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
         setSidebarOpen
     } = props;
 
+    const toggleSideBar = () => {
+        setSidebarOpen(!isSidebarOpen);
+    }
+
     const getHeader = () => {
         return (
             <header className="mb-4">
@@ -199,14 +203,14 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
 
     return (
         <aside
-            className={`fixed left-0 bottom-0 top-14 z-[999] w-full max-w-full glass border-t transition-transform duration-500 ease-in-out
+            className={`fixed left-0 bottom-0 z-[999] w-full max-w-full glass border-t transition-transform duration-500 ease-in-out
         ${theme === 'dark' ? 'border-white/10 bg-slate-900' : 'border-slate-200 bg-white'}
-        ${isSidebarOpen ? 'translate-y-0' : 'translate-y-full'}`}
+        ${isSidebarOpen ? 'translate-y-1/2' : 'h-200'}`}
             style={{height: 'calc(100vh - 56px)'}}
         >
             <div className="p-4 h-full flex flex-col">
                 {getHeader()}
-                <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar relative">
+                {isSidebarOpen && <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar relative">
                     {getLoader()}
                     {/* Hat/yürüme seçimi ekranı */}
                     {getButtonOptions()}
@@ -214,12 +218,12 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
                     {getEshotHatOptions()}
                     {/* Yürüme modu aktifse yakındaki durakları listele */}
                     {getWalkOptions()}
-                </div>
-                {getFooter()}
+                </div>}
+                {isSidebarOpen && getFooter()}
             </div>
             {/* Toggle Button */}
             <button
-                onClick={() => setSidebarOpen(false)}
+                onClick={() => toggleSideBar()}
                 className="absolute right-4 top-2 w-8 h-8 glass border border-white/10 rounded-full flex items-center justify-center hover:bg-white/5 transition-colors"
                 aria-label="Menüyü Kapat"
             >
