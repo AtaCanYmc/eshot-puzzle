@@ -111,7 +111,7 @@ export const eshotService = {
             console.error(`Smart Direction Hatası (${hatNo}):`, error.message);
             throw new Error("Yön bilgisi alınırken bir sorun oluştu.");
         }
-
+        
         return data || [];
     }
 };

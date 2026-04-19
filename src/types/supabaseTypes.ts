@@ -22,7 +22,7 @@ export interface DepartureTime {
 }
 
 export interface SmartDirection {
-    yon: number;           // 1: Gidiş, 2: Dönüş
+    smart_yon: number;           // 1: Gidiş, 2: Dönüş
     yon_adi: string;       // "Gidiş" veya "Dönüş"
     is_last_stop: boolean; // Son durak mı?
     mesaj: string;         // Kullanıcıya gösterilecek yönlendirme mesajı
