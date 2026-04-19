@@ -6,6 +6,8 @@ import { useTheme } from '../ThemeContext';
 import MapComponent from '../components/map/MapComponent';
 import Sidebar from '../components/sidebar/Sidebar';
 import GameTopBar from '../components/GameTopBar';
+import useIsMobile from '../hooks/useIsMobile';
+import MobileTopBar from '../components/MobileTopBar';
 
 
 interface GamePageProps {
@@ -138,12 +140,21 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
         ${theme === 'dark' ? 'bg-slate-950 text-white' : 'bg-white text-slate-900'}`}
     >
       {/* Top Bar */}
-      <GameTopBar
-        theme={theme}
-        toggleTheme={toggleTheme}
-        steps={gameState.steps}
-        onExit={() => navigate('/')}
-      />
+      {useIsMobile() ? (
+        <MobileTopBar
+          theme={theme}
+          toggleTheme={toggleTheme}
+          steps={gameState.steps}
+          onExit={() => navigate('/')}
+        />
+      ) : (
+        <GameTopBar
+          theme={theme}
+          toggleTheme={toggleTheme}
+          steps={gameState.steps}
+          onExit={() => navigate('/')}
+        />
+      )}
 
       <div className="flex-1 flex relative overflow-hidden transition-colors duration-300">
         {/* Sidebar */}
