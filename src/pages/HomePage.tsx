@@ -4,8 +4,8 @@ import { eshotService } from '../service/eshotService';
 import type { Stop } from '../types/supabaseTypes';
 import { useTheme } from '../ThemeContext';
 import StartModal from '../components/modal/StartModal';
-import HomeMenuBar from '../components/HomeMenuBar';
-import MobilMenuBar from '../components/MobilMenuBar';
+import HomeMenuBar from '../components/menubar/HomeMenuBar';
+import MobilMenuBar from '../components/menubar/MobilMenuBar';
 
 const HomePage: React.FC = () => {
   const [modalOpen, setModalOpen] = React.useState(false);
