@@ -8,6 +8,7 @@ import Sidebar from '../components/sidebar/Sidebar';
 import GameTopBar from '../components/GameTopBar';
 import useIsMobile from '../hooks/useIsMobile';
 import MobileTopBar from '../components/MobileTopBar';
+import MobileSideBar from '../components/MobileSideBar';
 
 
 interface GamePageProps {
@@ -158,20 +159,37 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
 
       <div className="flex-1 flex relative overflow-hidden transition-colors duration-300">
         {/* Sidebar */}
-        <Sidebar
-          gameState={gameState}
-          setGameState={setGameState}
-          theme={theme}
-          availableLines={availableLines}
-          loading={loading}
-          nearbyStops={nearbyStops}
-          handleSelectLine={handleSelectLine}
-          handleTravelToStop={handleTravelToStop}
-          handleWalkToStop={handleWalkToStop}
-          stops={stops}
-          isSidebarOpen={isSidebarOpen}
-          setSidebarOpen={setSidebarOpen}
-        />
+        {useIsMobile() ? (
+          <MobileSideBar
+            gameState={gameState}
+            setGameState={setGameState}
+            theme={theme}
+            availableLines={availableLines}
+            loading={loading}
+            nearbyStops={nearbyStops}
+            handleSelectLine={handleSelectLine}
+            handleTravelToStop={handleTravelToStop}
+            handleWalkToStop={handleWalkToStop}
+            stops={stops}
+            isSidebarOpen={isSidebarOpen}
+            setSidebarOpen={setSidebarOpen}
+          />
+        ) : (
+          <Sidebar
+            gameState={gameState}
+            setGameState={setGameState}
+            theme={theme}
+            availableLines={availableLines}
+            loading={loading}
+            nearbyStops={nearbyStops}
+            handleSelectLine={handleSelectLine}
+            handleTravelToStop={handleTravelToStop}
+            handleWalkToStop={handleWalkToStop}
+            stops={stops}
+            isSidebarOpen={isSidebarOpen}
+            setSidebarOpen={setSidebarOpen}
+          />
+        )}
 
         {/* Map */}
         <div className={`flex-1 h-full w-full min-h-[400px] relative cursor-crosshair ${theme === 'dark' ? '' : 'bg-slate-100'}`}>
