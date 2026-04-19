@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient'; // Kendi supabase client dosyan
-import type {Stop, RoutePoint, DepartureTime} from '../types/supabaseTypes.ts';
+import type {Stop, RoutePoint, DepartureTime, SmartDirection} from '../types/supabaseTypes.ts';
 
 export const eshotService = {
     /**
@@ -94,15 +94,24 @@ export const eshotService = {
     },
 
     /**
-     * Belirli bir duraktan geçen hattın hangi yöne/yönlere gittiğini döndürür.
+     * Durak ve hat numarasına göre en mantıklı yönü/yönleri döner.
+     * Son durak olan yönleri eler veya kullanıcıyı diğer yöne yönlendirir.
      */
-    async getAvailableDirections(durakId: number, hatNo: string): Promise<{ yon: number, yon_adi: string }[]> {
-        const { data, error } = await supabase.rpc('get_direction_by_stop_and_line', {
+     async getAvailableDirections(
+        durakId: number,
+        hatNo: string
+    ): Promise<SmartDirection[]> {
+
+        const { data, error } = await supabase.rpc('get_smart_direction', {
             p_durak_id: durakId,
             p_hat_no: hatNo
         });
 
-        if (error) throw error;
+        if (error) {
+            console.error(`Smart Direction Hatası (${hatNo}):`, error.message);
+            throw new Error("Yön bilgisi alınırken bir sorun oluştu.");
+        }
+
         return data || [];
     }
 };

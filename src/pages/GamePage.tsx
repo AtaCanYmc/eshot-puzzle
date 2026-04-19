@@ -122,7 +122,7 @@ const GamePage: React.FC<GamePageProps> = ({ stops }) => {
   const handleWalkToStop = (targetStop: Stop) => {
     setGameState(prev => ({
       currentStop: targetStop,
-      history: [...prev.history, { stop: targetStop, line: null, direction: null }],
+      history: [...prev.history, { stop: targetStop }],
       steps: prev.steps + 1,
       selectedLine: null,
       selectedDirection: null,
