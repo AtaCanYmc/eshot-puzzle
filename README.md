@@ -69,3 +69,23 @@ MIT
 - Proje Vite ile başlatıldı.
 - Harita için [react-leaflet](https://react-leaflet.js.org/) ve [leaflet](https://leafletjs.com/) kullanılır.
 - Otomatik deploy için [peaceiris/actions-gh-pages](https://github.com/peaceiris/actions-gh-pages) kullanılır.
+
+## Ortam Değişkenleri ve Güvenlik
+
+- Ortam değişkenlerinizi (örn. API anahtarları) GitHub Secrets olarak tanımlayabilirsiniz.
+- CI/CD pipeline'ında, bu secret'lar otomatik olarak `.env` dosyasına yazılır ve sadece build sırasında kullanılır.
+- `.env` dosyası `.gitignore` içinde olmalı ve repoya asla eklenmemelidir.
+- **Dikkat:** Vite gibi frontend projelerinde, `VITE_` ile başlayan değişkenler build sırasında herkese açık hale gelir. Gerçekten gizli kalması gereken anahtarları frontend'e koymayın!
+
+### Örnek: GitHub Actions ile .env dosyası oluşturma
+
+Workflow dosyanıza aşağıdaki adımı ekleyin:
+
+```yaml
+- name: Create .env file from secrets
+  run: |
+    echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> .env
+    # Diğer değişkenler için de aynı şekilde ekleyin
+```
+
+Bu adım, sadece CI ortamında geçici bir `.env` dosyası oluşturur. Dosya repoya eklenmez ve build sırasında kullanılır.

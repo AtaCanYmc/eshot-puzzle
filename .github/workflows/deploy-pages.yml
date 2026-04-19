@@ -21,6 +21,11 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Create .env file from secrets
+        run: |
+          echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> .env
+          # Diğer değişkenler için de aynı şekilde ekleyin
+
       - name: Install dependencies
         run: npm ci
 
