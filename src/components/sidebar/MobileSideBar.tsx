@@ -38,13 +38,20 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
         setSidebarOpen(!isSidebarOpen);
     }
 
-    const getHeader = () => {
+    const getHeader = (showBackButton = false, onBack?: () => void) => {
         return (
-            <header className="mb-4">
-                <h2 className={`text-xs font-black uppercase tracking-widest mb-1 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Şu
-                    Anki Durak</h2>
-                <p className={`text-lg font-bold leading-tight line-clamp-2 ${theme === 'dark' ? '' : 'text-slate-900'}`}>{gameState.currentStop.durak_adi}</p>
-                <span className="text-xs font-mono text-primary opacity-70">{gameState.currentStop.durak_id}</span>
+            <header className="mb-4 flex items-center justify-between">
+                <div>
+                    <h2 className={`text-xs font-black uppercase tracking-widest mb-1 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Şu Anki Durak</h2>
+                    <p className={`text-lg font-bold leading-tight line-clamp-2 ${theme === 'dark' ? '' : 'text-slate-900'}`}>{gameState.currentStop.durak_adi}</p>
+                    <span className="text-xs font-mono text-primary opacity-70">{gameState.currentStop.durak_id}</span>
+                </div>
+                {showBackButton && (
+                    <button
+                        onClick={onBack}
+                        className="text-sm font-extrabold text-slate-400 hover:text-primary underline px-2 py-1 transition-colors"
+                    >GERİ</button>
+                )}
             </header>
         );
     };
@@ -106,20 +113,13 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
         if (!gameState.selectedLine || gameState.isWalking) return <></>;
         return (
             <section>
-                <div className="flex items-center justify-between mb-2">
-                    <h3 className={`text-xs font-bold uppercase tracking-widest ${theme === 'dark' ? 'text-primary' : 'text-blue-700'}`}>Hat
-                        Durakları</h3>
-                    <button
-                        onClick={() => setGameState((prev: any) => ({
-                            ...prev,
-                            selectedLine: null,
-                            selectedDirection: null,
-                            lineStops: []
-                        }))}
-                        className="text-[10px] font-bold text-slate-400 hover:text-primary underline"
-                    >GERİ
-                    </button>
-                </div>
+                {getHeader(true, () => setGameState((prev: any) => ({
+                    ...prev,
+                    selectedLine: null,
+                    selectedDirection: null,
+                    lineStops: []
+                })))}
+                <h3 className={`text-xs font-bold uppercase tracking-widest mb-2 ${theme === 'dark' ? 'text-primary' : 'text-blue-700'}`}>Hat Durakları</h3>
                 <div className="space-y-1">
                     {gameState.lineStops.length === 0 && (
                         <div
@@ -159,15 +159,11 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
         if (!gameState.isWalking || gameState.selectedLine) return <></>;
         return (
             <section>
-                <div className="flex items-center justify-between mb-2">
-                    <h3 className={`text-xs font-bold uppercase tracking-widest ${theme === 'dark' ? 'text-yellow-400' : 'text-yellow-700'}`}>Yakındaki
-                        Duraklar</h3>
-                    <button
-                        onClick={() => setGameState((prev: any) => ({...prev, isWalking: false}))}
-                        className="text-[10px] font-bold text-slate-400 hover:text-yellow-500 underline"
-                    >GERİ DÖN
-                    </button>
-                </div>
+                {getHeader(true, () => setGameState((prev: any) => ({
+                    ...prev,
+                    isWalking: false
+                })))}
+                <h3 className={`text-xs font-bold uppercase tracking-widest mb-2 ${theme === 'dark' ? 'text-yellow-400' : 'text-yellow-700'}`}>Yakındaki Duraklar</h3>
                 <div className="space-y-1">
                     {nearbyStops.length === 0 && (
                         <div
@@ -210,7 +206,7 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
         ${isSidebarOpen ? 'translate-y-0 h-[calc(50%-50px)]' : 'translate-y-[calc(100%-100px)] h-[calc(50%-50px)]'}`}
         >
             <div className="p-4 h-full flex flex-col">
-                {getHeader()}
+                {(!gameState.selectedLine && !gameState.isWalking) && getHeader()}
                 {isSidebarOpen && <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar relative">
                     {getLoader()}
                     {/* Hat/yürüme seçimi ekranı */}
