@@ -42,6 +42,7 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
                 <h2 className={`text-xs font-black uppercase tracking-widest mb-1 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Şu
                     Anki Durak</h2>
                 <p className={`text-lg font-bold leading-tight line-clamp-2 ${theme === 'dark' ? '' : 'text-slate-900'}`}>{gameState.currentStop.durak_adi}</p>
+                <span className="text-xs font-mono text-primary opacity-70">{gameState.currentStop.durak_id}</span>
             </header>
         );
     };
@@ -204,7 +205,7 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
         <aside
             className={`fixed left-0 bottom-0 z-[999] w-full max-w-full glass border-t transition-transform duration-500 ease-in-out
         ${theme === 'dark' ? 'border-white/10 bg-slate-900' : 'border-slate-200 bg-white'}
-        ${isSidebarOpen ? 'translate-y-0 h-[calc(50%-50px)]' : 'translate-y-[calc(100%-80px)] h-[calc(50%-50px)]'}`}
+        ${isSidebarOpen ? 'translate-y-0 h-[calc(50%-50px)]' : 'translate-y-[calc(100%-100px)] h-[calc(50%-50px)]'}`}
         >
             <div className="p-4 h-full flex flex-col">
                 {getHeader()}
