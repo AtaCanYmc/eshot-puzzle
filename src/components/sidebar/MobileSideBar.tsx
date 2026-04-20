@@ -1,5 +1,7 @@
 import * as React from 'react';
 import type {Stop} from '../../types/supabaseTypes';
+import WalkIcon from '../../assets/svg/walk.svg';
+import EshotIcon from '../../assets/svg/eshot.svg';
 
 interface MobileSideBarProps {
     gameState: any;
@@ -72,7 +74,7 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
                             lineStops: []
                         }))}
                     >
-                        <span className="text-xl">🚶‍♂️</span>
+                        <img src={WalkIcon} alt="Yürü" className="w-5 h-5" />
                         <span className="block text-base font-black group-hover:scale-110 transition-transform"> Yürü </span>
                     </button>
                 </div>
@@ -88,7 +90,7 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
                                     : 'bg-white/5 border-primary/60 text-slate-800 hover:bg-primary/10 hover:border-primary'}
                       `}
                             >
-                                <span className="text-xl">{'🚌'}</span>
+                                <img src={EshotIcon} alt="ESHOT" className="w-5 h-5" />
                                 <span className="block text-base font-black group-hover:scale-110 transition-transform">{line.hat_no}</span>
                             </button>
                         ))
