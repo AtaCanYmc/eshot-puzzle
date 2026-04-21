@@ -74,19 +74,15 @@ export const EshotDurakOptions = (props: IProps) => {
     };
 
     const getDurakButton = (stop: Stop) => {
+        if (stop.status_code === 0) return null;
         const isCurrent = stop.status_code === 2;
-        const isPast = stop.status_code === 0;
+
         return (
             <button
                 key={stop.durak_id}
                 onClick={() => handleTravelToStopWithLoader(stop)}
                 className={`w-full p-2 rounded-xl text-left border flex items-center gap-2 transition-all
-                        ${isCurrent
-                    ? 'bg-green-100 border-green-500 text-green-700 font-black'
-                    : isPast
-                        ? 'bg-primary/10 border-primary text-primary opacity-50 pointer-events-none'
-                        : 'bg-primary/10 border-primary text-primary hover:bg-primary/20'}
-                      `}
+                        ${isCurrent ? 'bg-green-100 border-green-500 text-green-700 font-black' : 'bg-primary/10 border-primary text-primary hover:bg-primary/20'}`}
             >
                                             <span
                                                 className={`w-2 h-2 rounded-full shrink-0 ${isCurrent ? 'bg-green-500' : 'bg-primary'}`}></span>
