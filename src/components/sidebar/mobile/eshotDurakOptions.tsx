@@ -3,6 +3,8 @@ import * as React from "react";
 import LoaderOverlay from "../LoaderOverlay";
 import EshotIcon from "../../../assets/svg/eshot.svg";
 import {sleep} from "../../../utils/commonUtils";
+import { playSound } from '../../../utils/audioUtils';
+import eshotSound from '../../../assets/sound/eshot-travel-sound.mp3';
 
 interface IProps {
     gameState: any;
@@ -25,11 +27,14 @@ export const EshotDurakOptions = (props: IProps) => {
     const handleTravelToStopWithLoader = async (stop: Stop) => {
         setIsLoading(true);
         setDestinationStop(stop);
+        const sound = playSound(eshotSound);
         try {
-            await sleep(5000);
+            const durationMs = sound.duration() * 1000;
+            await sleep(durationMs);
             handleTravelToStop(stop);
         } finally {
             setIsLoading(false);
+            sound.stop();
         }
     };
 

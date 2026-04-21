@@ -22,3 +22,14 @@ export function stopAllSounds() {
   Howler.stop();
 }
 
+/**
+ * Bir veya birden fazla ses dosyasını önceden yükler.
+ * @param srcList Tek bir string veya string dizisi olarak ses dosyası yolu/isimleri
+ * @returns Howl örneği veya örnekleri
+ */
+export function preloadSounds(srcList: string | string[]): Howl | Howl[] {
+  if (Array.isArray(srcList)) {
+    return srcList.map(src => new Howl({ src: [src], preload: true }));
+  }
+  return new Howl({ src: [srcList], preload: true });
+}

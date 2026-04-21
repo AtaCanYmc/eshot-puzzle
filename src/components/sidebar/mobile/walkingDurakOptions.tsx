@@ -3,6 +3,8 @@ import * as React from "react";
 import LoaderOverlay from "../LoaderOverlay";
 import WalkIcon from "../../../assets/svg/walk.svg";
 import {sleep} from "../../../utils/commonUtils";
+import { playSound } from '../../../utils/audioUtils';
+import walkSound from '../../../assets/sound/walk.mp3';
 
 interface IProps {
     gameState: any;
@@ -27,10 +29,14 @@ export const WalkingDurakOptions = (props: IProps) => {
     const handleWalkToStopWithLoader = async (stop: Stop) => {
         setIsLoading(true);
         setDestinationStop(stop);
+        const sound = playSound(walkSound);
         try {
-            await sleep(5000).then(() => handleWalkToStop(stop));
+            const durationMs = sound.duration() * 1000;
+            await sleep(durationMs);
+            handleWalkToStop(stop);
         } finally {
             setIsLoading(false);
+            sound.stop();
         }
     };
 

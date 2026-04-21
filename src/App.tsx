@@ -3,6 +3,9 @@ import GamePage from './pages/GamePage';
 import HomePage from './pages/HomePage';
 import { useLocation } from 'react-router-dom';
 import './index.css';
+import { useEffect } from 'react';
+import { preloadSounds } from './utils/audioUtils';
+import eshotSound from './assets/sound/eshot-travel-sound.mp3';
 
 function GamePageWithState() {
     const location = useLocation();
@@ -15,6 +18,9 @@ function GamePageWithState() {
 }
 
 function App() {
+    useEffect(() => {
+        preloadSounds(eshotSound);
+    }, []);
     return (
         <Router basename={import.meta.env.BASE_URL}>
             <Routes>
