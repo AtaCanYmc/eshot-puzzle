@@ -1,8 +1,8 @@
 import * as React from 'react';
 import type {Stop} from '../../types/supabaseTypes';
-import WalkIcon from '../../assets/svg/walk.svg';
-import EshotIcon from '../../assets/svg/eshot.svg';
-import LoaderOverlay from './LoaderOverlay';
+import {EshotDurakOptions} from "./mobile/eshotDurakOptions";
+import {MainOptions} from "./mobile/mainOptions";
+import {WalkingDurakOptions} from "./mobile/walkingDurakOptions";
 
 interface MobileSideBarProps {
     gameState: any;
@@ -35,37 +35,16 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
         setSidebarOpen
     } = props;
 
-    const [actionLoading, setActionLoading] = React.useState<{type: 'walk' | 'eshot' | null, text?: string}>({type: null});
-
     const toggleSideBar = () => {
         setSidebarOpen(!isSidebarOpen);
     }
-
-    const handleTravelToStopWithLoader = async (stop: Stop) => {
-        setActionLoading({ type: 'eshot', text: `${stop.durak_adi} durağına gidiliyor...` });
-        try {
-            await sleep(5000);
-            handleTravelToStop(stop);
-        } finally {
-            setActionLoading({ type: null });
-        }
-    };
-
-    const handleWalkToStopWithLoader = async (stop: Stop) => {
-        setActionLoading({ type: 'walk', text: `${stop.durak_adi} durağına yürüyor...` });
-        try {
-            await sleep(5000);
-            handleWalkToStop(stop);
-        } finally {
-            setActionLoading({ type: null });
-        }
-    };
 
     const getHeader = (showBackButton = false, onBack?: () => void) => {
         return (
             <header className="mb-4 flex items-center justify-between">
                 <div>
-                    <h2 className={`text-xs font-black uppercase tracking-widest mb-1 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Şu Anki Durak</h2>
+                    <h2 className={`text-xs font-black uppercase tracking-widest mb-1 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Şu
+                        Anki Durak</h2>
                     <p className={`text-lg font-bold leading-tight line-clamp-2 ${theme === 'dark' ? '' : 'text-slate-900'}`}>{gameState.currentStop.durak_adi}</p>
                     <span className="text-xs font-mono text-primary opacity-70">{gameState.currentStop.durak_id}</span>
                 </div>
@@ -88,97 +67,7 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
         );
     };
 
-    const getButtonOptions = () => {
-        if (gameState.selectedLine || gameState.isWalking) return <></>;
-        return (
-            <section>
-                <h3 className={`text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2 ${theme === 'dark' ? 'text-primary' : 'text-blue-700'}`}>Geçen Hatlar</h3>
-                <div className="grid grid-cols-2 gap-2 mb-2">
-                    <button
-                        className={`p-2 rounded-xl border-2 text-center group col-span-2 flex items-center justify-center gap-2 ${gameState.isWalking ? 'bg-yellow-100 text-slate-800 font-black' : 'bg-white/5 text-slate-800 hover:bg-yellow-50'}`}
-                        onClick={() => setGameState((prev: any) => ({
-                            ...prev,
-                            isWalking: !prev.isWalking,
-                            selectedLine: null,
-                            selectedDirection: null,
-                            lineStops: []
-                        }))}
-                    >
-                        <img src={WalkIcon} alt="Yürü" className="w-5 h-5" />
-                        <span className="block text-base font-black group-hover:scale-110 transition-transform"> Yürü </span>
-                    </button>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                    {availableLines.length > 0 ? (
-                        availableLines.map(line => (
-                            <button
-                                key={line.hat_no}
-                                onClick={() => handleSelectLine(line.hat_no)}
-                                className={`p-2 rounded-xl border-2 text-center group flex gap-2 items-center justify-center
-                        ${gameState.selectedLine === line.hat_no
-                                    ? 'bg-primary/10 border-primary text-primary font-black'
-                                    : 'bg-white/5 border-primary/60 text-slate-800 hover:bg-primary/10 hover:border-primary'}
-                      `}
-                            >
-                                <img src={EshotIcon} alt="ESHOT" className="w-5 h-5" />
-                                <span className="block text-base font-black group-hover:scale-110 transition-transform">{line.hat_no}</span>
-                            </button>
-                        ))
-                    ) : (
-                        <p className={`col-span-2 text-xs italic py-2 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>Bu durakta hat bulunamadı.</p>
-                    )}
-                </div>
-            </section>
-        );
-    };
-
-    const getEshotHatOptions = () => {
-        if (!gameState.selectedLine || gameState.isWalking) return <></>;
-        return (
-            <section>
-                {getHeader(true, () => setGameState((prev: any) => ({
-                    ...prev,
-                    selectedLine: null,
-                    selectedDirection: null,
-                    lineStops: []
-                })))}
-                <h3 className={`text-xs font-bold uppercase tracking-widest mb-2 ${theme === 'dark' ? 'text-primary' : 'text-blue-700'}`}>Hat Durakları</h3>
-                <div className="space-y-1">
-                    {gameState.lineStops.length === 0 && (
-                        <div
-                            className={`text-xs italic ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>Duraklar
-                            yükleniyor veya bulunamadı.</div>
-                    )}
-                    {gameState.lineStops.length > 0 && gameState.lineStops.map((stop: Stop) => {
-                        const isCurrent = stop.status_code === 2;
-                        const isPast = stop.status_code === 0;
-                        return (
-                            <button
-                                key={stop.durak_id}
-                                onClick={() => handleTravelToStopWithLoader(stop)}
-                                className={`w-full p-2 rounded-xl text-left border flex items-center gap-2 transition-all
-                        ${isCurrent
-                                    ? 'bg-green-100 border-green-500 text-green-700 font-black'
-                                    : isPast
-                                        ? 'bg-primary/10 border-primary text-primary opacity-50 pointer-events-none'
-                                        : 'bg-primary/10 border-primary text-primary hover:bg-primary/20'}
-                      `}
-                            >
-                                            <span
-                                                className={`w-2 h-2 rounded-full shrink-0 ${isCurrent ? 'bg-green-500' : 'bg-primary'}`}></span>
-                                <span className="flex flex-col">
-                        <span className="text-xs font-semibold truncate">{stop.durak_adi}</span>
-                        <span className="text-[10px] font-mono text-primary opacity-70">{stop.durak_id}</span>
-                      </span>
-                            </button>
-                        );
-                    })}
-                </div>
-            </section>
-        );
-    };
-
-    const getWalkOptions = () => {
+    /* const getWalkOptions = () => {
         if (!gameState.isWalking || gameState.selectedLine) return <></>;
         return (
             <section>
@@ -186,7 +75,8 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
                     ...prev,
                     isWalking: false
                 })))}
-                <h3 className={`text-xs font-bold uppercase tracking-widest mb-2 ${theme === 'dark' ? 'text-yellow-400' : 'text-yellow-700'}`}>Yakındaki Duraklar</h3>
+                <h3 className={`text-xs font-bold uppercase tracking-widest mb-2 ${theme === 'dark' ? 'text-yellow-400' : 'text-yellow-700'}`}>Yakındaki
+                    Duraklar</h3>
                 <div className="space-y-1">
                     {nearbyStops.length === 0 && (
                         <div
@@ -210,7 +100,7 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
                 </div>
             </section>
         );
-    };
+    }; */
 
     const getFooter = () => {
         return (
@@ -233,17 +123,14 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
                 {isSidebarOpen && <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar relative">
                     {getLoader()}
                     {/* Hat/yürüme seçimi ekranı */}
-                    {getButtonOptions()}
+                    <MainOptions gameState={gameState} setGameState={setGameState} theme={theme}
+                                 availableLines={availableLines} handleSelectLine={handleSelectLine}/>
                     {/* Hat seçildiyse duraklar ve geri butonu */}
-                    {getEshotHatOptions()}
+                    <EshotDurakOptions gameState={gameState} setGameState={setGameState} theme={theme}
+                                       handleTravelToStop={handleTravelToStop}/>
                     {/* Yürüme modu aktifse yakındaki durakları listele */}
-                    {getWalkOptions()}
-                    {actionLoading.type && (
-                        <LoaderOverlay
-                            svgSrc={actionLoading.type === 'walk' ? WalkIcon : EshotIcon}
-                            text={actionLoading.text}
-                        />
-                    )}
+                    <WalkingDurakOptions gameState={gameState} setGameState={setGameState} theme={theme}
+                                         handleWalkToStop={handleWalkToStop} nearbyStops={nearbyStops}/>
                 </div>}
                 {isSidebarOpen && getFooter()}
             </div>
@@ -255,13 +142,13 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
             >
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                      stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                  {isSidebarOpen ? (
-                    // Aşağı ok
-                    <polyline points="6 9 12 15 18 9" />
-                  ) : (
-                    // Yukarı ok
-                    <polyline points="6 15 12 9 18 15" />
-                  )}
+                    {isSidebarOpen ? (
+                        // Aşağı ok
+                        <polyline points="6 9 12 15 18 9"/>
+                    ) : (
+                        // Yukarı ok
+                        <polyline points="6 15 12 9 18 15"/>
+                    )}
                 </svg>
             </button>
         </aside>
