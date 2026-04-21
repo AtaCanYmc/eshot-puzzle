@@ -116,7 +116,7 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
         <aside
             className={`fixed left-0 bottom-0 z-[999] w-full max-w-full glass border-t transition-transform duration-500 ease-in-out
         ${theme === 'dark' ? 'border-white/10 bg-slate-900' : 'border-slate-200 bg-white'}
-        ${isSidebarOpen ? 'translate-y-0 h-[calc(70%-50px)]' : 'translate-y-[calc(100%-100px)] h-[calc(70%-50px)]'}`}
+        ${isSidebarOpen ? 'translate-y-0 h-[calc(60%-50px)]' : 'translate-y-[calc(100%-100px)] h-[calc(60%-50px)]'}`}
         >
             <div className="p-4 h-full flex flex-col">
                 {(!gameState.selectedLine && !gameState.isWalking) && getHeader()}
