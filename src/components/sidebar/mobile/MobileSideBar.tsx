@@ -3,6 +3,8 @@ import type {Stop} from '../../../types/supabaseTypes';
 import {EshotDurakOptions} from "./eshotDurakOptions";
 import {MainOptions} from "./mainOptions";
 import {WalkingDurakOptions} from "./walkingDurakOptions";
+import LoaderOverlay from "../LoaderOverlay";
+import EshotIcon from "../../../assets/svg/eshot.svg";
 
 interface MobileSideBarProps {
     gameState: any;
@@ -61,9 +63,10 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
     const getLoader = () => {
         if (!loading) return <></>;
         return (
-            <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-950/20 backdrop-blur-[2px]">
-                <div className="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-            </div>
+            <LoaderOverlay
+                svgSrc={EshotIcon}
+                text={'Yükleniyor...'}
+            />
         );
     };
 

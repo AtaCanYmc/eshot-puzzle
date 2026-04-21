@@ -65,13 +65,15 @@ const GamePage: React.FC<GamePageProps> = ({stops}) => {
         let cancelled = false;
 
         async function fetchNearby() {
+            setLoading(true);
             try {
                 const data = await eshotService.getNearbyStops(gameState.currentStop.enlem, gameState.currentStop.boylam, 200);
-                // Sadece kendisini çıkar, history'de olanlar tekrar seçilebilir
                 const filtered = data.filter((s: Stop) => s.durak_id !== gameState.currentStop.durak_id);
                 if (!cancelled) setNearbyStops(filtered);
             } catch (e) {
                 setNearbyStops([]);
+            } finally {
+                setLoading(false);
             }
         }
 
