@@ -1,8 +1,8 @@
 import * as React from 'react';
-import type {Stop} from '../../types/supabaseTypes';
-import {EshotDurakOptions} from "./mobile/eshotDurakOptions";
-import {MainOptions} from "./mobile/mainOptions";
-import {WalkingDurakOptions} from "./mobile/walkingDurakOptions";
+import type {Stop} from '../../../types/supabaseTypes';
+import {EshotDurakOptions} from "./eshotDurakOptions";
+import {MainOptions} from "./mainOptions";
+import {WalkingDurakOptions} from "./walkingDurakOptions";
 
 interface MobileSideBarProps {
     gameState: any;

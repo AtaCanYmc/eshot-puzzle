@@ -8,7 +8,7 @@ import Sidebar from '../components/sidebar/Sidebar';
 import GameTopBar from '../components/topbar/GameTopBar';
 import useIsMobile from '../hooks/useIsMobile';
 import MobileTopBar from '../components/topbar/MobileTopBar';
-import MobileSideBar from '../components/sidebar/MobileSideBar';
+import MobileSideBar from '../components/sidebar/mobile/MobileSideBar';
 
 
 interface GamePageProps {
