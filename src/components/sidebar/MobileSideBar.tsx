@@ -2,6 +2,7 @@ import * as React from 'react';
 import type {Stop} from '../../types/supabaseTypes';
 import WalkIcon from '../../assets/svg/walk.svg';
 import EshotIcon from '../../assets/svg/eshot.svg';
+import LoaderOverlay from './LoaderOverlay';
 
 interface MobileSideBarProps {
     gameState: any;
@@ -34,9 +35,31 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
         setSidebarOpen
     } = props;
 
+    const [actionLoading, setActionLoading] = React.useState<{type: 'walk' | 'eshot' | null, text?: string}>({type: null});
+
     const toggleSideBar = () => {
         setSidebarOpen(!isSidebarOpen);
     }
+
+    const handleTravelToStopWithLoader = async (stop: Stop) => {
+        setActionLoading({ type: 'eshot', text: `${stop.durak_adi} durağına gidiliyor...` });
+        try {
+            await sleep(5000);
+            handleTravelToStop(stop);
+        } finally {
+            setActionLoading({ type: null });
+        }
+    };
+
+    const handleWalkToStopWithLoader = async (stop: Stop) => {
+        setActionLoading({ type: 'walk', text: `${stop.durak_adi} durağına yürüyor...` });
+        try {
+            await sleep(5000);
+            handleWalkToStop(stop);
+        } finally {
+            setActionLoading({ type: null });
+        }
+    };
 
     const getHeader = (showBackButton = false, onBack?: () => void) => {
         return (
@@ -132,7 +155,7 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
                         return (
                             <button
                                 key={stop.durak_id}
-                                onClick={() => handleTravelToStop(stop)}
+                                onClick={() => handleTravelToStopWithLoader(stop)}
                                 className={`w-full p-2 rounded-xl text-left border flex items-center gap-2 transition-all
                         ${isCurrent
                                     ? 'bg-green-100 border-green-500 text-green-700 font-black'
@@ -173,7 +196,7 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
                     {nearbyStops.map((stop) => (
                         <button
                             key={stop.durak_id}
-                            onClick={() => handleWalkToStop(stop)}
+                            onClick={() => handleWalkToStopWithLoader(stop)}
                             className="w-full p-2 rounded-xl text-left border border-yellow-400 bg-yellow-50 hover:bg-yellow-100 text-yellow-900 flex items-center gap-2"
                         >
                             <span className="w-2 h-2 rounded-full bg-yellow-400 shrink-0"></span>
@@ -192,7 +215,7 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
     const getFooter = () => {
         return (
             <footer
-                className={`mt-4 pt-4 border-t rounded-2xl p-2 ${theme === 'dark' ? 'border-white/10 bg-orange-500/10 border border-orange-500/20' : 'border-slate-200 bg-orange-100 border border-orange-300'}`}>
+                className={`mt-4 pt-4 border-t rounded-2xl p-2 ${theme === 'dark' ? 'border-orange-500/20 bg-orange-500/10 border' : 'border-orange-300 bg-orange-100 border'}`}>
                 <p className={`text-[10px] font-black uppercase mb-1 ${theme === 'dark' ? 'text-orange-400' : 'text-orange-700'}`}>Hedef</p>
                 <p className={`text-xs font-bold truncate ${theme === 'dark' ? '' : 'text-slate-900'}`}>{stops[1].durak_adi}</p>
             </footer>
@@ -215,6 +238,12 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
                     {getEshotHatOptions()}
                     {/* Yürüme modu aktifse yakındaki durakları listele */}
                     {getWalkOptions()}
+                    {actionLoading.type && (
+                        <LoaderOverlay
+                            svgSrc={actionLoading.type === 'walk' ? WalkIcon : EshotIcon}
+                            text={actionLoading.text}
+                        />
+                    )}
                 </div>}
                 {isSidebarOpen && getFooter()}
             </div>
