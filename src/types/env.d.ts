@@ -1,0 +1,6 @@
+// ...existing code...
+declare interface ImportMeta {
+  readonly env: Record<string, string>;
+}
+// ...existing code...
+

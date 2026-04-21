@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import GamePage from './pages/GamePage';
 import HomePage from './pages/HomePage';
+import NotFoundPage from './pages/NotFoundPage';
 import { useLocation } from 'react-router-dom';
 import './index.css';
 import { useEffect } from 'react';
@@ -26,10 +27,10 @@ function App() {
             <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/game" element={<GamePageWithState />} />
+                <Route path="*" element={<NotFoundPage />} />
             </Routes>
         </Router>
     );
 }
 
 export default App;
-
