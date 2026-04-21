@@ -16,7 +16,6 @@ interface IProps {
 export const EshotDurakOptions = (props: IProps) => {
     const {
         gameState,
-        setGameState,
         theme,
         handleTravelToStop
     } = props;
@@ -36,32 +35,6 @@ export const EshotDurakOptions = (props: IProps) => {
             setIsLoading(false);
             sound.stop();
         }
-    };
-
-    const handleBack = () => setGameState((prev: any) => ({
-        ...prev,
-        selectedLine: null,
-        selectedDirection: null,
-        lineStops: []
-    }));
-
-    const getHeader = (showBackButton = false, onBack?: () => void) => {
-        return (
-            <header className="mb-4 flex items-center justify-between">
-                <div>
-                    <h2 className={`text-xs font-black uppercase tracking-widest mb-1 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Şu
-                        Anki Durak</h2>
-                    <p className={`text-lg font-bold leading-tight line-clamp-2 ${theme === 'dark' ? '' : 'text-slate-900'}`}>{gameState.currentStop.durak_adi}</p>
-                    <span className="text-xs font-mono text-primary opacity-70">{gameState.currentStop.durak_id}</span>
-                </div>
-                {showBackButton && (
-                    <button
-                        onClick={onBack}
-                        className="text-sm font-extrabold text-slate-400 hover:text-primary underline px-2 py-1 transition-colors"
-                    >GERİ</button>
-                )}
-            </header>
-        );
     };
 
     const getDurakBulunamadi = () => {
@@ -113,7 +86,6 @@ export const EshotDurakOptions = (props: IProps) => {
     if (!gameState.selectedLine || gameState.isWalking) return <></>;
     return (
         <section>
-            {getHeader(true, handleBack)}
             <h3 className={`text-xs font-bold uppercase tracking-widest mb-2 ${theme === 'dark' ? 'text-primary' : 'text-blue-700'}`}>Hat
                 Durakları</h3>
             <div className="space-y-1">

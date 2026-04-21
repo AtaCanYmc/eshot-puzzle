@@ -5,6 +5,7 @@ import {MainOptions} from "./mainOptions";
 import {WalkingDurakOptions} from "./walkingDurakOptions";
 import LoaderOverlay from "../LoaderOverlay";
 import EshotIcon from "../../../assets/svg/eshot.svg";
+import {OptionSlider} from "./OptionSlider";
 
 interface MobileSideBarProps {
     gameState: any;
@@ -43,19 +44,15 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
 
     const getHeader = (showBackButton = false, onBack?: () => void) => {
         return (
-            <header className="mb-4 flex items-center justify-between">
-                <div>
+            <header className="mb-4 flex items-center justify-between flex-col w-full">
+                <div className={"w-full mt-1"}>
                     <h2 className={`text-xs font-black uppercase tracking-widest mb-1 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Şu
                         Anki Durak</h2>
                     <p className={`text-lg font-bold leading-tight line-clamp-2 ${theme === 'dark' ? '' : 'text-slate-900'}`}>{gameState.currentStop.durak_adi}</p>
                     <span className="text-xs font-mono text-primary opacity-70">{gameState.currentStop.durak_id}</span>
                 </div>
-                {showBackButton && (
-                    <button
-                        onClick={onBack}
-                        className="text-sm font-extrabold text-slate-400 hover:text-primary underline px-2 py-1 transition-colors"
-                    >GERİ</button>
-                )}
+                <OptionSlider gameState={gameState} setGameState={setGameState} theme={theme}
+                              availableLines={availableLines} handleSelectLine={handleSelectLine}/>
             </header>
         );
     };
@@ -69,41 +66,6 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
             />
         );
     };
-
-    /* const getWalkOptions = () => {
-        if (!gameState.isWalking || gameState.selectedLine) return <></>;
-        return (
-            <section>
-                {getHeader(true, () => setGameState((prev: any) => ({
-                    ...prev,
-                    isWalking: false
-                })))}
-                <h3 className={`text-xs font-bold uppercase tracking-widest mb-2 ${theme === 'dark' ? 'text-yellow-400' : 'text-yellow-700'}`}>Yakındaki
-                    Duraklar</h3>
-                <div className="space-y-1">
-                    {nearbyStops.length === 0 && (
-                        <div
-                            className={`text-xs italic ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>Yakında
-                            durak yok.</div>
-                    )}
-                    {nearbyStops.map((stop) => (
-                        <button
-                            key={stop.durak_id}
-                            onClick={() => handleWalkToStopWithLoader(stop)}
-                            className="w-full p-2 rounded-xl text-left border border-yellow-400 bg-yellow-50 hover:bg-yellow-100 text-yellow-900 flex items-center gap-2"
-                        >
-                            <span className="w-2 h-2 rounded-full bg-yellow-400 shrink-0"></span>
-                            <span className="flex flex-col text-xs font-semibold truncate">
-                      {stop.durak_adi}
-                                <span
-                                    className="text-[10px] font-mono text-yellow-700 opacity-70">{stop.durak_id}</span>
-                    </span>
-                        </button>
-                    ))}
-                </div>
-            </section>
-        );
-    }; */
 
     const getFooter = () => {
         return (
@@ -122,7 +84,7 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
         ${isSidebarOpen ? 'translate-y-0 h-[calc(60%-50px)]' : 'translate-y-[calc(100%-100px)] h-[calc(60%-50px)]'}`}
         >
             <div className="p-4 h-full flex flex-col">
-                {(!gameState.selectedLine && !gameState.isWalking) && getHeader()}
+                {getHeader()}
                 {isSidebarOpen && <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar relative">
                     {getLoader()}
                     {/* Hat/yürüme seçimi ekranı */}

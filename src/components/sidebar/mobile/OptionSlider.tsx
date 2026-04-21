@@ -22,7 +22,7 @@ export const OptionSlider = (props: IProps) => {
 
     const getWalkingButton = () => {
         return (
-            <button className={`p-2 rounded-xl border-2 text-center group flex items-center justify-center gap-2 ${gameState.isWalking ? 'bg-yellow-100 text-slate-800 font-black' : 'bg-white/5 text-slate-800 hover:bg-yellow-50'}`} onClick={() => {}}>
+            <button className={`p-2 rounded-xl border-2 text-center group flex items-center justify-center gap-2 w-full ${gameState.isWalking ? 'bg-primary/10 border-primary text-primary font-black' : 'bg-white/5 border-primary/60 text-slate-800 hover:bg-primary/10 hover:border-primary'}`} onClick={() => {}}>
                 <img src={WalkIcon} alt="Yürü" className="w-5 h-5"/>
                 <span className="block text-base font-black group-hover:scale-110 transition-transform"> Yürü </span>
             </button>
@@ -34,7 +34,7 @@ export const OptionSlider = (props: IProps) => {
             <button
                 key={hatNo}
                 onClick={() => handleSelectLine(hatNo)}
-                className={`p-2 rounded-xl border-2 text-center group flex gap-2 items-center justify-center
+                className={`p-2 rounded-xl border-2 text-center group flex gap-2 items-center justify-center w-full
                         ${gameState.selectedLine === hatNo ? 'bg-primary/10 border-primary text-primary font-black' : 'bg-white/5 border-primary/60 text-slate-800 hover:bg-primary/10 hover:border-primary'}`}>
                 <img src={EshotIcon} alt="ESHOT" className="w-5 h-5"/>
                 <span className="block text-base font-black group-hover:scale-110 transition-transform">{hatNo}</span>
@@ -68,23 +68,16 @@ export const OptionSlider = (props: IProps) => {
         }
     }, [carouselIndex]);
 
-    if (gameState.selectedLine || gameState.isWalking) return <></>;
     return (
-        <div className={`p-4 bg-white/10 rounded-xl ${theme === 'dark' ? 'text-slate-300' : 'text-slate-800'} mb-4`}>
+        <div className={`w-full p-4 bg-white/10 rounded-xl ${theme === 'dark' ? 'text-slate-300' : 'text-slate-800'} mb-4`}>
             <div className="flex items-center gap-2 mb-2">
                 <button onClick={handlePrev}
-                        className="p-2 rounded-full bg-slate-200 hover:bg-slate-300 text-xl font-black">&#8592;</button>
+                        className="p-2 text-xl font-black">&#8592;</button>
                 <div className="flex-1 flex justify-center">
                     {items[carouselIndex]}
                 </div>
                 <button onClick={handleNext}
-                        className="p-2 rounded-full bg-slate-200 hover:bg-slate-300 text-xl font-black">&#8594;</button>
-            </div>
-            <div className="flex justify-center gap-1 mt-2">
-                {items.map((_, idx) => (
-                    <span key={idx}
-                          className={`w-2 h-2 rounded-full ${carouselIndex === idx ? 'bg-primary' : 'bg-slate-300'}`}></span>
-                ))}
+                        className="p-2 text-xl font-black">&#8594;</button>
             </div>
         </div>
     );
