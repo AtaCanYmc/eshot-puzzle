@@ -101,7 +101,7 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
             {/* Toggle Button */}
             <button
                 onClick={() => toggleSideBar()}
-                className="absolute right-4 top-2 w-8 h-8 glass border border-white/10 rounded-full flex items-center justify-center hover:bg-white/5 transition-colors"
+                className="absolute right-4 top-2 w-8 h-8 glass flex items-center justify-center transition-colors"
                 aria-label="Menüyü Kapat"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"

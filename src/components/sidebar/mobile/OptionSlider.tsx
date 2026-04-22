@@ -69,7 +69,7 @@ export const OptionSlider = (props: IProps) => {
     }, [carouselIndex]);
 
     return (
-        <div className={`w-full p-4 bg-white/10 rounded-xl ${theme === 'dark' ? 'text-slate-300' : 'text-slate-800'}`}>
+        <div className={`w-full p-4 ${theme === 'dark' ? 'text-slate-300' : 'text-slate-800'}`}>
             <div className="flex items-center gap-2">
                 <button onClick={handlePrev}
                         className="p-2 text-xl font-black">&#8592;</button>
