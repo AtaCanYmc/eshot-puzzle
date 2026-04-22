@@ -12,8 +12,7 @@ function GamePageWithState() {
     const location = useLocation();
     const stops = location.state?.stops;
     if (!stops) {
-        return <div className="flex items-center justify-center min-h-screen text-2xl font-bold">Duraklar bulunamadı.
-            Lütfen ana sayfadan oyuna başlayın.</div>;
+        return <NotFoundPage message={'Duraklar bulunamadı!'}/>;
     }
     return <GamePage stops={stops} />;
 }
