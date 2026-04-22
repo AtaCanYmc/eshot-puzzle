@@ -5,6 +5,7 @@ import {MainOptions} from "./mainOptions";
 import {WalkingDurakOptions} from "./walkingDurakOptions";
 import LoaderOverlay from "../LoaderOverlay";
 import EshotIcon from "../../../assets/svg/eshot.svg";
+import TargetIcon from "../../../assets/svg/target.svg";
 import {OptionSlider} from "./OptionSlider";
 
 interface MobileSideBarProps {
@@ -70,9 +71,11 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
     const getFooter = () => {
         return (
             <footer
-                className={`mt-4 pt-4 border-t rounded-2xl p-2 ${theme === 'dark' ? 'border-orange-500/20 bg-orange-500/10 border' : 'border-orange-300 bg-orange-100 border'}`}>
-                <p className={`text-[10px] font-black uppercase mb-1 ${theme === 'dark' ? 'text-orange-400' : 'text-orange-700'}`}>Hedef</p>
-                <p className={`text-xs font-bold truncate ${theme === 'dark' ? '' : 'text-slate-900'}`}>{stops[1].durak_adi}</p>
+                className={`mt-2 pt-2 border-t rounded-xl px-2 pb-1 flex items-center gap-2 min-h-0 h-10 ${theme === 'dark' ? 'border-orange-500/20 bg-orange-500/10 border' : 'border-orange-300 bg-orange-100 border'}`}>
+                <span className="flex items-center gap-1">
+                    <img src={TargetIcon} alt="Hedef" className="w-4 h-4 inline-block" />
+                    <span className={`text-xs font-bold truncate ${theme === 'dark' ? '' : 'text-slate-900'}`}>{stops[1].durak_adi}</span>
+                </span>
             </footer>
         );
     };
