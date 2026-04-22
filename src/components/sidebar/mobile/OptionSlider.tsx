@@ -1,4 +1,5 @@
 import WalkIcon from "../../../assets/svg/walk.svg";
+import MapIcon from "../../../assets/svg/map.svg";
 import EshotIcon from "../../../assets/svg/eshot.svg";
 import * as React from "react";
 import {useEffect, useState} from "react";
@@ -13,16 +14,24 @@ interface IProps {
 
 export const OptionSlider = (props: IProps) => {
     const {
-        gameState,
         setGameState,
         theme,
         availableLines,
         handleSelectLine
     } = props;
 
+    const getMapButton = () => {
+        return (
+            <button className={`p-2 rounded-xl border-2 text-center group flex items-center justify-center gap-2 w-full bg-primary/10 border-primary text-primary font-black`} onClick={() => {}}>
+                <img src={MapIcon} alt="Harita" className="w-5 h-5"/>
+                <span className="block text-base font-black group-hover:scale-110 transition-transform"> Harita Kullan </span>
+            </button>
+        );
+    };
+
     const getWalkingButton = () => {
         return (
-            <button className={`p-2 rounded-xl border-2 text-center group flex items-center justify-center gap-2 w-full ${gameState.isWalking ? 'bg-primary/10 border-primary text-primary font-black' : 'bg-white/5 border-primary/60 text-slate-800 hover:bg-primary/10 hover:border-primary'}`} onClick={() => {}}>
+            <button className={`p-2 rounded-xl border-2 text-center group flex items-center justify-center gap-2 w-full bg-primary/10 border-primary text-primary font-black`} onClick={() => {}}>
                 <img src={WalkIcon} alt="Yürü" className="w-5 h-5"/>
                 <span className="block text-base font-black group-hover:scale-110 transition-transform"> Yürü </span>
             </button>
@@ -34,8 +43,7 @@ export const OptionSlider = (props: IProps) => {
             <button
                 key={hatNo}
                 onClick={() => {}}
-                className={`p-2 rounded-xl border-2 text-center group flex gap-2 items-center justify-center w-full
-                        ${gameState.selectedLine === hatNo ? 'bg-primary/10 border-primary text-primary font-black' : 'bg-white/5 border-primary/60 text-slate-800 hover:bg-primary/10 hover:border-primary'}`}>
+                className={`p-2 rounded-xl border-2 text-center group flex gap-2 items-center justify-center w-full bg-primary/10 border-primary text-primary font-black`}>
                 <img src={EshotIcon} alt="ESHOT" className="w-5 h-5"/>
                 <span className="block text-base font-black group-hover:scale-110 transition-transform">{hatNo}</span>
             </button>
@@ -46,15 +54,22 @@ export const OptionSlider = (props: IProps) => {
 
     // Carousel/slider için state
     const [carouselIndex, setCarouselIndex] = useState(0);
-    const items = [getWalkingButton(), ...eshotButtons];
+    const items = [getMapButton(), getWalkingButton(), ...eshotButtons];
     const totalItems = items.length;
 
     const handlePrev = () => setCarouselIndex(i => (i - 1 + totalItems) % totalItems);
     const handleNext = () => setCarouselIndex(i => (i + 1) % totalItems);
 
     useEffect(() => {
-        const selected = items[carouselIndex];
         if (carouselIndex === 0) {
+            setGameState((prev: any) => ({
+                ...prev,
+                isWalking: false,
+                selectedLine: null,
+                selectedDirection: null,
+                lineStops: []
+            }))
+        } else if (carouselIndex === 1) {
             setGameState((prev: any) => ({
                 ...prev,
                 isWalking: true,
