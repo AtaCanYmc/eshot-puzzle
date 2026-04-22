@@ -33,7 +33,7 @@ export const OptionSlider = (props: IProps) => {
         return (
             <button
                 key={hatNo}
-                onClick={() => handleSelectLine(hatNo)}
+                onClick={() => {}}
                 className={`p-2 rounded-xl border-2 text-center group flex gap-2 items-center justify-center w-full
                         ${gameState.selectedLine === hatNo ? 'bg-primary/10 border-primary text-primary font-black' : 'bg-white/5 border-primary/60 text-slate-800 hover:bg-primary/10 hover:border-primary'}`}>
                 <img src={EshotIcon} alt="ESHOT" className="w-5 h-5"/>
