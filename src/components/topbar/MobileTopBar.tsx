@@ -49,7 +49,7 @@ const MobileTopBar: React.FC<MobileTopBarProps> = (props: MobileTopBarProps) => 
                 <div
                     className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center font-black text-lg shadow">E
                 </div>
-                <span className="font-black text-base tracking-tight">IZMIR ULAŞ</span>
+                <span className="font-black text-base tracking-tight">ROUTE-35</span>
             </div>
             <div className="flex items-center">
                 {getThemeButton()}
