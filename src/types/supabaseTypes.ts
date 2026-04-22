@@ -1,3 +1,11 @@
+export enum durakTipi {
+    ESHOT = 'ESHOT',
+    VAPUR = 'VAPUR',
+    METRO = 'METRO',
+    IZBAN = 'IZBAN',
+    TRAMVAY = 'TRAMVAY',
+}
+
 export interface Stop {
     durak_id: number;
     durak_adi: string;
@@ -5,6 +13,7 @@ export interface Stop {
     boylam: number;
     sira?: number;
     status_code?: number;
+    type?: string;
 }
 
 export interface RoutePoint {
