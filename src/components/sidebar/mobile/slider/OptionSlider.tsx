@@ -8,7 +8,7 @@ interface IProps {
     gameState: any;
     setGameState: React.Dispatch<React.SetStateAction<any>>;
     theme: string;
-    availableLines: { hat_no: string }[];
+    availableHatList: string[];
     handleSelectLine: (hatNo: string) => void;
 }
 
@@ -16,7 +16,7 @@ export const OptionSlider = (props: IProps) => {
     const {
         setGameState,
         theme,
-        availableLines,
+        availableHatList,
         handleSelectLine
     } = props;
 
@@ -53,7 +53,7 @@ export const OptionSlider = (props: IProps) => {
 
     // Carousel/slider için state
     const [carouselIndex, setCarouselIndex] = useState(0);
-    const eshotButtons = availableLines.map(line => getEshotButton(line.hat_no));
+    const eshotButtons = availableHatList.map(hat => getEshotButton(hat));
     const items = [getMapButton(), getWalkingButton(), ...eshotButtons];
     const totalItems = items.length;
 
@@ -78,14 +78,14 @@ export const OptionSlider = (props: IProps) => {
                 lineStops: []
             }))
         } else {
-            const hatNo = availableLines[carouselIndex - 2].hat_no;
+            const hatNo = availableHatList[carouselIndex - 2];
             handleSelectLine(hatNo);
         }
-    }, [carouselIndex, availableLines]);
+    }, [carouselIndex, availableHatList]);
 
     useEffect(() => {
         setCarouselIndex(0);
-    }, [availableLines.length]);
+    }, [availableHatList.length]);
 
     return (
         <div className={`w-full p-4 ${theme === 'dark' ? 'text-slate-300' : 'text-slate-800'}`}>

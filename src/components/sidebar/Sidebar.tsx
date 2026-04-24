@@ -2,8 +2,6 @@ import * as React from 'react';
 import type {Stop} from '../../types/supabaseTypes';
 
 interface SidebarProps {
-    gameState: any;
-    setGameState: React.Dispatch<React.SetStateAction<any>>;
     theme: string;
     availableLines: { hat_no: string }[];
     loading: boolean;
@@ -16,28 +14,36 @@ interface SidebarProps {
     setSidebarOpen: (open: boolean) => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = (props: SidebarProps) => {
-    const {
-        gameState,
-        setGameState,
-        theme,
-        availableLines,
-        loading,
-        nearbyStops,
-        handleSelectLine,
-        handleTravelToStop,
-        handleWalkToStop,
-        stops,
-        isSidebarOpen,
-        setSidebarOpen
-    } = props;
+import {useGameStore} from '../../store/gameStore';
+const Sidebar: React.FC<SidebarProps> = ({
+    theme,
+    availableLines,
+    loading,
+    nearbyStops,
+    handleSelectLine,
+    handleTravelToStop,
+    handleWalkToStop,
+    stops,
+    isSidebarOpen,
+    setSidebarOpen
+}) => {
+    const currentStop = useGameStore(state => state.currentStop);
+    const selectedLine = useGameStore(state => state.selectedLine);
+    const selectedDirection = useGameStore(state => state.selectedDirection);
+    const lineStops = useGameStore(state => state.lineStops);
+    const isWalking = useGameStore(state => state.isWalking);
+    const setIsWalking = useGameStore(state => state.setIsWalking);
+    const setSelectedLine = useGameStore(state => state.setSelectedLine);
+    const setSelectedDirection = useGameStore(state => state.setSelectedDirection);
+    const setLineStops = useGameStore(state => state.setLineStops);
 
     const getAsideHeader = () => {
+        if (!currentStop) return null;
         return (
             <header className="mb-6">
                 <h2 className={`text-sm font-black uppercase tracking-widest mb-1 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Şu
                     Anki Durak</h2>
-                <p className={`text-xl font-bold leading-tight line-clamp-2 ${theme === 'dark' ? '' : 'text-slate-900'}`}>{gameState.currentStop.durak_adi}</p>
+                <p className={`text-xl font-bold leading-tight line-clamp-2 ${theme === 'dark' ? '' : 'text-slate-900'}`}>{currentStop.durak_adi}</p>
             </header>
         );
     };
@@ -53,7 +59,7 @@ const Sidebar: React.FC<SidebarProps> = (props: SidebarProps) => {
     };
 
     const getOptions = () => {
-        if (gameState.selectedLine || gameState.isWalking) return <></>;
+        if (selectedLine || isWalking) return <></>;
         return (
             <section>
                 <h3 className={`text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2 ${theme === 'dark' ? 'text-primary' : 'text-blue-700'}`}>
@@ -70,14 +76,13 @@ const Sidebar: React.FC<SidebarProps> = (props: SidebarProps) => {
                 <div className="grid grid-cols-2 gap-3 mb-3">
                     {/* Yürüme butonu */}
                     <button
-                        className={`p-3 rounded-xl border-2 transition-all text-center group col-span-2 flex items-center justify-center gap-2 ${gameState.isWalking ? 'bg-yellow-100 border-yellow-400 text-yellow-700 font-black' : 'bg-white/5 border-yellow-400 text-yellow-700 hover:bg-yellow-50'}`}
-                        onClick={() => setGameState((prev: any) => ({
-                            ...prev,
-                            isWalking: !prev.isWalking,
-                            selectedLine: null,
-                            selectedDirection: null,
-                            lineStops: []
-                        }))}
+                        className={`p-3 rounded-xl border-2 transition-all text-center group col-span-2 flex items-center justify-center gap-2 ${isWalking ? 'bg-yellow-100 border-yellow-400 text-yellow-700 font-black' : 'bg-white/5 border-yellow-400 text-yellow-700 hover:bg-yellow-50'}`}
+                        onClick={() => {
+                            setIsWalking(!isWalking);
+                            setSelectedLine(null);
+                            setSelectedDirection(null);
+                            setLineStops([]);
+                        }}
                     >
                         <span className="text-xl">🚶‍♂️</span> Yürü
                     </button>
@@ -89,13 +94,12 @@ const Sidebar: React.FC<SidebarProps> = (props: SidebarProps) => {
                                 key={line.hat_no}
                                 onClick={() => handleSelectLine(line.hat_no)}
                                 className={`p-3 rounded-xl border-2 transition-all text-center group
-                        ${gameState.selectedLine === line.hat_no
+                        ${selectedLine === line.hat_no
                                     ? 'bg-primary/10 border-primary text-primary font-black'
                                     : 'bg-white/5 border-primary/60 text-slate-800 hover:bg-primary/10 hover:border-primary'}
                       `}
                             >
-                                            <span
-                                                className="block text-lg font-black group-hover:scale-110 transition-transform">{line.hat_no}</span>
+                                <span className="block text-lg font-black group-hover:scale-110 transition-transform">{line.hat_no}</span>
                             </button>
                         ))
                     ) : (
@@ -108,31 +112,30 @@ const Sidebar: React.FC<SidebarProps> = (props: SidebarProps) => {
     };
 
     const getEshotDurakOptions = () => {
-        if (!gameState.selectedLine || gameState.isWalking) return <></>;
+        if (!selectedLine || isWalking) return <></>;
         return (
             <section>
                 <div className="flex items-center justify-between mb-4">
                     <h3 className={`text-xs font-bold uppercase tracking-widest ${theme === 'dark' ? 'text-primary' : 'text-blue-700'}`}>Hat
                         Durakları</h3>
                     <button
-                        onClick={() => setGameState((prev: any) => ({
-                            ...prev,
-                            selectedLine: null,
-                            selectedDirection: null,
-                            lineStops: []
-                        }))}
+                        onClick={() => {
+                            setSelectedLine(null);
+                            setSelectedDirection(null);
+                            setLineStops([]);
+                        }}
                         className="text-[10px] font-bold text-slate-400 hover:text-primary underline"
                     >
                         GERİ
                     </button>
                 </div>
                 <div className="space-y-2">
-                    {gameState.lineStops.length === 0 && (
+                    {lineStops.length === 0 && (
                         <div
                             className={`text-xs italic ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>Duraklar
                             yükleniyor veya bulunamadı.</div>
                     )}
-                    {gameState.lineStops.length > 0 && gameState.lineStops.map((stop: Stop) => {
+                    {lineStops.length > 0 && lineStops.map((stop: Stop) => {
                         const isCurrent = stop.status_code === 2;
                         const isPast = stop.status_code === 0;
                         return (
@@ -162,14 +165,14 @@ const Sidebar: React.FC<SidebarProps> = (props: SidebarProps) => {
     };
 
     const getWalkingOptions = () => {
-        if (!gameState.isWalking || gameState.selectedLine) return <></>;
+        if (!isWalking || selectedLine) return <></>;
         return (
             <section>
                 <div className="flex items-center justify-between mb-4">
                     <h3 className={`text-xs font-bold uppercase tracking-widest ${theme === 'dark' ? 'text-yellow-400' : 'text-yellow-700'}`}>Yakındaki
                         Duraklar</h3>
                     <button
-                        onClick={() => setGameState((prev: any) => ({...prev, isWalking: false}))}
+                        onClick={() => setIsWalking(false)}
                         className="text-[10px] font-bold text-slate-400 hover:text-yellow-500 underline"
                     >
                         GERİ DÖN

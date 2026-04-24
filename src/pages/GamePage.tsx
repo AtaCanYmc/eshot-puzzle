@@ -9,52 +9,38 @@ import GameTopBar from '../components/topbar/GameTopBar';
 import useIsMobile from '../hooks/useIsMobile';
 import MobileTopBar from '../components/topbar/MobileTopBar';
 import MobileSideBar from '../components/sidebar/mobile/MobileSideBar';
-
+import {useGameStore} from '../store/gameStore';
 
 interface GamePageProps {
     stops: [Stop, Stop];
 }
 
-interface GameRecord {
-    stop: Stop;
-    line?: string;
-    direction?: number;
-}
-
-interface TravelState {
-    currentStop: Stop;
-    history: GameRecord[];
-    steps: number;
-    selectedLine: string | null;
-    selectedDirection: number | null;
-    lineStops: Stop[];
-}
-
-
 const GamePage: React.FC<GamePageProps> = ({stops}) => {
     const navigate = useNavigate();
     const {theme, toggleTheme} = useTheme();
-    const [gameState, setGameState] = React.useState<TravelState & { isWalking?: boolean }>({
-        currentStop: stops[0],
-        history: [{stop: stops[0]}],
-        steps: 0,
-        selectedLine: null,
-        selectedDirection: null,
-        lineStops: [],
-        isWalking: false
-    });
+    // Zustand store'dan state ve setter'ları çek
+    const {
+        currentStop,
+        setCurrentStop,
+        setLoading,
+        reset
+    } = useGameStore();
 
-    const [availableLines, setAvailableLines] = React.useState<{ hat_no: string }[]>([]);
-    const [loading, setLoading] = React.useState(false);
-    const [isSidebarOpen, setSidebarOpen] = React.useState(true);
-    const [nearbyStops, setNearbyStops] = React.useState<Stop[]>([]);
+    // İlk render'da store'u başlat
+    React.useEffect(() => {
+        if (!currentStop) {
+            reset(stops[0]);
+        }
+        // eslint-disable-next-line
+    }, []);
 
     // Fetch lines for current stop
     React.useEffect(() => {
+        if (!currentStop) return;
         const fetchLines = async () => {
             setLoading(true);
             try {
-                const lines = await eshotService.getHatlarByDurakId(gameState.currentStop.durak_id);
+                const lines = await eshotService.getHatlarByDurakId(currentStop.durak_id);
                 setAvailableLines(lines);
             } catch (error) {
                 console.error("Lines fetch failed", error);
@@ -63,18 +49,20 @@ const GamePage: React.FC<GamePageProps> = ({stops}) => {
             }
         };
         fetchLines().then(r => r);
-    }, [gameState.currentStop]);
+    }, [currentStop]);
 
     // YAKIN DURAKLARI ÇEK
     React.useEffect(() => {
-        if (!gameState.isWalking) return;
+        if (!isWalking || !currentStop) return;
         let cancelled = false;
 
         async function fetchNearby() {
             setLoading(true);
             try {
-                const data = await eshotService.getNearbyStops(gameState.currentStop.enlem, gameState.currentStop.boylam, 200);
-                const filtered = data.filter((s: Stop) => s.durak_id !== gameState.currentStop.durak_id);
+                if (!currentStop) return;
+                const {enlem, boylam, durak_id} = currentStop;
+                const data = await eshotService.getNearbyStops(enlem, boylam, 200);
+                const filtered = data.filter((s: Stop) => s.durak_id !== durak_id);
                 if (!cancelled) setNearbyStops(filtered);
             } catch (e) {
                 setNearbyStops([]);
@@ -87,69 +75,42 @@ const GamePage: React.FC<GamePageProps> = ({stops}) => {
         return () => {
             cancelled = true;
         };
-    }, [gameState.isWalking, gameState.currentStop, gameState.history]);
+    }, [isWalking, currentStop, history]);
 
-    // Hat seçildiğinde yönü otomatik bul ve durakları getir
-    const handleSelectLine = async (hatNo: string) => {
-        setLoading(true);
-        try {
-            // Yönleri getir
-            const directions = await eshotService.getAvailableDirections(gameState.currentStop.durak_id, hatNo);
-            if (!directions.length) throw new Error('Yön bulunamadı');
-            const selectedDirection = directions[0].smart_yon;
-            const currentDurakId = gameState.currentStop.durak_id;
-            let lineStops = await eshotService.getOrderedStops(hatNo, selectedDirection, currentDurakId);
-            setGameState(prev => ({
-                ...prev,
-                selectedLine: hatNo,
-                selectedDirection,
-                lineStops,
-                isWalking: false
-            }));
-        } catch (error) {
-            setGameState(prev => ({...prev, selectedLine: null, selectedDirection: null, lineStops: []}));
-        } finally {
-            setLoading(false);
-        }
-    };
 
     // Sadece ileriye gidilebilen duraklara geçiş izni
     const handleTravelToStop = (targetStop: Stop) => {
-        if (!gameState.lineStops.length) return;
-        const currentIndex = gameState.lineStops.findIndex(s => s.durak_id === gameState.currentStop.durak_id);
-        const targetIndex = gameState.lineStops.findIndex(s => s.durak_id === targetStop.durak_id);
+        if (!lineStops.length || !currentStop) return;
+        const currentIndex = lineStops.findIndex(s => s.durak_id === currentStop.durak_id);
+        const targetIndex = lineStops.findIndex(s => s.durak_id === targetStop.durak_id);
         // Sadece ileriye (currentIndex < targetIndex) gidilebilir
-        if (targetStop.durak_id === gameState.currentStop.durak_id || targetIndex <= currentIndex) return;
-        setGameState(prev => ({
-            currentStop: targetStop,
-            history: [...prev.history, {
-                stop: targetStop,
-                line: prev.selectedLine!,
-                direction: prev.selectedDirection!
-            }],
-            steps: prev.steps + 1,
-            selectedLine: null,
-            selectedDirection: null,
-            lineStops: []
-        }));
+        if (targetStop.durak_id === currentStop.durak_id || targetIndex <= currentIndex) return;
+        setCurrentStop(targetStop);
+        setHistory([...history, {
+            stop: targetStop,
+            line: selectedLine!,
+            direction: selectedDirection!
+        }]);
+        setSteps(steps + 1);
+        setSelectedLine(null);
+        setSelectedDirection(null);
+        setLineStops([]);
     };
 
     // Yürüyerek gidilecek duraklara geçiş
     const handleWalkToStop = (targetStop: Stop) => {
-        setGameState(prev => ({
-            currentStop: targetStop,
-            history: [...prev.history, {stop: targetStop}],
-            steps: prev.steps + 1,
-            selectedLine: null,
-            selectedDirection: null,
-            lineStops: [],
-            isWalking: false
-        }));
+        setCurrentStop(targetStop);
+        setHistory([...history, {stop: targetStop}]);
+        setSteps(steps + 1);
+        setSelectedLine(null);
+        setSelectedDirection(null);
+        setLineStops([]);
+        setIsWalking(false);
     };
 
     const isGameWon = React.useMemo(() => {
-        return gameState.currentStop.durak_id === stops[1].durak_id;
-    }, [gameState.currentStop, stops]);
+        return currentStop && currentStop.durak_id === stops[1].durak_id;
+    }, [currentStop, stops]);
 
     return (
         <div
@@ -167,7 +128,7 @@ const GamePage: React.FC<GamePageProps> = ({stops}) => {
                 <GameTopBar
                     theme={theme}
                     toggleTheme={toggleTheme}
-                    steps={gameState.steps}
+                    steps={steps}
                     onExit={() => navigate('/')}
                 />
             )}
@@ -176,8 +137,7 @@ const GamePage: React.FC<GamePageProps> = ({stops}) => {
                 {/* Sidebar */}
                 {useIsMobile() ? (
                     <MobileSideBar
-                        gameState={gameState}
-                        setGameState={setGameState}
+                        // ... Diğer prop'lar ...
                         theme={theme}
                         availableLines={availableLines}
                         loading={loading}
@@ -187,12 +147,12 @@ const GamePage: React.FC<GamePageProps> = ({stops}) => {
                         handleWalkToStop={handleWalkToStop}
                         stops={stops}
                         isSidebarOpen={isSidebarOpen}
-                        setSidebarOpen={setSidebarOpen}
+                        setSidebarOpen={setIsSidebarOpen}
+                        // gameState ve setGameState kaldırıldı
                     />
                 ) : (
                     <Sidebar
-                        gameState={gameState}
-                        setGameState={setGameState}
+                        // ... Diğer prop'lar ...
                         theme={theme}
                         availableLines={availableLines}
                         loading={loading}
@@ -202,35 +162,42 @@ const GamePage: React.FC<GamePageProps> = ({stops}) => {
                         handleWalkToStop={handleWalkToStop}
                         stops={stops}
                         isSidebarOpen={isSidebarOpen}
-                        setSidebarOpen={setSidebarOpen}
+                        setSidebarOpen={setIsSidebarOpen}
+                        // gameState ve setGameState kaldırıldı
                     />
                 )}
 
                 {/* Map */}
                 <div
                     className={`flex-1 h-full w-full min-h-[400px] relative cursor-crosshair ${theme === 'dark' ? '' : 'bg-slate-100'}`}>
-                    <MapComponent
-                        currentStop={gameState.currentStop}
-                        stops={stops}
-                        gameState={gameState}
-                        setGameState={setGameState}
-                        theme={theme}
-                        toggleTheme={toggleTheme}
-                        lineStops={gameState.lineStops}
-                        onStopClick={(stop) => {
-                            if (stop.durak_id === gameState.currentStop.durak_id) return;
-                            setGameState(prev => ({
-                                ...prev,
-                                currentStop: stop,
-                                history: [...prev.history, {stop}],
-                                steps: prev.steps + 1,
-                                selectedLine: null,
-                                selectedDirection: null,
-                                lineStops: [],
-                                isWalking: false
-                            }));
-                        }}
-                    />
+                    {currentStop && (
+                        <MapComponent
+                            currentStop={currentStop}
+                            stops={stops}
+                            gameState={{
+                                currentStop,
+                                history,
+                                steps,
+                                selectedLine,
+                                selectedDirection,
+                                lineStops,
+                                isWalking
+                            }}
+                            theme={theme}
+                            toggleTheme={toggleTheme}
+                            lineStops={lineStops}
+                            onStopClick={(stop) => {
+                                if (!currentStop || stop.durak_id === currentStop.durak_id) return;
+                                setCurrentStop(stop);
+                                setHistory([...history, {stop}]);
+                                setSteps(steps + 1);
+                                setSelectedLine(null);
+                                setSelectedDirection(null);
+                                setLineStops([]);
+                                setIsWalking(false);
+                            }}
+                        />
+                    )}
                 </div>
 
                 {/* Win Modal */}
@@ -249,7 +216,7 @@ const GamePage: React.FC<GamePageProps> = ({stops}) => {
                             <h2 className="text-4xl font-black mb-2 tracking-tighter uppercase">BAŞARDIN!</h2>
                             <p className="text-slate-400 mb-8">
                                 Hedef noktasına toplam <span
-                                className="text-primary font-black">{gameState.steps}</span> adımda ulaştın. Harika bir
+                                className="text-primary font-black">{steps}</span> adımda ulaştın. Harika bir
                                 iş çıkardın!
                             </p>
                             <button

@@ -9,8 +9,6 @@ import TargetIcon from "../../../assets/svg/target.svg";
 import {OptionSlider} from "./slider/OptionSlider";
 
 interface MobileSideBarProps {
-    gameState: any;
-    setGameState: React.Dispatch<React.SetStateAction<any>>;
     theme: string;
     availableLines: { hat_no: string }[];
     loading: boolean;
@@ -23,37 +21,37 @@ interface MobileSideBarProps {
     setSidebarOpen: (open: boolean) => void;
 }
 
-const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) => {
-    const {
-        gameState,
-        setGameState,
-        theme,
-        availableLines,
-        loading,
-        nearbyStops,
-        handleSelectLine,
-        handleTravelToStop,
-        handleWalkToStop,
-        stops,
-        isSidebarOpen,
-        setSidebarOpen
-    } = props;
+import {useGameStore} from '../../../store/gameStore';
+const MobileSideBar: React.FC<MobileSideBarProps> = ({
+    theme,
+    availableLines,
+    loading,
+    nearbyStops,
+    handleSelectLine,
+    handleTravelToStop,
+    handleWalkToStop,
+    stops,
+    isSidebarOpen,
+    setSidebarOpen
+}) => {
+    const currentStop = useGameStore(state => state.currentStop);
 
     const toggleSideBar = () => {
         setSidebarOpen(!isSidebarOpen);
     }
 
     const getHeader = (showBackButton = false, onBack?: () => void) => {
+        if (!currentStop) return null;
         return (
             <header className="mb-4 flex items-center justify-between flex-col w-full">
                 <div className={"w-full mt-1"}>
                     <h2 className={`text-xs font-black uppercase tracking-widest mb-1 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Şu
                         Anki Durak</h2>
-                    <p className={`text-lg font-bold leading-tight line-clamp-2 ${theme === 'dark' ? '' : 'text-slate-900'}`}>{gameState.currentStop.durak_adi}</p>
-                    <span className="text-xs font-mono text-primary opacity-70">{gameState.currentStop.durak_id}</span>
+                    <p className={`text-lg font-bold leading-tight line-clamp-2 ${theme === 'dark' ? '' : 'text-slate-900'}`}>{currentStop.durak_adi}</p>
+                    <span className="text-xs font-mono text-primary opacity-70">{currentStop.durak_id}</span>
                 </div>
-                <OptionSlider gameState={gameState} setGameState={setGameState} theme={theme}
-                              availableLines={availableLines} handleSelectLine={handleSelectLine}/>
+                {/* OptionSlider ve diğer alt bileşenler de store'dan state çekmeli */}
+                <OptionSlider theme={theme} availableLines={availableLines} handleSelectLine={handleSelectLine}/>
             </header>
         );
     };
@@ -89,21 +87,16 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
                 {getHeader()}
                 {isSidebarOpen && <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar relative">
                     {getLoader()}
-                    {/* Hat/yürüme seçimi ekranı */}
-                    <MainOptions gameState={gameState} setGameState={setGameState} theme={theme}
-                                 availableLines={availableLines} handleSelectLine={handleSelectLine}/>
-                    {/* Hat seçildiyse duraklar ve geri butonu */}
-                    <EshotDurakOptions gameState={gameState} setGameState={setGameState} theme={theme}
-                                       handleTravelToStop={handleTravelToStop}/>
-                    {/* Yürüme modu aktifse yakındaki durakları listele */}
-                    <WalkingDurakOptions gameState={gameState} setGameState={setGameState} theme={theme}
-                                         handleWalkToStop={handleWalkToStop} nearbyStops={nearbyStops}/>
+                    {/* MainOptions, EshotDurakOptions, WalkingDurakOptions da store'dan state çekmeli */}
+                    <MainOptions theme={theme} availableLines={availableLines} handleSelectLine={handleSelectLine}/>
+                    <EshotDurakOptions theme={theme} handleTravelToStop={handleTravelToStop}/>
+                    <WalkingDurakOptions theme={theme} handleWalkToStop={handleWalkToStop} nearbyStops={nearbyStops}/>
                 </div>}
                 {isSidebarOpen && getFooter()}
             </div>
             {/* Toggle Button */}
             <button
-                onClick={() => toggleSideBar()}
+                onClick={() => setSidebarOpen(!isSidebarOpen)}
                 className="absolute right-4 top-2 w-8 h-8 glass flex items-center justify-center transition-colors"
                 aria-label="Menüyü Kapat"
             >
@@ -123,4 +116,3 @@ const MobileSideBar: React.FC<MobileSideBarProps> = (props: MobileSideBarProps) 
 };
 
 export default MobileSideBar;
-

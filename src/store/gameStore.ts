@@ -9,34 +9,49 @@ interface GameRecord {
 }
 
 interface GameState {
-    // values
+    // current stop
     currentStop: Stop | null;
+    setCurrentStop: (stop: Stop) => void;
+
+    // game history
     history: GameRecord[];
     steps: number;
+    setHistory: (history: GameRecord[]) => void;
+    setSteps: (steps: number) => void;
+
+    // current line and direction
     selectedLine: string | null;
     selectedDirection: number | null;
     lineStops: Stop[];
-    isWalking: boolean;
-    availableLines: { hat_no: string }[];
-    loading: boolean;
-    loadingIcon: React.ReactNode;
-    loadingMessage: string;
-    isSidebarOpen: boolean;
-    nearbyStops: Stop[];
-    // Setters
-    setCurrentStop: (stop: Stop) => void;
-    setHistory: (history: GameRecord[]) => void;
-    setSteps: (steps: number) => void;
     setSelectedLine: (line: string | null) => void;
     setSelectedDirection: (dir: number | null) => void;
     setLineStops: (stops: Stop[]) => void;
-    setIsWalking: (val: boolean) => void;
+
+    // eshot lines (duraktan gecen)
+    availableLines: { hat_no: string }[];
     setAvailableLines: (lines: { hat_no: string }[]) => void;
+
+    // nearby stops
+    nearbyStops: Stop[];
+    setNearbyStops: (stops: Stop[]) => void;
+
+    // Slider
+    sliderIndex: number;
+    setSliderIndex: (index: number) => void;
+
+    // sidebar
+    isSidebarOpen: boolean;
+    setIsSidebarOpen: (val: boolean) => void;
+
+    // loading
+    loading: boolean;
+    loadingIcon: React.ReactNode;
+    loadingMessage: string;
     setLoading: (val: boolean) => void;
     setLoadingIcon: (icon: React.ReactNode) => void;
     setLoadingMessage: (message: string) => void;
-    setIsSidebarOpen: (val: boolean) => void;
-    setNearbyStops: (stops: Stop[]) => void;
+
+    // reset
     reset: (firstStop: Stop) => void;
 }
 
@@ -47,7 +62,7 @@ export const useGameStore = create<GameState>((set) => ({
     selectedLine: null,
     selectedDirection: null,
     lineStops: [],
-    isWalking: false,
+    sliderIndex: 0,
     availableLines: [],
     loading: false,
     loadingIcon: null,
@@ -60,7 +75,7 @@ export const useGameStore = create<GameState>((set) => ({
     setSelectedLine: (line) => set(() => ({selectedLine: line})),
     setSelectedDirection: (dir) => set(() => ({selectedDirection: dir})),
     setLineStops: (stops) => set(() => ({lineStops: stops})),
-    setIsWalking: (val) => set(() => ({isWalking: val})),
+    setSliderIndex: (index) => set(() => ({sliderIndex: index})),
     setAvailableLines: (lines) => set(() => ({availableLines: lines})),
     setLoading: (val) => set(() => ({loading: val})),
     setLoadingIcon: (icon) => set(() => ({loadingIcon: icon})),
