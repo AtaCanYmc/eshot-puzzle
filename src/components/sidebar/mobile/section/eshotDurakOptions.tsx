@@ -1,44 +1,44 @@
 import type {Stop} from "../../../../types/supabaseTypes";
 import * as React from "react";
-import LoaderOverlay from "../../../loader/LoaderOverlay";
-import EshotIcon from "../../../../assets/svg/eshot.svg";
 import {sleep} from "../../../../utils/commonUtils";
-import { playSound } from '../../../../utils/audioUtils';
+import {playSound} from '../../../../utils/audioUtils';
 import eshotSound from '../../../../assets/sound/eshot-travel-sound.mp3';
+import {eshotService} from "../../../../service/eshotService";
+import {useGameStore} from "../../../../store/gameStore";
+import {useEffect} from "react";
 
 interface IProps {
-    gameState: any;
-    setGameState: React.Dispatch<React.SetStateAction<any>>;
+    hatNo: string;
     theme: string;
     handleTravelToStop: (stop: Stop) => void;
 }
 
 export const EshotDurakOptions = (props: IProps) => {
     const {
-        gameState,
+        hatNo,
         theme,
         handleTravelToStop
     } = props;
 
-    const [isLoading, setIsLoading] = React.useState(false);
-    const [destinationStop, setDestinationStop] = React.useState<Stop | null>(null);
+    const {
+        currentStop,
+        setLoading,
+    } = useGameStore();
+
+    const [lineStops, setLineStops] = React.useState<Stop[]>([]);
 
     const handleTravelToStopWithLoader = async (stop: Stop) => {
-        setIsLoading(true);
-        setDestinationStop(stop);
         const sound = playSound(eshotSound);
         try {
             const durationMs = sound.duration() * 1000;
             await sleep(durationMs);
             handleTravelToStop(stop);
         } finally {
-            setIsLoading(false);
             sound.stop();
         }
     };
 
     const getDurakBulunamadi = () => {
-        if (gameState.lineStops.length > 0) return <></>;
         return (
             <div className={`text-xs italic ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>
                 Hatta ait durak bulunamadı.
@@ -68,30 +68,40 @@ export const EshotDurakOptions = (props: IProps) => {
     };
 
     const getDurakList = () => {
-        if (gameState.lineStops.length === 0) return <></>;
-        return gameState.lineStops.map(getDurakButton);
+        if (lineStops.length === 0) return getDurakBulunamadi();
+        return lineStops.map(getDurakButton);
     };
 
-    const getLoader = () => {
-        if (!isLoading) return <></>;
-        const message = `Durağa seyahat ediliyor: ${destinationStop ? destinationStop.durak_adi : '...'}\nLütfen bekleyin.`;
-        return (
-            <LoaderOverlay
-                svgSrc={EshotIcon}
-                text={message}
-            />
-        );
+    const fetchDirection = async (durakId: number): Promise<number> => {
+        const directions = await eshotService.getAvailableDirections(durakId, hatNo);
+        if (!directions.length) throw new Error('Yön bulunamadı');
+        return directions[0].smart_yon;
     };
 
-    if (!gameState.selectedLine || gameState.isWalking) return <></>;
+    const fetchLineStops = async (durakId: number, direction: number) => {
+        const result = await eshotService.getOrderedStops(hatNo, direction, durakId);
+        setLineStops(result);
+    };
+
+    const handleErrors = (error: Error) => {
+        console.error(error);
+    }
+
+    useEffect(() => {
+        if (currentStop == null || currentStop?.durak_id === null) return;
+        setLoading(true);
+        fetchDirection(currentStop?.durak_id)
+            .then(direction => fetchLineStops(currentStop.durak_id, direction))
+            .catch(handleErrors)
+            .finally(() => setLoading(false));
+    }, [currentStop, hatNo]);
+
     return (
         <section>
             <h3 className={`text-xs font-bold uppercase tracking-widest mb-2 ${theme === 'dark' ? 'text-primary' : 'text-blue-700'}`}>Hat
                 Durakları</h3>
             <div className="space-y-1">
-                {getDurakBulunamadi()}
                 {getDurakList()}
-                {getLoader()}
             </div>
         </section>
     );
