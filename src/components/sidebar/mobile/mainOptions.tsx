@@ -22,7 +22,7 @@ export const MainOptions = (props: IProps) => {
     const getWalkingButton = () => {
         return (
             <button
-                className={`p-2 rounded-xl border-2 text-center group flex items-center justify-center gap-2 ${gameState.isWalking ? 'bg-yellow-100 text-slate-800 font-black' : 'bg-white/5 text-slate-800 hover:bg-yellow-50'}`}
+                className={`p-2 rounded-xl border-2 text-center group flex items-center justify-center gap-2`}
                 onClick={() => setGameState((prev: any) => ({
                     ...prev,
                     isWalking: !prev.isWalking,
@@ -43,8 +43,7 @@ export const MainOptions = (props: IProps) => {
             <button
                 key={hatNo}
                 onClick={() => handleSelectLine(hatNo)}
-                className={`p-2 rounded-xl border-2 text-center group flex gap-2 items-center justify-center
-                        ${gameState.selectedLine === hatNo ? 'bg-primary/10 border-primary text-primary font-black' : 'bg-white/5 border-primary/60 text-slate-800 hover:bg-primary/10 hover:border-primary'}`}>
+                className={`p-2 rounded-xl border-2 text-center group flex gap-2 items-center justify-center`}>
                 <img src={EshotIcon} alt="ESHOT" className="w-5 h-5"/>
                 <span className="block text-base font-black group-hover:scale-110 transition-transform">{hatNo}</span>
             </button>
