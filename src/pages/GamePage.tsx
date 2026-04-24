@@ -15,9 +15,15 @@ interface GamePageProps {
     stops: [Stop, Stop];
 }
 
+interface GameRecord {
+    stop: Stop;
+    line?: string;
+    direction?: number;
+}
+
 interface TravelState {
     currentStop: Stop;
-    history: { stop: Stop; line?: string; direction?: number }[];
+    history: GameRecord[];
     steps: number;
     selectedLine: string | null;
     selectedDirection: number | null;
@@ -155,9 +161,7 @@ const GamePage: React.FC<GamePageProps> = ({stops}) => {
                 <MobileTopBar
                     theme={theme}
                     toggleTheme={toggleTheme}
-                    steps={gameState.steps}
                     onExit={() => navigate('/')}
-                    setSidebarOpen={setSidebarOpen}
                 />
             ) : (
                 <GameTopBar
