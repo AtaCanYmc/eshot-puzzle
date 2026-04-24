@@ -50,10 +50,10 @@ export const OptionSlider = (props: IProps) => {
         );
     };
 
-    const eshotButtons = availableLines.map(line => getEshotButton(line.hat_no));
 
     // Carousel/slider için state
     const [carouselIndex, setCarouselIndex] = useState(0);
+    const eshotButtons = availableLines.map(line => getEshotButton(line.hat_no));
     const items = [getMapButton(), getWalkingButton(), ...eshotButtons];
     const totalItems = items.length;
 
@@ -78,10 +78,14 @@ export const OptionSlider = (props: IProps) => {
                 lineStops: []
             }))
         } else {
-            const hatNo = availableLines[carouselIndex - 1].hat_no;
+            const hatNo = availableLines[carouselIndex - 2].hat_no;
             handleSelectLine(hatNo);
         }
-    }, [carouselIndex]);
+    }, [carouselIndex, availableLines]);
+
+    useEffect(() => {
+        setCarouselIndex(0);
+    }, [availableLines.length]);
 
     return (
         <div className={`w-full p-4 ${theme === 'dark' ? 'text-slate-300' : 'text-slate-800'}`}>
