@@ -1,5 +1,5 @@
-import WalkIcon from "../../../assets/svg/walk.svg";
-import EshotIcon from "../../../assets/svg/eshot.svg";
+import WalkIcon from "../../../../assets/svg/walk.svg";
+import EshotIcon from "../../../../assets/svg/eshot.svg";
 import * as React from "react";
 
 interface IProps {

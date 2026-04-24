@@ -1,12 +1,12 @@
 import * as React from 'react';
 import type {Stop} from '../../../types/supabaseTypes';
-import {EshotDurakOptions} from "./eshotDurakOptions";
-import {MainOptions} from "./mainOptions";
-import {WalkingDurakOptions} from "./walkingDurakOptions";
+import {EshotDurakOptions} from "./section/eshotDurakOptions";
+import {MainOptions} from "./section/mainOptions";
+import {WalkingDurakOptions} from "./section/walkingDurakOptions";
 import LoaderOverlay from "../../loader/LoaderOverlay";
 import EshotIcon from "../../../assets/svg/eshot.svg";
 import TargetIcon from "../../../assets/svg/target.svg";
-import {OptionSlider} from "./OptionSlider";
+import {OptionSlider} from "./slider/OptionSlider";
 
 interface MobileSideBarProps {
     gameState: any;

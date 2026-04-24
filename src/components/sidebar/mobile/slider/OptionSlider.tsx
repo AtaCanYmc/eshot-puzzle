@@ -1,6 +1,6 @@
-import WalkIcon from "../../../assets/svg/walk.svg";
-import MapIcon from "../../../assets/svg/map.svg";
-import EshotIcon from "../../../assets/svg/eshot.svg";
+import WalkIcon from "../../../../assets/svg/walk.svg";
+import MapIcon from "../../../../assets/svg/map.svg";
+import EshotIcon from "../../../../assets/svg/eshot.svg";
 import * as React from "react";
 import {useEffect, useState} from "react";
 

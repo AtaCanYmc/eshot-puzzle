@@ -1,10 +1,10 @@
-import type {Stop} from "../../../types/supabaseTypes";
+import type {Stop} from "../../../../types/supabaseTypes";
 import * as React from "react";
-import LoaderOverlay from "../../loader/LoaderOverlay";
-import WalkIcon from "../../../assets/svg/walk.svg";
-import {sleep} from "../../../utils/commonUtils";
-import { playSound } from '../../../utils/audioUtils';
-import walkSound from '../../../assets/sound/walk.mp3';
+import LoaderOverlay from "../../../loader/LoaderOverlay";
+import WalkIcon from "../../../../assets/svg/walk.svg";
+import {sleep} from "../../../../utils/commonUtils";
+import { playSound } from '../../../../utils/audioUtils';
+import walkSound from '../../../../assets/sound/walk.mp3';
 
 interface IProps {
     gameState: any;

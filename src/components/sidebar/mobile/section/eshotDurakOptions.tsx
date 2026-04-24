@@ -1,10 +1,10 @@
-import type {Stop} from "../../../types/supabaseTypes";
+import type {Stop} from "../../../../types/supabaseTypes";
 import * as React from "react";
-import LoaderOverlay from "../../loader/LoaderOverlay";
-import EshotIcon from "../../../assets/svg/eshot.svg";
-import {sleep} from "../../../utils/commonUtils";
-import { playSound } from '../../../utils/audioUtils';
-import eshotSound from '../../../assets/sound/eshot-travel-sound.mp3';
+import LoaderOverlay from "../../../loader/LoaderOverlay";
+import EshotIcon from "../../../../assets/svg/eshot.svg";
+import {sleep} from "../../../../utils/commonUtils";
+import { playSound } from '../../../../utils/audioUtils';
+import eshotSound from '../../../../assets/sound/eshot-travel-sound.mp3';
 
 interface IProps {
     gameState: any;
