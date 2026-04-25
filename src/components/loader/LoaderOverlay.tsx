@@ -1,5 +1,5 @@
 import React from 'react';
-import LoadIcon from "../../assets/react.svg";
+import LoadIcon from "../../assets/svg/react.svg";
 
 interface LoaderOverlayProps {
   svgSrc: string | null;
