@@ -16,7 +16,8 @@ export const useCommonTravel = () => {
         setAvailableLines,
         setSteps,
         setCurrentStop,
-        setHistory
+        setHistory,
+        setSliderIndex
     } = useGameStore();
 
     const handleSelectLine = async (hatNo: string) => {
@@ -81,6 +82,7 @@ export const useCommonTravel = () => {
         setSelectedLine(null);
         setSelectedDirection(null);
         setAvailableStops([]);
+        setSliderIndex(0);
     };
 
     return {
