@@ -7,7 +7,7 @@ import StartModal from '../components/modal/StartModal';
 import HomeMenuBar from '../components/menubar/HomeMenuBar';
 import MobilMenuBar from '../components/menubar/MobilMenuBar';
 import useIsMobile from '../hooks/useIsMobile';
-import heroBg from '../assets/hero-bg.png';
+import heroBg from '../assets/svg/route.svg';
 
 const HomePage: React.FC = () => {
   const [modalOpen, setModalOpen] = React.useState(false);
