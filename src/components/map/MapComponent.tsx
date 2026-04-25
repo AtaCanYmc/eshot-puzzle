@@ -33,15 +33,13 @@ const stopIcon = new DivIcon({
 
 const MapComponent: React.FC<MapComponentProps> = (props: MapComponentProps) => {
     const {theme} = props;
-
+    const {handleTravelToStop} = useCommonTravel();
     const {
         currentStop,
         targetStop,
         availableStops,
         sliderIndex
     } = useGameStore();
-
-    const {handleTravelToStop} = useCommonTravel();
 
     const darkTile = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
     const lightTile = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
