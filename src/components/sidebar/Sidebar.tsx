@@ -5,6 +5,7 @@ import {MainOptions} from "./mobile/section/mainOptions";
 import {WalkingDurakOptions} from "./mobile/section/walkingDurakOptions";
 import {EshotDurakOptions} from "./mobile/section/eshotDurakOptions";
 import {OptionSlider} from "./mobile/slider/OptionSlider";
+import TargetIcon from "../../assets/svg/target.svg";
 
 interface SidebarProps {
     theme: string;
@@ -42,12 +43,15 @@ const Sidebar: React.FC<SidebarProps> = ({theme}) => {
     const getFooter = () => {
         return (
             <footer
-                className={`mt-6 pt-6 border-t rounded-2xl p-4 ${theme === 'dark' ? 'border-white/10 bg-orange-500/10 border border-orange-500/20' : 'border-slate-200 bg-orange-100 border border-orange-300'}`}>
-                <p className={`text-[10px] font-black uppercase mb-1 ${theme === 'dark' ? 'text-orange-400' : 'text-orange-700'}`}>Hedef</p>
-                <p className={`text-sm font-bold truncate ${theme === 'dark' ? '' : 'text-slate-900'}`}>{targetStop.durak_adi}</p>
+                className={`mt-2 pt-2 border-t rounded-xl px-2 pb-1 flex items-center gap-2 min-h-0 h-10 ${theme === 'dark' ? 'border-orange-500/20 bg-orange-500/10 border' : 'border-orange-300 bg-orange-100 border'}`}>
+                <span className="flex items-center gap-1">
+                    <img src={TargetIcon} alt="Hedef" className="w-4 h-4 inline-block"/>
+                    <span
+                        className={`text-xs font-bold truncate ${theme === 'dark' ? '' : 'text-slate-900'}`}>{targetStop.durak_adi}</span>
+                </span>
             </footer>
         );
-    }
+    };
 
     return (
         <aside
