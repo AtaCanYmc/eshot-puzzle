@@ -3,7 +3,6 @@ import * as React from "react";
 import {sleep} from "../../../../utils/commonUtils";
 import {playSound} from '../../../../utils/audioUtils';
 import eshotSound from '../../../../assets/sound/eshot-travel-sound.mp3';
-import {eshotService} from "../../../../service/eshotService";
 import {useGameStore} from "../../../../store/gameStore";
 import {useEffect} from "react";
 import {useCommonTravel} from "../../../../hooks/useCommonTravel";
@@ -17,13 +16,10 @@ export const EshotDurakOptions = (props: IProps) => {
     const {hatNo, theme} = props;
 
     const {
-        currentStop,
-        setLoading,
+        availableStops,
     } = useGameStore();
 
-    const {handleTravelToStop} = useCommonTravel();
-
-    const [lineStops, setLineStops] = React.useState<Stop[]>([]);
+    const {handleTravelToStop, handleSelectLine} = useCommonTravel();
 
     const handleTravelToStopWithLoader = async (stop: Stop) => {
         const sound = playSound(eshotSound);
@@ -66,33 +62,13 @@ export const EshotDurakOptions = (props: IProps) => {
     };
 
     const getDurakList = () => {
-        if (lineStops.length === 0) return getDurakBulunamadi();
-        return lineStops.map(getDurakButton);
+        if (availableStops.length === 0) return getDurakBulunamadi();
+        return availableStops.map(getDurakButton);
     };
-
-    const fetchDirection = async (durakId: number): Promise<number> => {
-        const directions = await eshotService.getAvailableDirections(durakId, hatNo);
-        if (!directions.length) throw new Error('Yön bulunamadı');
-        return directions[0].smart_yon;
-    };
-
-    const fetchLineStops = async (durakId: number, direction: number) => {
-        const result = await eshotService.getOrderedStops(hatNo, direction, durakId);
-        setLineStops(result);
-    };
-
-    const handleErrors = (error: Error) => {
-        console.error(error);
-    }
 
     useEffect(() => {
-        if (currentStop == null || currentStop?.durak_id === null) return;
-        setLoading(true);
-        fetchDirection(currentStop?.durak_id)
-            .then(direction => fetchLineStops(currentStop.durak_id, direction))
-            .catch(handleErrors)
-            .finally(() => setLoading(false));
-    }, [currentStop, hatNo]);
+        handleSelectLine(hatNo).then(r => r);
+    }, [hatNo]);
 
     return (
         <section>
