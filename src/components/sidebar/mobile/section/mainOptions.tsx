@@ -27,10 +27,15 @@ export const MainOptions = (props: IProps) => {
 
     const getEshotButton = (hatNo: string, idx: number) => {
         return (
-            <TasitButton identifier={hatNo} icon={EshotIcon} text={hatNo} onClick={() => {
-                handleSelectLine(hatNo).then(r => r);
-                setSliderIndex(idx + 2);
-            }}/>
+            <TasitButton key={hatNo}
+                         identifier={hatNo}
+                         icon={EshotIcon}
+                         text={hatNo}
+                         onClick={() => {
+                             handleSelectLine(hatNo).then(r => r);
+                             setSliderIndex(idx + 2);
+                         }}
+            />
         );
     };
 
