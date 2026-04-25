@@ -13,7 +13,6 @@ export const useCommonTravel = () => {
         setLoading,
         setSelectedLine,
         setSelectedDirection,
-        setNearbyStops,
         setAvailableLines,
         setSteps,
         setCurrentStop,
@@ -47,9 +46,9 @@ export const useCommonTravel = () => {
             const {enlem, boylam, durak_id} = currentStop;
             const data = await eshotService.getNearbyStops(enlem, boylam, 200);
             const filtered = data.filter((s: Stop) => s.durak_id !== durak_id);
-            setNearbyStops(filtered);
+            setAvailableStops(filtered);
         } catch (e) {
-            setNearbyStops([]);
+            setAvailableStops([]);
             console.error("Nearby stops fetch failed", e);
         } finally {
             setLoading(false);
