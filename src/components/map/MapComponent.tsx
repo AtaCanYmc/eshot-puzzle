@@ -69,6 +69,7 @@ const MapComponent: React.FC<MapComponentProps> = (props: MapComponentProps) => 
             <>
                 {
                     availableStops.map((stop: Stop) => {
+                        if (stop.status_code === 0) return null; // Gidilemez durakları gösterme
                         return (
                             <Marker
                                 key={stop.durak_id}
