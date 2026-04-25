@@ -36,7 +36,6 @@ const MobileSideBar: React.FC<MobileSideBarProps> = ({theme}) => {
         return (
             <header className="mb-4 flex items-center flex-col w-full">
                 <div className={"w-full mt-1 flex flex-row gap-4 items-center"}>
-                    {/* STOP ICONS */}
                     <img src={getStopIcon(currentStop.durak_type)} alt="tasit" className="w-12 h-12"/>
                     <div className={"w-full mt-1"}>
                         <h2 className={`text-xs font-black uppercase tracking-widest mb-1 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Şu Anki Durak</h2>
