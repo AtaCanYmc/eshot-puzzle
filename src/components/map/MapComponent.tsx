@@ -26,14 +26,21 @@ const targetIcon = new DivIcon({
 
 const stopIcon = new DivIcon({
     className: 'custom-marker-stop',
-    html: '<div class="w-4 h-4 rounded-full bg-slate-400 border-2 border-white shadow-sm hover:scale-150 transition-transform"></div>',
+    html: '<div class="w-4 h-4 rounded-full bg-red-400 border-2 border-white shadow-sm hover:scale-150 transition-transform"></div>',
     iconSize: [16, 16],
     iconAnchor: [8, 8]
 });
 
 const metroIcon = new DivIcon({
-    className: 'custom-marker-stop',
+    className: 'custom-metro-marker-stop',
     html: '<div class="w-4 h-4 rounded-full bg-blue-400 border-2 border-white shadow-sm hover:scale-150 transition-transform"></div>',
+    iconSize: [16, 16],
+    iconAnchor: [8, 8]
+});
+
+const izbanIcon = new DivIcon({
+    className: 'custom-izban-marker-stop',
+    html: '<div class="w-4 h-4 rounded-full bg-gray-400 border-2 border-white shadow-sm hover:scale-150 transition-transform"></div>',
     iconSize: [16, 16],
     iconAnchor: [8, 8]
 });
@@ -92,6 +99,8 @@ const MapComponent: React.FC<MapComponentProps> = (props: MapComponentProps) => 
                         switch (stop.durak_type) {
                             case TasitTip.METRO:
                                 return getDurak(stop, metroIcon);
+                            case TasitTip.IZBAN:
+                                return getDurak(stop, izbanIcon);
                             default:
                                 return getDurak(stop);
                         }

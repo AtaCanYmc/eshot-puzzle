@@ -4,6 +4,7 @@ import type {Stop} from "../types/supabaseTypes";
 import {playSound} from "../utils/audioUtils";
 import {sleep} from "../utils/commonUtils";
 import {metroService} from "../service/metroService";
+import {izbanService} from "../service/izbanService";
 
 export const useCommonTravel = () => {
     const {
@@ -52,7 +53,8 @@ export const useCommonTravel = () => {
             const {enlem, boylam, durak_id} = currentStop;
             const eshot = await eshotService.getNearbyStops(enlem, boylam, 200);
             const metro = await metroService.getNearbyStations(enlem, boylam, 500);
-            const data = [...eshot, ...metro];
+            const izban = await izbanService.getNearbyStations(enlem, boylam, 500);
+            const data = [...eshot, ...metro, ...izban];
             const filtered = data.filter((s: Stop) => s.durak_id !== durak_id);
             setAvailableStops(filtered);
         } catch (e) {
