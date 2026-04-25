@@ -19,6 +19,7 @@ const GamePage: React.FC<GamePageProps> = ({stops}) => {
     const navigate = useNavigate();
     const {theme, toggleTheme} = useTheme();
     const {fetchLines} = useCommonTravel();
+    const isMobile = useIsMobile();
     const {
         currentStop,
         targetStop,
@@ -26,8 +27,6 @@ const GamePage: React.FC<GamePageProps> = ({stops}) => {
         steps,
         setTargetStop
     } = useGameStore();
-
-    const isMobile = useIsMobile();
 
     // İlk render'da store'u başlat
     React.useEffect(() => {
