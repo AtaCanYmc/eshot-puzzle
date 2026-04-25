@@ -10,8 +10,12 @@ interface GameRecord {
 
 interface GameState {
     // current stop
-    currentStop: Stop | null;
+    currentStop: Stop;
     setCurrentStop: (stop: Stop) => void;
+
+    // target stop
+    targetStop: Stop;
+    setTargetStop: (stop: Stop) => void;
 
     // game history
     history: GameRecord[];
@@ -22,14 +26,16 @@ interface GameState {
     // current line and direction
     selectedLine: string | null;
     selectedDirection: number | null;
-    lineStops: Stop[];
     setSelectedLine: (line: string | null) => void;
     setSelectedDirection: (dir: number | null) => void;
-    setLineStops: (stops: Stop[]) => void;
+
+    // haritada gözükecek duraklar
+    availableStops: Stop[];
+    setAvailableStops: (stops: Stop[]) => void;
 
     // eshot lines (duraktan gecen)
-    availableLines: { hat_no: string }[];
-    setAvailableLines: (lines: { hat_no: string }[]) => void;
+    availableLines: string[];
+    setAvailableLines: (lines: string[]) => void;
 
     // nearby stops
     nearbyStops: Stop[];
@@ -39,9 +45,14 @@ interface GameState {
     sliderIndex: number;
     setSliderIndex: (index: number) => void;
 
+    //sidebar content
+    sidebarContent: React.ReactNode;
+    setSidebarContent: (content: React.ReactNode) => void;
+
     // sidebar
     isSidebarOpen: boolean;
     setIsSidebarOpen: (val: boolean) => void;
+    toggleSidebar: () => void;
 
     // loading
     loading: boolean;
@@ -56,32 +67,37 @@ interface GameState {
 }
 
 export const useGameStore = create<GameState>((set) => ({
-    currentStop: null,
+    currentStop: {} as Stop,
+    targetStop: {} as Stop,
     history: [],
     steps: 0,
     selectedLine: null,
     selectedDirection: null,
-    lineStops: [],
     sliderIndex: 0,
+    sidebarContent: null,
     availableLines: [],
     loading: false,
     loadingIcon: null,
     loadingMessage: '',
     isSidebarOpen: true,
     nearbyStops: [],
+    availableStops: [],
     setCurrentStop: (stop) => set(() => ({currentStop: stop})),
+    setTargetStop: (stop) => set(() => ({targetStop: stop})),
     setHistory: (history) => set(() => ({history})),
     setSteps: (steps) => set(() => ({steps})),
     setSelectedLine: (line) => set(() => ({selectedLine: line})),
     setSelectedDirection: (dir) => set(() => ({selectedDirection: dir})),
-    setLineStops: (stops) => set(() => ({lineStops: stops})),
     setSliderIndex: (index) => set(() => ({sliderIndex: index})),
     setAvailableLines: (lines) => set(() => ({availableLines: lines})),
     setLoading: (val) => set(() => ({loading: val})),
     setLoadingIcon: (icon) => set(() => ({loadingIcon: icon})),
     setLoadingMessage: (message) => set(() => ({loadingMessage: message})),
     setIsSidebarOpen: (val) => set(() => ({isSidebarOpen: val})),
+    toggleSidebar: () => set((state) => ({isSidebarOpen: !state.isSidebarOpen})),
     setNearbyStops: (stops) => set(() => ({nearbyStops: stops})),
+    setAvailableStops: (stops) => set(() => ({availableStops: stops})),
+    setSidebarContent: (content) => set(() => ({sidebarContent: content})),
     reset: (firstStop) => set(() => ({
         currentStop: firstStop,
         history: [{stop: firstStop}],

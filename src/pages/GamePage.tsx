@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {useNavigate} from 'react-router-dom';
-import {eshotService} from '../service/eshotService';
 import type {Stop} from '../types/supabaseTypes';
 import {useTheme} from '../ThemeContext';
 import MapComponent from '../components/map/MapComponent';
@@ -10,6 +9,7 @@ import useIsMobile from '../hooks/useIsMobile';
 import MobileTopBar from '../components/topbar/MobileTopBar';
 import MobileSideBar from '../components/sidebar/mobile/MobileSideBar';
 import {useGameStore} from '../store/gameStore';
+import {useCommonTravel} from "../hooks/useCommonTravel";
 
 interface GamePageProps {
     stops: [Stop, Stop];
@@ -18,99 +18,54 @@ interface GamePageProps {
 const GamePage: React.FC<GamePageProps> = ({stops}) => {
     const navigate = useNavigate();
     const {theme, toggleTheme} = useTheme();
-    // Zustand store'dan state ve setter'ları çek
+    const {fetchLines} = useCommonTravel();
     const {
         currentStop,
-        setCurrentStop,
-        setLoading,
-        reset
+        targetStop,
+        reset,
+        steps,
+        setTargetStop
     } = useGameStore();
 
     // İlk render'da store'u başlat
     React.useEffect(() => {
-        if (!currentStop) {
+        if (!currentStop.durak_id) {
             reset(stops[0]);
+        }
+        if (!targetStop.durak_id) {
+            setTargetStop(stops[1]);
         }
         // eslint-disable-next-line
     }, []);
 
     // Fetch lines for current stop
     React.useEffect(() => {
-        if (!currentStop) return;
-        const fetchLines = async () => {
-            setLoading(true);
-            try {
-                const lines = await eshotService.getHatlarByDurakId(currentStop.durak_id);
-                setAvailableLines(lines);
-            } catch (error) {
-                console.error("Lines fetch failed", error);
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchLines().then(r => r);
     }, [currentStop]);
-
-    // YAKIN DURAKLARI ÇEK
-    React.useEffect(() => {
-        if (!isWalking || !currentStop) return;
-        let cancelled = false;
-
-        async function fetchNearby() {
-            setLoading(true);
-            try {
-                if (!currentStop) return;
-                const {enlem, boylam, durak_id} = currentStop;
-                const data = await eshotService.getNearbyStops(enlem, boylam, 200);
-                const filtered = data.filter((s: Stop) => s.durak_id !== durak_id);
-                if (!cancelled) setNearbyStops(filtered);
-            } catch (e) {
-                setNearbyStops([]);
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        fetchNearby().then(r => r);
-        return () => {
-            cancelled = true;
-        };
-    }, [isWalking, currentStop, history]);
-
-
-    // Sadece ileriye gidilebilen duraklara geçiş izni
-    const handleTravelToStop = (targetStop: Stop) => {
-        if (!lineStops.length || !currentStop) return;
-        const currentIndex = lineStops.findIndex(s => s.durak_id === currentStop.durak_id);
-        const targetIndex = lineStops.findIndex(s => s.durak_id === targetStop.durak_id);
-        // Sadece ileriye (currentIndex < targetIndex) gidilebilir
-        if (targetStop.durak_id === currentStop.durak_id || targetIndex <= currentIndex) return;
-        setCurrentStop(targetStop);
-        setHistory([...history, {
-            stop: targetStop,
-            line: selectedLine!,
-            direction: selectedDirection!
-        }]);
-        setSteps(steps + 1);
-        setSelectedLine(null);
-        setSelectedDirection(null);
-        setLineStops([]);
-    };
-
-    // Yürüyerek gidilecek duraklara geçiş
-    const handleWalkToStop = (targetStop: Stop) => {
-        setCurrentStop(targetStop);
-        setHistory([...history, {stop: targetStop}]);
-        setSteps(steps + 1);
-        setSelectedLine(null);
-        setSelectedDirection(null);
-        setLineStops([]);
-        setIsWalking(false);
-    };
 
     const isGameWon = React.useMemo(() => {
         return currentStop && currentStop.durak_id === stops[1].durak_id;
     }, [currentStop, stops]);
+
+    const getTopBar = () => {
+        if (useIsMobile()) {
+            return (
+                <MobileTopBar
+                    theme={theme}
+                    toggleTheme={toggleTheme}
+                    onExit={() => navigate('/')}
+                />
+            );
+        }
+        return (
+            <GameTopBar
+                theme={theme}
+                toggleTheme={toggleTheme}
+                steps={steps}
+                onExit={() => navigate('/')}
+            />
+        );
+    };
 
     return (
         <div
@@ -118,53 +73,14 @@ const GamePage: React.FC<GamePageProps> = ({stops}) => {
         ${theme === 'dark' ? 'bg-slate-950 text-white' : 'bg-white text-slate-900'}`}
         >
             {/* Top Bar */}
-            {useIsMobile() ? (
-                <MobileTopBar
-                    theme={theme}
-                    toggleTheme={toggleTheme}
-                    onExit={() => navigate('/')}
-                />
-            ) : (
-                <GameTopBar
-                    theme={theme}
-                    toggleTheme={toggleTheme}
-                    steps={steps}
-                    onExit={() => navigate('/')}
-                />
-            )}
+            {getTopBar()}
 
             <div className="flex-1 flex relative overflow-hidden transition-colors duration-300">
                 {/* Sidebar */}
                 {useIsMobile() ? (
-                    <MobileSideBar
-                        // ... Diğer prop'lar ...
-                        theme={theme}
-                        availableLines={availableLines}
-                        loading={loading}
-                        nearbyStops={nearbyStops}
-                        handleSelectLine={handleSelectLine}
-                        handleTravelToStop={handleTravelToStop}
-                        handleWalkToStop={handleWalkToStop}
-                        stops={stops}
-                        isSidebarOpen={isSidebarOpen}
-                        setSidebarOpen={setIsSidebarOpen}
-                        // gameState ve setGameState kaldırıldı
-                    />
+                    <MobileSideBar theme={theme}/>
                 ) : (
-                    <Sidebar
-                        // ... Diğer prop'lar ...
-                        theme={theme}
-                        availableLines={availableLines}
-                        loading={loading}
-                        nearbyStops={nearbyStops}
-                        handleSelectLine={handleSelectLine}
-                        handleTravelToStop={handleTravelToStop}
-                        handleWalkToStop={handleWalkToStop}
-                        stops={stops}
-                        isSidebarOpen={isSidebarOpen}
-                        setSidebarOpen={setIsSidebarOpen}
-                        // gameState ve setGameState kaldırıldı
-                    />
+                    <Sidebar theme={theme}/>
                 )}
 
                 {/* Map */}
@@ -172,30 +88,8 @@ const GamePage: React.FC<GamePageProps> = ({stops}) => {
                     className={`flex-1 h-full w-full min-h-[400px] relative cursor-crosshair ${theme === 'dark' ? '' : 'bg-slate-100'}`}>
                     {currentStop && (
                         <MapComponent
-                            currentStop={currentStop}
-                            stops={stops}
-                            gameState={{
-                                currentStop,
-                                history,
-                                steps,
-                                selectedLine,
-                                selectedDirection,
-                                lineStops,
-                                isWalking
-                            }}
                             theme={theme}
                             toggleTheme={toggleTheme}
-                            lineStops={lineStops}
-                            onStopClick={(stop) => {
-                                if (!currentStop || stop.durak_id === currentStop.durak_id) return;
-                                setCurrentStop(stop);
-                                setHistory([...history, {stop}]);
-                                setSteps(steps + 1);
-                                setSelectedLine(null);
-                                setSelectedDirection(null);
-                                setLineStops([]);
-                                setIsWalking(false);
-                            }}
                         />
                     )}
                 </div>

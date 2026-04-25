@@ -1,102 +1,38 @@
-import WalkIcon from "../../../../assets/svg/walk.svg";
-import MapIcon from "../../../../assets/svg/map.svg";
-import EshotIcon from "../../../../assets/svg/eshot.svg";
 import * as React from "react";
-import {useEffect, useState} from "react";
+import {useGameStore} from "../../../../store/gameStore";
+import WalkIcon from "../../../../assets/svg/walk.svg";
+import {TasitButton} from "../../../button/TasitButton";
 
 interface IProps {
-    gameState: any;
-    setGameState: React.Dispatch<React.SetStateAction<any>>;
     theme: string;
-    availableHatList: string[];
-    handleSelectLine: (hatNo: string) => void;
 }
 
 export const OptionSlider = (props: IProps) => {
+    const {theme} = props;
     const {
-        setGameState,
-        theme,
-        availableHatList,
-        handleSelectLine
-    } = props;
+        sliderIndex,
+        setSliderIndex,
+        availableLines
+    } = useGameStore();
 
-    const getMapButton = () => {
-        return (
-            <button className={`p-2 rounded-xl border-2 text-center group flex items-center justify-center gap-2 w-full bg-primary/10 border-primary text-primary font-black`} onClick={() => {}}>
-                <img src={MapIcon} alt="Harita" className="w-5 h-5"/>
-                <span className="block text-base font-black group-hover:scale-110 transition-transform"> Harita Kullan </span>
-            </button>
-        );
+    const items = [
+        <TasitButton key={'walk'} icon={WalkIcon} text={'Yürü'}/>
+    ]
+
+    const handlePrev = () => {
+        setSliderIndex((sliderIndex - 1 + items.length) % items.length);
     };
 
-    const getWalkingButton = () => {
-        return (
-            <button className={`p-2 rounded-xl border-2 text-center group flex items-center justify-center gap-2 w-full bg-primary/10 border-primary text-primary font-black`} onClick={() => {}}>
-                <img src={WalkIcon} alt="Yürü" className="w-5 h-5"/>
-                <span className="block text-base font-black group-hover:scale-110 transition-transform"> Yürü </span>
-            </button>
-        );
+    const handleNext = () => {
+        setSliderIndex((sliderIndex + 1 + items.length) % items.length);
     };
-
-    const getEshotButton = (hatNo: string) => {
-        return (
-            <button
-                key={hatNo}
-                onClick={() => {}}
-                className={`p-2 rounded-xl border-2 text-center group flex gap-2 items-center justify-center w-full bg-primary/10 border-primary text-primary font-black`}>
-                <img src={EshotIcon} alt="ESHOT" className="w-5 h-5"/>
-                <span className="block text-base font-black group-hover:scale-110 transition-transform">{hatNo}</span>
-            </button>
-        );
-    };
-
-
-    // Carousel/slider için state
-    const [carouselIndex, setCarouselIndex] = useState(0);
-    const eshotButtons = availableHatList.map(hat => getEshotButton(hat));
-    const items = [getMapButton(), getWalkingButton(), ...eshotButtons];
-    const totalItems = items.length;
-
-    const handlePrev = () => setCarouselIndex(i => (i - 1 + totalItems) % totalItems);
-    const handleNext = () => setCarouselIndex(i => (i + 1) % totalItems);
-
-    useEffect(() => {
-        if (carouselIndex === 0) {
-            setGameState((prev: any) => ({
-                ...prev,
-                isWalking: false,
-                selectedLine: null,
-                selectedDirection: null,
-                lineStops: []
-            }))
-        } else if (carouselIndex === 1) {
-            setGameState((prev: any) => ({
-                ...prev,
-                isWalking: true,
-                selectedLine: null,
-                selectedDirection: null,
-                lineStops: []
-            }))
-        } else {
-            const hatNo = availableHatList[carouselIndex - 2];
-            handleSelectLine(hatNo);
-        }
-    }, [carouselIndex, availableHatList]);
-
-    useEffect(() => {
-        setCarouselIndex(0);
-    }, [availableHatList.length]);
 
     return (
         <div className={`w-full p-4 ${theme === 'dark' ? 'text-slate-300' : 'text-slate-800'}`}>
             <div className="flex items-center gap-2">
-                <button onClick={handlePrev}
-                        className="p-2 text-xl font-black">&#8592;</button>
-                <div className="flex-1 flex justify-center">
-                    {items[carouselIndex]}
-                </div>
-                <button onClick={handleNext}
-                        className="p-2 text-xl font-black">&#8594;</button>
+                <button onClick={handlePrev} className="p-2 text-xl font-black">&#8592;</button>
+                <div className="flex-1 flex justify-center">{items[sliderIndex]}</div>
+                <button onClick={handleNext} className="p-2 text-xl font-black">&#8594;</button>
             </div>
         </div>
     );

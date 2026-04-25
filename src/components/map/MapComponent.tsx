@@ -2,19 +2,13 @@ import * as React from 'react';
 import {MapContainer, TileLayer, Marker, Popup, Polyline} from 'react-leaflet';
 import {DivIcon} from 'leaflet';
 import type {Stop} from '../../types/supabaseTypes';
-import {eshotService} from "../../service/eshotService";
-import {filterPastStops} from "../../utils/eshotUtils";
+import {useGameStore} from "../../store/gameStore";
+import {useCommonTravel} from "../../hooks/useCommonTravel";
 
 
 interface MapComponentProps {
-    currentStop: Stop;
-    stops: [Stop, Stop];
-    gameState: any;
-    setGameState: (fn: (prev: any) => any) => void;
     theme: string;
     toggleTheme: () => void;
-    onStopClick?: (stop: Stop) => void;
-    lineStops?: Stop[];
 }
 
 const currentIcon = new DivIcon({
@@ -47,22 +41,23 @@ const walkIcon = new DivIcon({
 
 const MapComponent: React.FC<MapComponentProps> = (props: MapComponentProps) => {
     const {
-        currentStop,
-        stops,
-        gameState,
-        setGameState,
         theme,
-        onStopClick,
-        lineStops
     } = props;
 
-    const polylinePositions = (lineStops && lineStops.length > 1) ? lineStops.map(stop => [stop.enlem, stop.boylam]) : [];
+    const {
+        currentStop,
+        targetStop,
+        availableStops
+    } = useGameStore();
+
+    const {handleTravelToStop} = useCommonTravel();
+
+    const polylinePositions = (availableStops && availableStops.length > 1) ? availableStops.map(stop => [stop.enlem, stop.boylam]) : [];
     const darkTile = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
     const lightTile = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
     const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
     const center = [currentStop.enlem, currentStop.boylam] as [number, number];
     const zoom = 14;
-    const [nearbyStops, setNearbyStops] = React.useState<Stop[]>([]);
 
     const getGuzergah = () => {
         if (polylinePositions.length < 1) return <></>;
@@ -76,8 +71,7 @@ const MapComponent: React.FC<MapComponentProps> = (props: MapComponentProps) => 
     };
 
     const getAvailableDurakMarkers = () => {
-        if (!gameState.lineStops || gameState.lineStops.length === 0) return <></>;
-        const availableStops = filterPastStops(gameState.lineStops, currentStop);
+        if (!availableStops || availableStops.length === 0) return <></>;
         return (
             <>
                 {
@@ -88,7 +82,7 @@ const MapComponent: React.FC<MapComponentProps> = (props: MapComponentProps) => 
                                 position={[stop.enlem, stop.boylam]}
                                 // @ts-ignore
                                 icon={stopIcon}
-                                eventHandlers={onStopClick ? {click: () => onStopClick(stop)} : undefined}
+                                eventHandlers={{click: () => handleTravelToStop(stop)}}
                             >
                                 <Popup>{stop.durak_adi}</Popup>
                             </Marker>
@@ -97,62 +91,6 @@ const MapComponent: React.FC<MapComponentProps> = (props: MapComponentProps) => 
                 }
             </>
         );
-    };
-
-    const getWalkableDurakMarkers = () => {
-        if (!gameState.isWalking || !nearbyStops) return <></>;
-        return (
-            <>
-                {nearbyStops.map((stop) => (
-                    // @ts-ignore
-                    <Marker key={"walk-" + stop.durak_id} position={[stop.enlem, stop.boylam]} icon={walkIcon}
-                            eventHandlers={{click: () => handleWalkToStop(stop)}}>
-                        <Popup>
-                            <div>
-                                <div className="font-bold">{stop.durak_adi}</div>
-                                <button className="mt-2 px-3 py-1 rounded bg-yellow-400 text-black font-bold"
-                                        onClick={() => handleWalkToStop(stop)}>
-                                    Buraya Yürü
-                                </button>
-                            </div>
-                        </Popup>
-                    </Marker>
-                ))}
-            </>
-        );
-    };
-
-    React.useEffect(() => {
-        let cancelled = false;
-
-        async function fetchNearby() {
-            try {
-                const data = await eshotService.getNearbyStops(currentStop.enlem, currentStop.boylam, 200); // 200m
-                const filtered = data.filter((s: Stop) => s.durak_id !== currentStop.durak_id);
-                if (!cancelled) setNearbyStops(filtered);
-            } catch (e) {
-                setNearbyStops([]);
-            }
-        }
-
-        fetchNearby().then(r => r);
-        return () => {
-            cancelled = true;
-        };
-    }, [currentStop]);
-
-    // Yürüyerek gidilen durağa geçiş
-    const handleWalkToStop = (stop: Stop) => {
-        setGameState((prev: any) => ({
-            ...prev,
-            currentStop: stop,
-            history: [...prev.history, {stop, walk: true}],
-            steps: prev.steps + 1,
-            selectedLine: null,
-            selectedDirection: null,
-            lineStops: [],
-            isWalking: false
-        }));
     };
 
     return (
@@ -175,8 +113,8 @@ const MapComponent: React.FC<MapComponentProps> = (props: MapComponentProps) => 
 
             {/* Hedef noktası */}
             {/* @ts-ignore */}
-            <Marker position={[stops[1].enlem, stops[1].boylam]} icon={targetIcon}>
-                <Popup>Hedef: {stops[1].durak_adi}</Popup>
+            <Marker position={[targetStop.enlem, targetStop.boylam]} icon={targetIcon}>
+                <Popup>Hedef: {targetStop.durak_adi}</Popup>
             </Marker>
 
             {/* Şu anki konum */}
@@ -187,9 +125,6 @@ const MapComponent: React.FC<MapComponentProps> = (props: MapComponentProps) => 
 
             {/* Gidilebilecek duraklar */}
             {getAvailableDurakMarkers()}
-
-            {/* Yakındaki duraklar (yürüyerek gidilebilir) */}
-            {getWalkableDurakMarkers()}
         </MapContainer>
     );
 };

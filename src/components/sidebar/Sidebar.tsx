@@ -1,41 +1,21 @@
 import * as React from 'react';
-import type {Stop} from '../../types/supabaseTypes';
 
 interface SidebarProps {
     theme: string;
-    availableLines: { hat_no: string }[];
-    loading: boolean;
-    nearbyStops: Stop[];
-    handleSelectLine: (hatNo: string) => void;
-    handleTravelToStop: (stop: Stop) => void;
-    handleWalkToStop: (stop: Stop) => void;
-    stops: [Stop, Stop];
-    isSidebarOpen: boolean;
-    setSidebarOpen: (open: boolean) => void;
 }
 
 import {useGameStore} from '../../store/gameStore';
-const Sidebar: React.FC<SidebarProps> = ({
-    theme,
-    availableLines,
-    loading,
-    nearbyStops,
-    handleSelectLine,
-    handleTravelToStop,
-    handleWalkToStop,
-    stops,
-    isSidebarOpen,
-    setSidebarOpen
-}) => {
-    const currentStop = useGameStore(state => state.currentStop);
-    const selectedLine = useGameStore(state => state.selectedLine);
-    const selectedDirection = useGameStore(state => state.selectedDirection);
-    const lineStops = useGameStore(state => state.lineStops);
-    const isWalking = useGameStore(state => state.isWalking);
-    const setIsWalking = useGameStore(state => state.setIsWalking);
-    const setSelectedLine = useGameStore(state => state.setSelectedLine);
-    const setSelectedDirection = useGameStore(state => state.setSelectedDirection);
-    const setLineStops = useGameStore(state => state.setLineStops);
+import {MainOptions} from "./mobile/section/mainOptions";
+import {EshotDurakOptions} from "./mobile/section/eshotDurakOptions";
+import {WalkingDurakOptions} from "./mobile/section/walkingDurakOptions";
+const Sidebar: React.FC<SidebarProps> = ({theme}) => {
+    const {
+        currentStop,
+        loading,
+        targetStop,
+        isSidebarOpen,
+        setIsSidebarOpen
+    } = useGameStore();
 
     const getAsideHeader = () => {
         if (!currentStop) return null;
@@ -58,156 +38,11 @@ const Sidebar: React.FC<SidebarProps> = ({
         );
     };
 
-    const getOptions = () => {
-        if (selectedLine || isWalking) return <></>;
-        return (
-            <section>
-                <h3 className={`text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2 ${theme === 'dark' ? 'text-primary' : 'text-blue-700'}`}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"
-                         strokeLinejoin="round">
-                        <rect x="3" y="4" width="18" height="12" rx="2"/>
-                        <path d="M7 20h10"/>
-                        <path d="M9 16v4"/>
-                        <path d="M15 16v4"/>
-                    </svg>
-                    Geçen Hatlar
-                </h3>
-                <div className="grid grid-cols-2 gap-3 mb-3">
-                    {/* Yürüme butonu */}
-                    <button
-                        className={`p-3 rounded-xl border-2 transition-all text-center group col-span-2 flex items-center justify-center gap-2 ${isWalking ? 'bg-yellow-100 border-yellow-400 text-yellow-700 font-black' : 'bg-white/5 border-yellow-400 text-yellow-700 hover:bg-yellow-50'}`}
-                        onClick={() => {
-                            setIsWalking(!isWalking);
-                            setSelectedLine(null);
-                            setSelectedDirection(null);
-                            setLineStops([]);
-                        }}
-                    >
-                        <span className="text-xl">🚶‍♂️</span> Yürü
-                    </button>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                    {availableLines.length > 0 ? (
-                        availableLines.map(line => (
-                            <button
-                                key={line.hat_no}
-                                onClick={() => handleSelectLine(line.hat_no)}
-                                className={`p-3 rounded-xl border-2 transition-all text-center group
-                        ${selectedLine === line.hat_no
-                                    ? 'bg-primary/10 border-primary text-primary font-black'
-                                    : 'bg-white/5 border-primary/60 text-slate-800 hover:bg-primary/10 hover:border-primary'}
-                      `}
-                            >
-                                <span className="block text-lg font-black group-hover:scale-110 transition-transform">{line.hat_no}</span>
-                            </button>
-                        ))
-                    ) : (
-                        <p className={`col-span-2 text-sm italic py-4 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>Bu
-                            durakta hat bulunamadı.</p>
-                    )}
-                </div>
-            </section>
-        );
-    };
-
-    const getEshotDurakOptions = () => {
-        if (!selectedLine || isWalking) return <></>;
-        return (
-            <section>
-                <div className="flex items-center justify-between mb-4">
-                    <h3 className={`text-xs font-bold uppercase tracking-widest ${theme === 'dark' ? 'text-primary' : 'text-blue-700'}`}>Hat
-                        Durakları</h3>
-                    <button
-                        onClick={() => {
-                            setSelectedLine(null);
-                            setSelectedDirection(null);
-                            setLineStops([]);
-                        }}
-                        className="text-[10px] font-bold text-slate-400 hover:text-primary underline"
-                    >
-                        GERİ
-                    </button>
-                </div>
-                <div className="space-y-2">
-                    {lineStops.length === 0 && (
-                        <div
-                            className={`text-xs italic ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>Duraklar
-                            yükleniyor veya bulunamadı.</div>
-                    )}
-                    {lineStops.length > 0 && lineStops.map((stop: Stop) => {
-                        const isCurrent = stop.status_code === 2;
-                        const isPast = stop.status_code === 0;
-                        return (
-                            <button
-                                key={stop.durak_id}
-                                onClick={() => handleTravelToStop(stop)}
-                                className={`w-full p-3 rounded-xl text-left border flex items-center gap-3 transition-all
-                        ${isCurrent
-                                    ? 'bg-green-100 border-green-500 text-green-700 font-black'
-                                    : isPast
-                                        ? 'bg-primary/10 border-primary text-red-500 pointer-events-none'
-                                        : 'bg-primary/10 border-primary text-primary hover:bg-primary/20'}
-                      `}
-                            >
-                                <span
-                                    className={`w-2 h-2 rounded-full shrink-0 ${isCurrent ? 'bg-green-500' : isPast ? 'bg-red-500' : 'bg-primary'}`}></span>
-                                <span className="flex flex-col text-sm font-semibold truncate">
-                                    {stop.durak_adi}
-                                    <span className="text-xs font-mono text-primary opacity-70">{stop.durak_id}</span>
-                                </span>
-                            </button>
-                        );
-                    })}
-                </div>
-            </section>
-        );
-    };
-
-    const getWalkingOptions = () => {
-        if (!isWalking || selectedLine) return <></>;
-        return (
-            <section>
-                <div className="flex items-center justify-between mb-4">
-                    <h3 className={`text-xs font-bold uppercase tracking-widest ${theme === 'dark' ? 'text-yellow-400' : 'text-yellow-700'}`}>Yakındaki
-                        Duraklar</h3>
-                    <button
-                        onClick={() => setIsWalking(false)}
-                        className="text-[10px] font-bold text-slate-400 hover:text-yellow-500 underline"
-                    >
-                        GERİ DÖN
-                    </button>
-                </div>
-                <div className="space-y-2">
-                    {nearbyStops.length === 0 && (
-                        <div
-                            className={`text-xs italic ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>Yakında
-                            durak yok.</div>
-                    )}
-                    {nearbyStops.map((stop) => (
-                        <button
-                            key={stop.durak_id}
-                            onClick={() => handleWalkToStop(stop)}
-                            className="w-full p-3 rounded-xl text-left border border-yellow-400 bg-yellow-50 hover:bg-yellow-100 text-yellow-900 flex items-center gap-3"
-                        >
-                            <span className="w-2 h-2 rounded-full bg-yellow-400 shrink-0"></span>
-                            <span className="flex flex-col text-sm font-semibold truncate">
-                      {stop.durak_adi}
-                                <span
-                                    className="text-xs font-mono text-yellow-700 opacity-70">{stop.durak_id}</span>
-                    </span>
-                        </button>
-                    ))}
-                </div>
-            </section>
-        );
-    };
-
     const getFooter = () => {
         return (
             <footer className={`mt-6 pt-6 border-t rounded-2xl p-4 ${theme === 'dark' ? 'border-white/10 bg-orange-500/10 border border-orange-500/20' : 'border-slate-200 bg-orange-100 border border-orange-300'}`}>
                 <p className={`text-[10px] font-black uppercase mb-1 ${theme === 'dark' ? 'text-orange-400' : 'text-orange-700'}`}>Hedef</p>
-                <p className={`text-sm font-bold truncate ${theme === 'dark' ? '' : 'text-slate-900'}`}>{stops[1].durak_adi}</p>
+                <p className={`text-sm font-bold truncate ${theme === 'dark' ? '' : 'text-slate-900'}`}>{targetStop.durak_adi}</p>
             </footer>
         );
     }
@@ -222,19 +57,13 @@ const Sidebar: React.FC<SidebarProps> = ({
                 {getAsideHeader()}
                 <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar relative">
                     {getSpinner()}
-                    {/* Seçili mod yoksa butonları listele */}
-                    {getOptions()}
-                    {/* Hat seçiliyse o hattın duraklarını listele */}
-                    {getEshotDurakOptions()}
-                    {/* Yürüme modu aktifse yakındaki durakları listele */}
-                    {getWalkingOptions()}
                 </div>
                 {getFooter()}
             </div>
 
             {/* Toggle Button */}
             <button
-                onClick={() => setSidebarOpen(!isSidebarOpen)}
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                 className="absolute -right-10 top-1/2 -translate-y-1/2 w-10 h-20 glass border-l-0 border-white/10 rounded-r-2xl flex items-center justify-center hover:bg-white/5 transition-colors"
             >
                 <div className={`transition-transform duration-500 ${isSidebarOpen ? '' : 'rotate-180'}`}>

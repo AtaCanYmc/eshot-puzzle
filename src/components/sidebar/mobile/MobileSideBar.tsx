@@ -1,68 +1,45 @@
 import * as React from 'react';
-import type {Stop} from '../../../types/supabaseTypes';
 import {EshotDurakOptions} from "./section/eshotDurakOptions";
 import {MainOptions} from "./section/mainOptions";
 import {WalkingDurakOptions} from "./section/walkingDurakOptions";
-import LoaderOverlay from "../../loader/LoaderOverlay";
-import EshotIcon from "../../../assets/svg/eshot.svg";
 import TargetIcon from "../../../assets/svg/target.svg";
 import {OptionSlider} from "./slider/OptionSlider";
 
 interface MobileSideBarProps {
     theme: string;
-    availableLines: { hat_no: string }[];
-    loading: boolean;
-    nearbyStops: Stop[];
-    handleSelectLine: (hatNo: string) => void;
-    handleTravelToStop: (stop: Stop) => void;
-    handleWalkToStop: (stop: Stop) => void;
-    stops: [Stop, Stop];
-    isSidebarOpen: boolean;
-    setSidebarOpen: (open: boolean) => void;
 }
 
 import {useGameStore} from '../../../store/gameStore';
-const MobileSideBar: React.FC<MobileSideBarProps> = ({
-    theme,
-    availableLines,
-    loading,
-    nearbyStops,
-    handleSelectLine,
-    handleTravelToStop,
-    handleWalkToStop,
-    stops,
-    isSidebarOpen,
-    setSidebarOpen
-}) => {
+import {useMemo} from "react";
+
+const MobileSideBar: React.FC<MobileSideBarProps> = ({theme}) => {
     const currentStop = useGameStore(state => state.currentStop);
 
-    const toggleSideBar = () => {
-        setSidebarOpen(!isSidebarOpen);
-    }
+    const {
+        isSidebarOpen,
+        targetStop,
+        toggleSidebar,
+        availableLines
+    } = useGameStore();
+
+    const getSliderContents = () => {
+        const map = <MainOptions theme={theme}/>;
+        const walk = <WalkingDurakOptions theme={theme}/>;
+        const eshot = availableLines.map(line => <EshotDurakOptions key={line} hatNo={line} theme={theme}/>);
+        return [map, walk, ...eshot];
+    };
 
     const getHeader = (showBackButton = false, onBack?: () => void) => {
         if (!currentStop) return null;
         return (
             <header className="mb-4 flex items-center justify-between flex-col w-full">
                 <div className={"w-full mt-1"}>
-                    <h2 className={`text-xs font-black uppercase tracking-widest mb-1 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Şu
-                        Anki Durak</h2>
+                    <h2 className={`text-xs font-black uppercase tracking-widest mb-1 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Şu Anki Durak</h2>
                     <p className={`text-lg font-bold leading-tight line-clamp-2 ${theme === 'dark' ? '' : 'text-slate-900'}`}>{currentStop.durak_adi}</p>
                     <span className="text-xs font-mono text-primary opacity-70">{currentStop.durak_id}</span>
                 </div>
-                {/* OptionSlider ve diğer alt bileşenler de store'dan state çekmeli */}
-                <OptionSlider theme={theme} availableLines={availableLines} handleSelectLine={handleSelectLine}/>
+                <OptionSlider theme={theme}/>
             </header>
-        );
-    };
-
-    const getLoader = () => {
-        if (!loading) return <></>;
-        return (
-            <LoaderOverlay
-                svgSrc={EshotIcon}
-                text={'Yükleniyor...'}
-            />
         );
     };
 
@@ -71,12 +48,33 @@ const MobileSideBar: React.FC<MobileSideBarProps> = ({
             <footer
                 className={`mt-2 pt-2 border-t rounded-xl px-2 pb-1 flex items-center gap-2 min-h-0 h-10 ${theme === 'dark' ? 'border-orange-500/20 bg-orange-500/10 border' : 'border-orange-300 bg-orange-100 border'}`}>
                 <span className="flex items-center gap-1">
-                    <img src={TargetIcon} alt="Hedef" className="w-4 h-4 inline-block" />
-                    <span className={`text-xs font-bold truncate ${theme === 'dark' ? '' : 'text-slate-900'}`}>{stops[1].durak_adi}</span>
+                    <img src={TargetIcon} alt="Hedef" className="w-4 h-4 inline-block"/>
+                    <span
+                        className={`text-xs font-bold truncate ${theme === 'dark' ? '' : 'text-slate-900'}`}>{targetStop.durak_adi}</span>
                 </span>
             </footer>
         );
     };
+
+    const barIcon = useMemo(() => {
+        if (isSidebarOpen) {
+            // Aşağı ok
+            return (
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="6 9 12 15 18 9"/>
+                </svg>
+            );
+        } else {
+            // Yukarı ok
+            return (
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="6 15 12 9 18 15"/>
+                </svg>
+            );
+        }
+    }, [isSidebarOpen]);
 
     return (
         <aside className={`fixed left-0 bottom-0 z-[999] w-full max-w-full glass border-t transition-transform duration-500 ease-in-out
@@ -86,30 +84,21 @@ const MobileSideBar: React.FC<MobileSideBarProps> = ({
             <div className="p-4 h-full flex flex-col">
                 {getHeader()}
                 {isSidebarOpen && <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar relative">
-                    {getLoader()}
-                    {/* MainOptions, EshotDurakOptions, WalkingDurakOptions da store'dan state çekmeli */}
-                    <MainOptions theme={theme} availableLines={availableLines} handleSelectLine={handleSelectLine}/>
-                    <EshotDurakOptions theme={theme} handleTravelToStop={handleTravelToStop}/>
-                    <WalkingDurakOptions theme={theme} handleWalkToStop={handleWalkToStop} nearbyStops={nearbyStops}/>
+                    {getSliderContents().map((content, index) => (
+                        <div key={index} className="mb-4 last:mb-0">
+                            {content}
+                        </div>
+                    ))}
                 </div>}
                 {isSidebarOpen && getFooter()}
             </div>
             {/* Toggle Button */}
             <button
-                onClick={() => setSidebarOpen(!isSidebarOpen)}
+                onClick={toggleSidebar}
                 className="absolute right-4 top-2 w-8 h-8 glass flex items-center justify-center transition-colors"
                 aria-label="Menüyü Kapat"
             >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                    {isSidebarOpen ? (
-                        // Aşağı ok
-                        <polyline points="6 9 12 15 18 9"/>
-                    ) : (
-                        // Yukarı ok
-                        <polyline points="6 15 12 9 18 15"/>
-                    )}
-                </svg>
+                {barIcon}
             </button>
         </aside>
     );

@@ -1,46 +1,37 @@
 import type {Stop} from "../../../../types/supabaseTypes";
 import * as React from "react";
-import LoaderOverlay from "../../../loader/LoaderOverlay";
-import WalkIcon from "../../../../assets/svg/walk.svg";
 import {sleep} from "../../../../utils/commonUtils";
-import { playSound } from '../../../../utils/audioUtils';
+import {playSound} from '../../../../utils/audioUtils';
 import walkSound from '../../../../assets/sound/walk.mp3';
+import {useGameStore} from "../../../../store/gameStore";
+import {useCommonTravel} from "../../../../hooks/useCommonTravel";
 
 interface IProps {
-    gameState: any;
-    setGameState: React.Dispatch<React.SetStateAction<any>>;
     theme: string;
-    handleWalkToStop: (stop: Stop) => void;
-    nearbyStops: Stop[];
 }
 
 export const WalkingDurakOptions = (props: IProps) => {
+    const {theme} = props;
     const {
-        gameState,
-        theme,
-        handleWalkToStop,
-        nearbyStops,
-    } = props;
-
-    const [isLoading, setIsLoading] = React.useState(false);
-    const [destinationStop, setDestinationStop] = React.useState<Stop | null>(null);
+        availableStops,
+        setLoading,
+    } = useGameStore();
+    const {handleTravelToStop} = useCommonTravel();
 
     const handleWalkToStopWithLoader = async (stop: Stop) => {
-        setIsLoading(true);
-        setDestinationStop(stop);
+        setLoading(true);
         const sound = playSound(walkSound);
         try {
             const durationMs = sound.duration() * 1000;
             await sleep(durationMs);
-            handleWalkToStop(stop);
+            handleTravelToStop(stop);
         } finally {
-            setIsLoading(false);
+            setLoading(false);
             sound.stop();
         }
     };
 
     const getDurakBulunamadi = () => {
-        if (nearbyStops.length > 0) return <></>;
         return (
             <div className={`text-xs italic ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>
                 Yakında durak bulunamadı.
@@ -65,30 +56,15 @@ export const WalkingDurakOptions = (props: IProps) => {
     };
 
     const getDurakList = () => {
-        if (nearbyStops.length === 0) return <></>;
-        return nearbyStops.map(getDurakButton);
+        if (availableStops.length === 0) return getDurakBulunamadi();
+        return availableStops.map(getDurakButton);
     };
 
-    const getLoader = () => {
-        if (!isLoading) return <></>;
-        const message = `Durağa seyahat ediliyor: ${destinationStop ? destinationStop.durak_adi : '...'}\nLütfen bekleyin.`;
-        return (
-            <LoaderOverlay
-                svgSrc={WalkIcon}
-                text={message}
-            />
-        );
-    };
-
-    if (!gameState.isWalking || gameState.selectedLine) return <></>;
     return (
         <section>
-            <h3 className={`text-xs font-bold uppercase tracking-widest mb-2 ${theme === 'dark' ? 'text-yellow-400' : 'text-yellow-700'}`}>Yakındaki Duraklar</h3>
-            <div className="space-y-1">
-                {getDurakBulunamadi()}
-                {getDurakList()}
-                {getLoader()}
-            </div>
+            <h3 className={`text-xs font-bold uppercase tracking-widest mb-2 ${theme === 'dark' ? 'text-yellow-400' : 'text-yellow-700'}`}>Yakındaki
+                Duraklar</h3>
+            <div className="space-y-1">{getDurakList()}</div>
         </section>
     );
 };

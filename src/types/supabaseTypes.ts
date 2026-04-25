@@ -1,9 +1,10 @@
-export enum durakTipi {
+export enum TasitTip {
     ESHOT = 'ESHOT',
     VAPUR = 'VAPUR',
     METRO = 'METRO',
     IZBAN = 'IZBAN',
     TRAMVAY = 'TRAMVAY',
+    YURUME = 'YURUME',
 }
 
 export interface Stop {

@@ -6,24 +6,22 @@ import eshotSound from '../../../../assets/sound/eshot-travel-sound.mp3';
 import {eshotService} from "../../../../service/eshotService";
 import {useGameStore} from "../../../../store/gameStore";
 import {useEffect} from "react";
+import {useCommonTravel} from "../../../../hooks/useCommonTravel";
 
 interface IProps {
     hatNo: string;
     theme: string;
-    handleTravelToStop: (stop: Stop) => void;
 }
 
 export const EshotDurakOptions = (props: IProps) => {
-    const {
-        hatNo,
-        theme,
-        handleTravelToStop
-    } = props;
+    const {hatNo, theme} = props;
 
     const {
         currentStop,
         setLoading,
     } = useGameStore();
+
+    const {handleTravelToStop} = useCommonTravel();
 
     const [lineStops, setLineStops] = React.useState<Stop[]>([]);
 
