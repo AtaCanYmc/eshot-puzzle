@@ -13,9 +13,8 @@ import {useGameStore} from '../../../store/gameStore';
 import {useMemo} from "react";
 
 const MobileSideBar: React.FC<MobileSideBarProps> = ({theme}) => {
-    const currentStop = useGameStore(state => state.currentStop);
-
     const {
+        currentStop,
         isSidebarOpen,
         targetStop,
         toggleSidebar,

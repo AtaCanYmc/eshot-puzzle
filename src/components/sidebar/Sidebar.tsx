@@ -1,5 +1,10 @@
 import * as React from 'react';
 import {useGameStore} from '../../store/gameStore';
+import {useMemo} from "react";
+import {MainOptions} from "./mobile/section/mainOptions";
+import {WalkingDurakOptions} from "./mobile/section/walkingDurakOptions";
+import {EshotDurakOptions} from "./mobile/section/eshotDurakOptions";
+import {OptionSlider} from "./mobile/slider/OptionSlider";
 
 interface SidebarProps {
     theme: string;
@@ -8,36 +13,36 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({theme}) => {
     const {
         currentStop,
-        loading,
-        targetStop,
         isSidebarOpen,
-        setIsSidebarOpen
+        targetStop,
+        toggleSidebar,
+        availableLines,
+        sliderIndex
     } = useGameStore();
 
+    const sliderContents = useMemo(() => {
+        const map = <MainOptions theme={theme}/>;
+        const walk = <WalkingDurakOptions theme={theme}/>;
+        const eshot = availableLines.map(line => <EshotDurakOptions key={line} hatNo={line} theme={theme}/>);
+        return [map, walk, ...eshot];
+    }, [availableLines]);
+
     const getAsideHeader = () => {
-        if (!currentStop) return null;
+        if (!currentStop.durak_id) return null;
         return (
             <header className="mb-6">
                 <h2 className={`text-sm font-black uppercase tracking-widest mb-1 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Şu
                     Anki Durak</h2>
                 <p className={`text-xl font-bold leading-tight line-clamp-2 ${theme === 'dark' ? '' : 'text-slate-900'}`}>{currentStop.durak_adi}</p>
+                <OptionSlider theme={theme}/>
             </header>
-        );
-    };
-
-    const getSpinner = () => {
-        if (!loading) return <></>;
-        return (
-            <div
-                className="absolute inset-0 z-10 flex items-center justify-center bg-slate-950/20 backdrop-blur-[2px]">
-                <div className="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-            </div>
         );
     };
 
     const getFooter = () => {
         return (
-            <footer className={`mt-6 pt-6 border-t rounded-2xl p-4 ${theme === 'dark' ? 'border-white/10 bg-orange-500/10 border border-orange-500/20' : 'border-slate-200 bg-orange-100 border border-orange-300'}`}>
+            <footer
+                className={`mt-6 pt-6 border-t rounded-2xl p-4 ${theme === 'dark' ? 'border-white/10 bg-orange-500/10 border border-orange-500/20' : 'border-slate-200 bg-orange-100 border border-orange-300'}`}>
                 <p className={`text-[10px] font-black uppercase mb-1 ${theme === 'dark' ? 'text-orange-400' : 'text-orange-700'}`}>Hedef</p>
                 <p className={`text-sm font-bold truncate ${theme === 'dark' ? '' : 'text-slate-900'}`}>{targetStop.durak_adi}</p>
             </footer>
@@ -53,14 +58,14 @@ const Sidebar: React.FC<SidebarProps> = ({theme}) => {
             <div className="p-6 h-full flex flex-col">
                 {getAsideHeader()}
                 <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar relative">
-                    {getSpinner()}
+                    {sliderContents[sliderIndex]}
                 </div>
                 {getFooter()}
             </div>
 
             {/* Toggle Button */}
             <button
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                onClick={() => toggleSidebar()}
                 className="absolute -right-10 top-1/2 -translate-y-1/2 w-10 h-20 glass border-l-0 border-white/10 rounded-r-2xl flex items-center justify-center hover:bg-white/5 transition-colors"
             >
                 <div className={`transition-transform duration-500 ${isSidebarOpen ? '' : 'rotate-180'}`}>
