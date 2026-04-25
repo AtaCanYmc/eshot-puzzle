@@ -39,10 +39,9 @@ export const EshotDurakOptions = (props: IProps) => {
                 className={`w-full p-2 rounded-xl text-left border flex items-center gap-2 transition-all
                         ${isCurrent ? 'bg-green-100 border-green-500 text-green-700 font-black' : 'bg-primary/10 border-primary text-primary hover:bg-primary/20'}`}
             >
-                                            <span
-                                                className={`w-2 h-2 rounded-full shrink-0 ${isCurrent ? 'bg-green-500' : 'bg-primary'}`}></span>
+                <span className={`w-2 h-2 rounded-full shrink-0 ${isCurrent ? 'bg-green-500' : 'bg-primary'}`}></span>
                 <span className="flex flex-col">
-                        <span className="text-xs font-semibold truncate">{stop.durak_adi}</span>
+                        <span className="text-xs font-semibold truncate max-w-[200px]">{stop.durak_adi}</span>
                         <span className="text-[10px] font-mono text-primary opacity-70">{stop.durak_id}</span>
                       </span>
             </button>

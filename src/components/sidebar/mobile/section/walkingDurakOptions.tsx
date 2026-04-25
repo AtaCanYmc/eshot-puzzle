@@ -35,7 +35,7 @@ export const WalkingDurakOptions = (props: IProps) => {
                 className="w-full p-2 rounded-xl text-left border border-yellow-400 bg-yellow-50 hover:bg-yellow-100 text-yellow-900 flex items-center gap-2"
             >
                 <span className="w-2 h-2 rounded-full bg-yellow-400 shrink-0"></span>
-                <span className="flex flex-col text-xs font-semibold truncate">
+                <span className="flex flex-col text-xs font-semibold truncate max-w-[200px]">
                     {stop.durak_adi}
                     <span className="text-[10px] font-mono text-yellow-700 opacity-70">{stop.durak_id}</span>
                 </span>
