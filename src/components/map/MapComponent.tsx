@@ -37,12 +37,12 @@ const MapComponent: React.FC<MapComponentProps> = (props: MapComponentProps) => 
     const {
         currentStop,
         targetStop,
-        availableStops
+        availableStops,
+        sliderIndex
     } = useGameStore();
 
     const {handleTravelToStop} = useCommonTravel();
 
-    const polylinePositions = (availableStops && availableStops.length > 1) ? availableStops.map(stop => [stop.enlem, stop.boylam]) : [];
     const darkTile = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
     const lightTile = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
     const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
@@ -50,6 +50,8 @@ const MapComponent: React.FC<MapComponentProps> = (props: MapComponentProps) => 
     const zoom = 14;
 
     const getGuzergah = () => {
+        if (sliderIndex <= 1) return <></>;
+        const polylinePositions = (availableStops && availableStops.length > 1) ? availableStops.map(stop => [stop.enlem, stop.boylam]) : [];
         if (polylinePositions.length < 1) return <></>;
         const color = theme === 'dark' ? '#38bdf8' : '#0ea5e9';
         return (
@@ -61,6 +63,7 @@ const MapComponent: React.FC<MapComponentProps> = (props: MapComponentProps) => 
     };
 
     const getAvailableDurakMarkers = () => {
+        if (sliderIndex === 0) return <></>;
         if (!availableStops || availableStops.length === 0) return <></>;
         return (
             <>
