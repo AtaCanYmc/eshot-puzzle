@@ -36,7 +36,7 @@ const GamePage: React.FC<GamePageProps> = ({stops}) => {
             setTargetStop(stops[1]);
         }
         // eslint-disable-next-line
-    }, []);
+    }, [stops]);
 
     // Fetch lines for current stop
     React.useEffect(() => {
@@ -66,7 +66,8 @@ const GamePage: React.FC<GamePageProps> = ({stops}) => {
             />
         );
     };
-
+    
+    if (!currentStop.durak_id || !targetStop.durak_id) return <></>;
     return (
         <div
             className={`w-screen h-screen flex flex-col overflow-hidden transition-colors duration-300

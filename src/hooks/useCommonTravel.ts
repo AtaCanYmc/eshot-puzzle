@@ -21,7 +21,7 @@ export const useCommonTravel = () => {
     } = useGameStore();
 
     const handleSelectLine = async (hatNo: string) => {
-        if (!currentStop) return;
+        if (!currentStop.durak_id) return;
         setLoading(true);
         try {
             const dir = await eshotService.getAvailableDirections(currentStop.durak_id, hatNo)
@@ -40,7 +40,7 @@ export const useCommonTravel = () => {
     };
 
     const fetchNearby = async () => {
-        if (!currentStop) return;
+        if (!currentStop.durak_id) return;
         setLoading(true);
         try {
             if (!currentStop) return;
@@ -57,7 +57,7 @@ export const useCommonTravel = () => {
     };
 
     const fetchLines = async () => {
-        if (!currentStop) return;
+        if (!currentStop.durak_id) return;
         setLoading(true);
         try {
             const lines = await eshotService.getHatlarByDurakId(currentStop.durak_id);
@@ -70,7 +70,7 @@ export const useCommonTravel = () => {
     };
 
     const handleTravelToStop = (targetStop: Stop) => {
-        if (!setAvailableStops.length || !currentStop) return;
+        if (!setAvailableStops.length || !currentStop.durak_id) return;
         if (targetStop.durak_id === currentStop.durak_id) return;
         setCurrentStop(targetStop);
         setHistory([...history, {
