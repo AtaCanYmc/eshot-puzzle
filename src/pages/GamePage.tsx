@@ -10,6 +10,8 @@ import MobileTopBar from '../components/topbar/MobileTopBar';
 import MobileSideBar from '../components/sidebar/mobile/MobileSideBar';
 import {useGameStore} from '../store/gameStore';
 import {useCommonTravel} from "../hooks/useCommonTravel";
+import LoaderOverlay from "../components/loader/LoaderOverlay";
+import LoadIcon from "../assets/react.svg";
 
 interface GamePageProps {
     stops: [Stop, Stop];
@@ -21,6 +23,7 @@ const GamePage: React.FC<GamePageProps> = ({stops}) => {
     const {fetchLines} = useCommonTravel();
     const isMobile = useIsMobile();
     const {
+        loading,
         currentStop,
         targetStop,
         reset,
@@ -67,6 +70,13 @@ const GamePage: React.FC<GamePageProps> = ({stops}) => {
             />
         );
     };
+    
+    const getLoader = () => {
+        if (!loading) return null;
+        return (
+            <LoaderOverlay svgSrc={LoadIcon} text="Yükleniyor..."/>
+        );
+    };
 
     if (!currentStop.durak_id || !targetStop.durak_id) return <></>;
     return (
@@ -74,6 +84,7 @@ const GamePage: React.FC<GamePageProps> = ({stops}) => {
             className={`w-screen h-screen flex flex-col overflow-hidden transition-colors duration-300
         ${theme === 'dark' ? 'bg-slate-950 text-white' : 'bg-white text-slate-900'}`}
         >
+            {getLoader()}
             {/* Top Bar */}
             {getTopBar()}
 
