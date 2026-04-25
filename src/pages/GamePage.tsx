@@ -66,7 +66,7 @@ const GamePage: React.FC<GamePageProps> = ({stops}) => {
             />
         );
     };
-    
+
     if (!currentStop.durak_id || !targetStop.durak_id) return <></>;
     return (
         <div
