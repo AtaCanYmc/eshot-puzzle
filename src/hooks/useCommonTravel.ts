@@ -81,8 +81,8 @@ export const useCommonTravel = () => {
         if (!availableStops.length || !currentStop.durak_id) return;
         if (targetStop.durak_id === currentStop.durak_id) return;
 
-        setLoading(true);
         setLoadingIcon(icon || null);
+        setLoading(true);
 
         if (sound) {
             const sndObject = playSound(sound);
