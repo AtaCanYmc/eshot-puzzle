@@ -18,9 +18,9 @@ export const OptionSlider = (props: IProps) => {
     } = useGameStore();
 
     const items = [
-        <TasitButton key={'harita'} icon={MapIcon} text={'Harita'}/>,
-        <TasitButton key={'walk'} icon={WalkIcon} text={'Yürü'}/>,
-        ...availableLines.map(line => <TasitButton key={line} icon={EshotIcon} text={`Hat ${line}`}/>)
+        <TasitButton identifier={'harita'} icon={MapIcon} text={'Harita'}/>,
+        <TasitButton identifier={'walk'} icon={WalkIcon} text={'Yürü'}/>,
+        ...availableLines.map(line => <TasitButton identifier={line} icon={EshotIcon} text={`Hat ${line}`}/>)
     ]
 
     const handlePrev = () => {

@@ -1,7 +1,7 @@
 import * as React from "react";
 
 interface TasitButtonProps {
-    key: string;
+    identifier: string;
     icon: string;
     text: string;
     onClick?: () => void;
@@ -9,7 +9,7 @@ interface TasitButtonProps {
 
 export const TasitButton = (props: TasitButtonProps) => {
     const {
-        key,
+        identifier,
         icon,
         text,
         onClick = () => {
@@ -17,7 +17,7 @@ export const TasitButton = (props: TasitButtonProps) => {
     } = props;
     return (
         <button
-            key={key}
+            key={identifier}
             onClick={onClick}
             className={`p-2 rounded-xl border-2 text-center group flex gap-2 items-center justify-center w-full bg-primary/10 border-primary text-primary font-black`}>
             <img src={icon} alt="tasit" className="w-5 h-5"/>
