@@ -1,16 +1,16 @@
 import * as React from 'react';
+import {useMemo} from 'react';
 import {EshotDurakOptions} from "./section/EshotDurakOptions";
 import {MainOptions} from "./section/MainOptions";
 import {WalkingDurakOptions} from "./section/WalkingDurakOptions";
 import TargetIcon from "../../../assets/svg/target.svg";
 import {OptionSlider} from "./slider/OptionSlider";
+import {useGameStore} from '../../../store/gameStore';
+import {useCommonTravel} from "../../../hooks/useCommonTravel";
 
 interface MobileSideBarProps {
     theme: string;
 }
-
-import {useGameStore} from '../../../store/gameStore';
-import {useMemo} from "react";
 
 const MobileSideBar: React.FC<MobileSideBarProps> = ({theme}) => {
     const {
@@ -22,6 +22,8 @@ const MobileSideBar: React.FC<MobileSideBarProps> = ({theme}) => {
         sliderIndex
     } = useGameStore();
 
+    const {getStopIcon} = useCommonTravel();
+
     const sliderContents = useMemo(() => {
         const map = <MainOptions theme={theme}/>;
         const walk = <WalkingDurakOptions theme={theme}/>;
@@ -32,11 +34,15 @@ const MobileSideBar: React.FC<MobileSideBarProps> = ({theme}) => {
     const getHeader = () => {
         if (!currentStop) return null;
         return (
-            <header className="mb-4 flex items-center justify-between flex-col w-full">
-                <div className={"w-full mt-1"}>
-                    <h2 className={`text-xs font-black uppercase tracking-widest mb-1 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Şu Anki Durak</h2>
-                    <p className={`text-lg font-bold leading-tight line-clamp-2 ${theme === 'dark' ? '' : 'text-slate-900'}`}>{currentStop.durak_adi}</p>
-                    <span className="text-xs font-mono text-primary opacity-70">{currentStop.durak_id}</span>
+            <header className="mb-4 flex items-center flex-col w-full">
+                <div className={"w-full mt-1 flex flex-row gap-4 items-center"}>
+                    {/* STOP ICONS */}
+                    <img src={getStopIcon(currentStop.durak_type)} alt="tasit" className="w-12 h-12"/>
+                    <div className={"w-full mt-1"}>
+                        <h2 className={`text-xs font-black uppercase tracking-widest mb-1 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Şu Anki Durak</h2>
+                        <p className={`text-lg font-bold leading-tight line-clamp-2 ${theme === 'dark' ? '' : 'text-slate-900'}`}>{currentStop.durak_adi}</p>
+                        <span className="text-xs font-mono text-primary opacity-70">{currentStop.durak_id}</span>
+                    </div>
                 </div>
                 <OptionSlider theme={theme}/>
             </header>

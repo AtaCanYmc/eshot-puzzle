@@ -1,10 +1,15 @@
 import {eshotService} from "../service/eshotService";
 import {useGameStore} from "../store/gameStore";
-import type {Stop} from "../types/supabaseTypes";
+import {Stop, TasitTip} from "../types/supabaseTypes";
 import {playSound} from "../utils/audioUtils";
 import {sleep} from "../utils/commonUtils";
 import {metroService} from "../service/metroService";
 import {izbanService} from "../service/izbanService";
+import MetroStopIcon from "../assets/svg/metro-stop.svg";
+import IzbanStopIcon from "../assets/svg/metro-stop.svg";
+import TramvayStopIcon from "../assets/svg/tram-stop.svg";
+import FerryStopIcon from "../assets/svg/anchor.svg";
+import EshotStopIcon from "../assets/svg/bus-stop.svg";
 
 export const useCommonTravel = () => {
     const {
@@ -114,10 +119,26 @@ export const useCommonTravel = () => {
         setLoadingIcon(null);
     };
 
+    const getStopIcon = (type?: string) => {
+        switch (type) {
+            case TasitTip.METRO:
+                return MetroStopIcon;
+            case TasitTip.IZBAN:
+                return IzbanStopIcon;
+            case TasitTip.TRAMVAY:
+                return TramvayStopIcon;
+            case TasitTip.VAPUR:
+                return FerryStopIcon;
+            default:
+                return EshotStopIcon;
+        }
+    };
+
     return {
         handleSelectLine,
         fetchNearby,
         fetchLines,
-        handleTravelToStop
+        handleTravelToStop,
+        getStopIcon
     }
 };
