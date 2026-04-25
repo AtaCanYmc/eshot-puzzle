@@ -1,13 +1,10 @@
 import * as React from 'react';
+import {useGameStore} from '../../store/gameStore';
 
 interface SidebarProps {
     theme: string;
 }
 
-import {useGameStore} from '../../store/gameStore';
-import {MainOptions} from "./mobile/section/mainOptions";
-import {EshotDurakOptions} from "./mobile/section/eshotDurakOptions";
-import {WalkingDurakOptions} from "./mobile/section/walkingDurakOptions";
 const Sidebar: React.FC<SidebarProps> = ({theme}) => {
     const {
         currentStop,

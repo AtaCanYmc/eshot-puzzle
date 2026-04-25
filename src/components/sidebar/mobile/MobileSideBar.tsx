@@ -30,7 +30,7 @@ const MobileSideBar: React.FC<MobileSideBarProps> = ({theme}) => {
         return [map, walk, ...eshot];
     }, [availableLines]);
 
-    const getHeader = (showBackButton = false, onBack?: () => void) => {
+    const getHeader = () => {
         if (!currentStop) return null;
         return (
             <header className="mb-4 flex items-center justify-between flex-col w-full">
