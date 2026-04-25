@@ -1,10 +1,8 @@
 import type {Stop} from "../../../../types/supabaseTypes";
 import * as React from "react";
-import {sleep} from "../../../../utils/commonUtils";
-import {playSound} from '../../../../utils/audioUtils';
-import walkSound from '../../../../assets/sound/walk.mp3';
 import {useGameStore} from "../../../../store/gameStore";
 import {useCommonTravel} from "../../../../hooks/useCommonTravel";
+import {useEffect} from "react";
 
 interface IProps {
     theme: string;
@@ -12,24 +10,12 @@ interface IProps {
 
 export const WalkingDurakOptions = (props: IProps) => {
     const {theme} = props;
-    const {
-        availableStops,
-        setLoading,
-    } = useGameStore();
-    const {handleTravelToStop} = useCommonTravel();
+    const {availableStops} = useGameStore();
+    const {handleTravelToStop, fetchNearby} = useCommonTravel();
 
-    const handleWalkToStopWithLoader = async (stop: Stop) => {
-        setLoading(true);
-        const sound = playSound(walkSound);
-        try {
-            const durationMs = sound.duration() * 1000;
-            await sleep(durationMs);
-            handleTravelToStop(stop);
-        } finally {
-            setLoading(false);
-            sound.stop();
-        }
-    };
+    useEffect(() => {
+        fetchNearby().then(r => r)
+    }, []);
 
     const getDurakBulunamadi = () => {
         return (
@@ -43,7 +29,7 @@ export const WalkingDurakOptions = (props: IProps) => {
         return (
             <button
                 key={stop.durak_id}
-                onClick={() => handleWalkToStopWithLoader(stop)}
+                onClick={() => handleTravelToStop(stop)}
                 className="w-full p-2 rounded-xl text-left border border-yellow-400 bg-yellow-50 hover:bg-yellow-100 text-yellow-900 flex items-center gap-2"
             >
                 <span className="w-2 h-2 rounded-full bg-yellow-400 shrink-0"></span>

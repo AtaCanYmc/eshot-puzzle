@@ -5,7 +5,6 @@ import type {Stop} from '../../types/supabaseTypes';
 import {useGameStore} from "../../store/gameStore";
 import {useCommonTravel} from "../../hooks/useCommonTravel";
 
-
 interface MapComponentProps {
     theme: string;
     toggleTheme: () => void;
