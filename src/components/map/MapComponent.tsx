@@ -12,16 +12,16 @@ interface MapComponentProps {
 
 const currentIcon = new DivIcon({
     className: 'custom-marker-current',
-    html: '<div class="w-8 h-8 rounded-full bg-green-500 border-4 border-white shadow-lg animate-pulse"></div>',
-    iconSize: [32, 32],
-    iconAnchor: [16, 16]
+    html: '<div class="w-6 h-6 rounded-full bg-green-500 border-2 border-white shadow-lg animate-pulse"></div>',
+    iconSize: [16, 16],
+    iconAnchor: [8, 8]
 });
 
 const targetIcon = new DivIcon({
     className: 'custom-marker-target',
-    html: '<div class="w-8 h-8 rounded-full bg-orange-500 border-4 border-white shadow-lg"></div>',
-    iconSize: [32, 32],
-    iconAnchor: [16, 16]
+    html: '<div class="w-6 h-6 rounded-full bg-orange-500 border-2 border-white shadow-lg"></div>',
+    iconSize: [16, 16],
+    iconAnchor: [8, 8]
 });
 
 const stopIcon = new DivIcon({
