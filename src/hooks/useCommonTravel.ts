@@ -3,6 +3,7 @@ import {useGameStore} from "../store/gameStore";
 import type {Stop} from "../types/supabaseTypes";
 import {playSound} from "../utils/audioUtils";
 import {sleep} from "../utils/commonUtils";
+import {metroService} from "../service/metroService";
 
 export const useCommonTravel = () => {
     const {
@@ -49,7 +50,9 @@ export const useCommonTravel = () => {
         try {
             if (!currentStop) return;
             const {enlem, boylam, durak_id} = currentStop;
-            const data = await eshotService.getNearbyStops(enlem, boylam, 200);
+            const eshot = await eshotService.getNearbyStops(enlem, boylam, 200);
+            const metro = await metroService.getNearbyStations(enlem, boylam);
+            const data = [...eshot, ...metro];
             const filtered = data.filter((s: Stop) => s.durak_id !== durak_id);
             setAvailableStops(filtered);
         } catch (e) {
