@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {MapContainer, TileLayer, Marker, Popup, Polyline} from 'react-leaflet';
 import {DivIcon} from 'leaflet';
-import type {Stop} from '../../types/supabaseTypes';
+import {Stop, TasitTip} from '../../types/supabaseTypes';
 import {useGameStore} from "../../store/gameStore";
 import {useCommonTravel} from "../../hooks/useCommonTravel";
 
@@ -27,6 +27,13 @@ const targetIcon = new DivIcon({
 const stopIcon = new DivIcon({
     className: 'custom-marker-stop',
     html: '<div class="w-4 h-4 rounded-full bg-slate-400 border-2 border-white shadow-sm hover:scale-150 transition-transform"></div>',
+    iconSize: [16, 16],
+    iconAnchor: [8, 8]
+});
+
+const metroIcon = new DivIcon({
+    className: 'custom-marker-stop',
+    html: '<div class="w-4 h-4 rounded-full bg-blue-400 border-2 border-white shadow-sm hover:scale-150 transition-transform"></div>',
     iconSize: [16, 16],
     iconAnchor: [8, 8]
 });
@@ -60,6 +67,20 @@ const MapComponent: React.FC<MapComponentProps> = (props: MapComponentProps) => 
         );
     };
 
+    const getDurak = (stop: Stop, icon = stopIcon) => {
+        return (
+            <Marker
+                key={stop.durak_id}
+                position={[stop.enlem, stop.boylam]}
+                // @ts-ignore
+                icon={icon}
+                eventHandlers={{click: () => handleTravelToStop(stop)}}
+            >
+                <Popup>{stop.durak_adi}</Popup>
+            </Marker>
+        );
+    };
+
     const getAvailableDurakMarkers = () => {
         if (sliderIndex === 0) return <></>;
         if (!availableStops || availableStops.length === 0) return <></>;
@@ -68,17 +89,12 @@ const MapComponent: React.FC<MapComponentProps> = (props: MapComponentProps) => 
                 {
                     availableStops.map((stop: Stop) => {
                         if (stop.status_code === 0) return null; // Gidilemez durakları gösterme
-                        return (
-                            <Marker
-                                key={stop.durak_id}
-                                position={[stop.enlem, stop.boylam]}
-                                // @ts-ignore
-                                icon={stopIcon}
-                                eventHandlers={{click: () => handleTravelToStop(stop)}}
-                            >
-                                <Popup>{stop.durak_adi}</Popup>
-                            </Marker>
-                        );
+                        switch (stop.durak_type) {
+                            case TasitTip.METRO:
+                                return getDurak(stop, metroIcon);
+                            default:
+                                return getDurak(stop);
+                        }
                     })
                 }
             </>

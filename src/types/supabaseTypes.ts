@@ -14,7 +14,7 @@ export interface Stop {
     boylam: number;
     sira?: number;
     status_code?: number;
-    type?: string;
+    durak_type?: string;
 }
 
 export interface RoutePoint {
