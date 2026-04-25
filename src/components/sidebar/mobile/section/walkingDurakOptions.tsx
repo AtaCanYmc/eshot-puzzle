@@ -2,6 +2,8 @@ import type {Stop} from "../../../../types/supabaseTypes";
 import * as React from "react";
 import {useGameStore} from "../../../../store/gameStore";
 import {useCommonTravel} from "../../../../hooks/useCommonTravel";
+import WalkIcon from "../../../../assets/svg/walk.svg";
+import WalkSound from "../../../../assets/sound/walk.mp3";
 import {useEffect} from "react";
 
 interface IProps {
@@ -29,7 +31,7 @@ export const WalkingDurakOptions = (props: IProps) => {
         return (
             <button
                 key={stop.durak_id}
-                onClick={() => handleTravelToStop(stop)}
+                onClick={() => handleTravelToStop(stop, WalkIcon, WalkSound)}
                 className="w-full p-2 rounded-xl text-left border border-yellow-400 bg-yellow-50 hover:bg-yellow-100 text-yellow-900 flex items-center gap-2"
             >
                 <span className="w-2 h-2 rounded-full bg-yellow-400 shrink-0"></span>

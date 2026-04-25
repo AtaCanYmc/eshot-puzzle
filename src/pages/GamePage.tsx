@@ -11,7 +11,6 @@ import MobileSideBar from '../components/sidebar/mobile/MobileSideBar';
 import {useGameStore} from '../store/gameStore';
 import {useCommonTravel} from "../hooks/useCommonTravel";
 import LoaderOverlay from "../components/loader/LoaderOverlay";
-import LoadIcon from "../assets/react.svg";
 
 interface GamePageProps {
     stops: [Stop, Stop];
@@ -24,6 +23,7 @@ const GamePage: React.FC<GamePageProps> = ({stops}) => {
     const isMobile = useIsMobile();
     const {
         loading,
+        loadingIcon,
         currentStop,
         targetStop,
         reset,
@@ -74,7 +74,7 @@ const GamePage: React.FC<GamePageProps> = ({stops}) => {
     const getLoader = () => {
         if (!loading) return null;
         return (
-            <LoaderOverlay svgSrc={LoadIcon} text="Yükleniyor..."/>
+            <LoaderOverlay svgSrc={loadingIcon} text="Yükleniyor..."/>
         );
     };
 

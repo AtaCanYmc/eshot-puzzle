@@ -1,14 +1,15 @@
 import React from 'react';
+import LoadIcon from "../../assets/react.svg";
 
 interface LoaderOverlayProps {
-  svgSrc: string;
+  svgSrc: string | null;
   text?: string;
 }
 
 const LoaderOverlay: React.FC<LoaderOverlayProps> = ({ svgSrc, text }) => (
   <div className="fixed inset-0 z-[2000] flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm text-center">
     <img
-      src={svgSrc}
+      src={svgSrc ?? LoadIcon}
       alt="Yükleniyor"
       className="w-16 h-16 animate-blink-smooth mb-4"
       style={{ animation: 'blink-smooth 1.2s linear infinite' }}

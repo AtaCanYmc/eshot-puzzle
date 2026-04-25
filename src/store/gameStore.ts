@@ -56,10 +56,10 @@ interface GameState {
 
     // loading
     loading: boolean;
-    loadingIcon: React.ReactNode;
+    loadingIcon: string | null;
     loadingMessage: string;
     setLoading: (val: boolean) => void;
-    setLoadingIcon: (icon: React.ReactNode) => void;
+    setLoadingIcon: (icon: string | null) => void;
     setLoadingMessage: (message: string) => void;
 
     // reset

@@ -1,8 +1,7 @@
 import type {Stop} from "../../../../types/supabaseTypes";
 import * as React from "react";
-import {sleep} from "../../../../utils/commonUtils";
-import {playSound} from '../../../../utils/audioUtils';
 import eshotSound from '../../../../assets/sound/eshot-travel-sound.mp3';
+import EshotIcon from '../../../../assets/svg/eshot.svg';
 import {useGameStore} from "../../../../store/gameStore";
 import {useEffect} from "react";
 import {useCommonTravel} from "../../../../hooks/useCommonTravel";
@@ -21,17 +20,6 @@ export const EshotDurakOptions = (props: IProps) => {
 
     const {handleTravelToStop, handleSelectLine} = useCommonTravel();
 
-    const handleTravelToStopWithLoader = async (stop: Stop) => {
-        const sound = playSound(eshotSound);
-        try {
-            const durationMs = sound.duration() * 1000;
-            await sleep(durationMs);
-            handleTravelToStop(stop);
-        } finally {
-            sound.stop();
-        }
-    };
-
     const getDurakBulunamadi = () => {
         return (
             <div className={`text-xs italic ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>
@@ -47,7 +35,7 @@ export const EshotDurakOptions = (props: IProps) => {
         return (
             <button
                 key={stop.durak_id}
-                onClick={() => handleTravelToStopWithLoader(stop)}
+                onClick={() => handleTravelToStop(stop, EshotIcon, eshotSound)}
                 className={`w-full p-2 rounded-xl text-left border flex items-center gap-2 transition-all
                         ${isCurrent ? 'bg-green-100 border-green-500 text-green-700 font-black' : 'bg-primary/10 border-primary text-primary hover:bg-primary/20'}`}
             >

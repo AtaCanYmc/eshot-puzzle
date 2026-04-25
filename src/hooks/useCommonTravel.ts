@@ -1,6 +1,8 @@
 import {eshotService} from "../service/eshotService";
 import {useGameStore} from "../store/gameStore";
 import type {Stop} from "../types/supabaseTypes";
+import {playSound} from "../utils/audioUtils";
+import {sleep} from "../utils/commonUtils";
 
 export const useCommonTravel = () => {
     const {
@@ -9,8 +11,10 @@ export const useCommonTravel = () => {
         selectedDirection,
         selectedLine,
         history,
+        availableStops,
         setAvailableStops,
         setLoading,
+        setLoadingIcon,
         setSelectedLine,
         setSelectedDirection,
         setAvailableLines,
@@ -69,20 +73,40 @@ export const useCommonTravel = () => {
         }
     };
 
-    const handleTravelToStop = (targetStop: Stop) => {
-        if (!setAvailableStops.length || !currentStop.durak_id) return;
+    const handleTravelToStop = async (
+        targetStop: Stop,
+        icon?: any,
+        sound?: any
+    ) => {
+        if (!availableStops.length || !currentStop.durak_id) return;
         if (targetStop.durak_id === currentStop.durak_id) return;
+
+        setLoading(true);
+        setLoadingIcon(icon || null);
+
+        if (sound) {
+            const sndObject = playSound(sound);
+            try {
+                const durationMs = sndObject.duration() * 1000;
+                await sleep(durationMs);
+            } finally {
+                sndObject.stop();
+            }
+        }
+
         setCurrentStop(targetStop);
-        setHistory([...history, {
-            stop: targetStop,
-            line: selectedLine!,
-            direction: selectedDirection!
-        }]);
         setSteps(steps + 1);
         setSelectedLine(null);
         setSelectedDirection(null);
         setAvailableStops([]);
         setSliderIndex(0);
+        setHistory([...history, {
+            stop: targetStop,
+            line: selectedLine!,
+            direction: selectedDirection!
+        }]);
+        setLoading(false);
+        setLoadingIcon(null);
     };
 
     return {
