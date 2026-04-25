@@ -19,15 +19,9 @@ export const MainOptions = (props: IProps) => {
 
     const getWalkingButton = () => {
         return (
-            <button
-                className={`p-2 rounded-xl border-2 text-center group flex items-center justify-center gap-2`}
-                onClick={() => {
-                }}
-            >
-                <img src={WalkIcon} alt="Yürü" className="w-5 h-5"/>
-                <span
-                    className="block text-base font-black group-hover:scale-110 transition-transform"> Yürü </span>
-            </button>
+            <TasitButton identifier={"walk"} icon={WalkIcon} text={"Yürü"} onClick={() => {
+                setSliderIndex(1);
+            }}/>
         );
     };
 
