@@ -1,6 +1,8 @@
 import * as React from "react";
 import {useGameStore} from "../../../../store/gameStore";
 import WalkIcon from "../../../../assets/svg/walk.svg";
+import MapIcon from "../../../../assets/svg/map.svg";
+import EshotIcon from "../../../../assets/svg/eshot.svg";
 import {TasitButton} from "../../../button/TasitButton";
 
 interface IProps {
@@ -16,7 +18,9 @@ export const OptionSlider = (props: IProps) => {
     } = useGameStore();
 
     const items = [
-        <TasitButton key={'walk'} icon={WalkIcon} text={'Yürü'}/>
+        <TasitButton key={'harita'} icon={MapIcon} text={'Harita'}/>,
+        <TasitButton key={'walk'} icon={WalkIcon} text={'Yürü'}/>,
+        ...availableLines.map(line => <TasitButton key={line} icon={EshotIcon} text={`Hat ${line}`}/>)
     ]
 
     const handlePrev = () => {

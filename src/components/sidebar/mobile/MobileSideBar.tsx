@@ -19,15 +19,16 @@ const MobileSideBar: React.FC<MobileSideBarProps> = ({theme}) => {
         isSidebarOpen,
         targetStop,
         toggleSidebar,
-        availableLines
+        availableLines,
+        sliderIndex
     } = useGameStore();
 
-    const getSliderContents = () => {
+    const sliderContents = useMemo(() => {
         const map = <MainOptions theme={theme}/>;
         const walk = <WalkingDurakOptions theme={theme}/>;
         const eshot = availableLines.map(line => <EshotDurakOptions key={line} hatNo={line} theme={theme}/>);
         return [map, walk, ...eshot];
-    };
+    }, [availableLines]);
 
     const getHeader = (showBackButton = false, onBack?: () => void) => {
         if (!currentStop) return null;
@@ -84,11 +85,7 @@ const MobileSideBar: React.FC<MobileSideBarProps> = ({theme}) => {
             <div className="p-4 h-full flex flex-col">
                 {getHeader()}
                 {isSidebarOpen && <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar relative">
-                    {getSliderContents().map((content, index) => (
-                        <div key={index} className="mb-4 last:mb-0">
-                            {content}
-                        </div>
-                    ))}
+                    {sliderContents[sliderIndex]}
                 </div>}
                 {isSidebarOpen && getFooter()}
             </div>
