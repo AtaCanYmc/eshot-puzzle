@@ -32,13 +32,6 @@ const stopIcon = new DivIcon({
     iconAnchor: [8, 8]
 });
 
-const walkIcon = new DivIcon({
-    className: 'custom-marker-walk',
-    html: '<div class="w-6 h-6 rounded-full bg-yellow-400 border-4 border-white shadow"></div>',
-    iconSize: [24, 24],
-    iconAnchor: [12, 12]
-});
-
 const MapComponent: React.FC<MapComponentProps> = (props: MapComponentProps) => {
     const {
         theme,
