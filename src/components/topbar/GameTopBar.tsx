@@ -19,8 +19,8 @@ const GameTopBar: React.FC<GameTopBarProps> = ({ theme, toggleTheme, steps, onEx
           <p className={`text-[10px] uppercase tracking-widest font-bold ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Aktarma Simülasyonu</p>
         </div>
       </div>
-      <div className="flex items-center gap-8">
-        <div className="flex flex-col items-center">
+      <div className="flex items-center gap-2">
+        <div className="flex flex-col items-center mr-4">
           <span className={`text-[10px] uppercase font-black tracking-tighter ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>ADIMLAR</span>
           <span className="text-xl font-black text-primary leading-none">{steps}</span>
         </div>
