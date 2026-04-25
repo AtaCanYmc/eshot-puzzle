@@ -27,6 +27,8 @@ const GamePage: React.FC<GamePageProps> = ({stops}) => {
         setTargetStop
     } = useGameStore();
 
+    const isMobile = useIsMobile();
+
     // İlk render'da store'u başlat
     React.useEffect(() => {
         if (!currentStop.durak_id) {
@@ -48,7 +50,7 @@ const GamePage: React.FC<GamePageProps> = ({stops}) => {
     }, [currentStop, stops]);
 
     const getTopBar = () => {
-        if (useIsMobile()) {
+        if (isMobile) {
             return (
                 <MobileTopBar
                     theme={theme}
@@ -78,7 +80,7 @@ const GamePage: React.FC<GamePageProps> = ({stops}) => {
 
             <div className="flex-1 flex relative overflow-hidden transition-colors duration-300">
                 {/* Sidebar */}
-                {useIsMobile() ? (
+                {isMobile ? (
                     <MobileSideBar theme={theme}/>
                 ) : (
                     <Sidebar theme={theme}/>
