@@ -1,7 +1,7 @@
 import * as React from 'react';
-import {EshotDurakOptions} from "./section/eshotDurakOptions";
-import {MainOptions} from "./section/mainOptions";
-import {WalkingDurakOptions} from "./section/walkingDurakOptions";
+import {EshotDurakOptions} from "./section/EshotDurakOptions";
+import {MainOptions} from "./section/MainOptions";
+import {WalkingDurakOptions} from "./section/WalkingDurakOptions";
 import TargetIcon from "../../../assets/svg/target.svg";
 import {OptionSlider} from "./slider/OptionSlider";
 

@@ -1,9 +1,9 @@
 import * as React from 'react';
 import {useGameStore} from '../../store/gameStore';
 import {useMemo} from "react";
-import {MainOptions} from "./mobile/section/mainOptions";
-import {WalkingDurakOptions} from "./mobile/section/walkingDurakOptions";
-import {EshotDurakOptions} from "./mobile/section/eshotDurakOptions";
+import {MainOptions} from "./mobile/section/MainOptions";
+import {WalkingDurakOptions} from "./mobile/section/WalkingDurakOptions";
+import {EshotDurakOptions} from "./mobile/section/EshotDurakOptions";
 import {OptionSlider} from "./mobile/slider/OptionSlider";
 import TargetIcon from "../../assets/svg/target.svg";
 
