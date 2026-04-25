@@ -84,10 +84,10 @@ const MobileSideBar: React.FC<MobileSideBarProps> = ({theme}) => {
         >
             <div className="p-4 h-full flex flex-col">
                 {getHeader()}
-                {isSidebarOpen && <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar relative">
+                <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar relative">
                     {sliderContents[sliderIndex]}
-                </div>}
-                {isSidebarOpen && getFooter()}
+                </div>
+                {getFooter()}
             </div>
             {/* Toggle Button */}
             <button

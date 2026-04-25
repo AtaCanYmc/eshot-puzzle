@@ -32,9 +32,7 @@ const stopIcon = new DivIcon({
 });
 
 const MapComponent: React.FC<MapComponentProps> = (props: MapComponentProps) => {
-    const {
-        theme,
-    } = props;
+    const {theme} = props;
 
     const {
         currentStop,
