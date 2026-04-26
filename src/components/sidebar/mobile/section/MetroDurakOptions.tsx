@@ -1,6 +1,6 @@
 import {Stop, TasitTip} from "../../../../types/supabaseTypes";
 import * as React from "react";
-import eshotSound from '../../../../assets/sound/eshot-travel-sound.mp3';
+import MetroSound from '../../../../assets/sound/metro.mp3';
 import MetroIcon from '../../../../assets/svg/metro.svg';
 import {useGameStore} from "../../../../store/gameStore";
 import {useEffect} from "react";
@@ -34,7 +34,7 @@ export const MetroDurakOptions = (props: IProps) => {
         return (
             <button
                 key={stop.durak_id}
-                onClick={() => handleTravelToStop(stop, MetroIcon, eshotSound)}
+                onClick={() => handleTravelToStop(stop, MetroIcon, MetroSound)}
                 className={`w-full p-2 rounded-xl text-left border flex items-center gap-2 transition-all
                         ${isCurrent ? 'bg-green-100 border-green-500 text-green-700 font-black' : 'bg-primary/10 border-primary text-primary hover:bg-primary/20'}`}
             >
