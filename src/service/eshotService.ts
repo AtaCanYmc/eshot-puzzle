@@ -1,22 +1,17 @@
 import { supabase } from './supabaseClient'; // Kendi supabase client dosyan
 import type {Stop, RoutePoint, DepartureTime, SmartDirection} from '../types/supabaseTypes.ts';
-import { getCache, setCache } from '../utils/simpleCache';
 
 export const eshotService = {
     /**
      * Belirli bir hattın ve yönün duraklarını sıralı olarak getirir.
      */
     async getOrderedStops(hatNo: string, yon: number, current_durak_id?: number): Promise<Stop[]> {
-        const cacheKey = `getOrderedStops:${hatNo}:${yon}:${current_durak_id ?? 'null'}`;
-        const cached = getCache<Stop[]>(cacheKey);
-        if (cached) return cached;
         const { data, error } = await supabase.rpc('get_smart_ordered_stops', {
             p_hat_no: hatNo,
             p_yon: yon,
             p_current_durak_id: current_durak_id || null
         });
         if (error) throw error;
-        setCache(cacheKey, data || []);
         return data || [];
     },
 
@@ -64,14 +59,10 @@ export const eshotService = {
      * Bir duraktan geçen hatları split mantığıyla (dizi olarak) döndürür.
      */
     async getHatlarByDurakId(durakId: number): Promise<{ hat_no: string }[]> {
-        const cacheKey = `getHatlarByDurakId:${durakId}`;
-        const cached = getCache<{ hat_no: string }[]>(cacheKey);
-        if (cached) return cached;
         const { data, error } = await supabase.rpc('get_hatlar_by_durak_id_split', {
             target_durak_id: durakId
         });
         if (error) throw error;
-        setCache(cacheKey, data || []);
         return data || [];
     },
 

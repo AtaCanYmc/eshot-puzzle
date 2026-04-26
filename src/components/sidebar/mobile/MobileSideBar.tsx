@@ -26,6 +26,10 @@ const MobileSideBar: React.FC<MobileSideBarProps> = ({theme}) => {
 
     const {getStopIcon} = useCommonTravel();
 
+    const headerTheme = theme === 'dark' ? 'text-slate-400' : 'text-slate-500';
+    const durakAdiTheme = theme === 'dark' ? '' : 'text-slate-900';
+    const footerTheme = theme === 'dark' ? 'border-orange-500/20 bg-orange-500/10 border' : 'border-orange-300 bg-orange-100 border';
+
     const sliderContents = useMemo(() => {
         const map = <MainOptions theme={theme}/>;
         const walk = <WalkingDurakOptions theme={theme}/>;
@@ -42,8 +46,8 @@ const MobileSideBar: React.FC<MobileSideBarProps> = ({theme}) => {
                 <div className={"w-full mt-1 flex flex-row gap-4 items-center"}>
                     <img src={getStopIcon(currentStop.durak_type)} alt="tasit" className="w-12 h-12"/>
                     <div className={"w-full mt-1"}>
-                        <h2 className={`text-xs font-black uppercase tracking-widest mb-1 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Şu Anki Durak</h2>
-                        <p className={`text-lg font-bold leading-tight line-clamp-2 ${theme === 'dark' ? '' : 'text-slate-900'}`}>{currentStop.durak_adi}</p>
+                        <h2 className={`text-xs font-black uppercase tracking-widest mb-1 ${headerTheme}`}>Şu Anki Durak</h2>
+                        <p className={`text-lg font-bold leading-tight line-clamp-2 ${durakAdiTheme}`}>{currentStop.durak_adi}</p>
                         <span className="text-xs font-mono text-primary opacity-70">{currentStop.durak_id}</span>
                     </div>
                 </div>
@@ -56,11 +60,11 @@ const MobileSideBar: React.FC<MobileSideBarProps> = ({theme}) => {
         if (!targetStop.durak_id) return null;
         return (
             <footer
-                className={`mt-2 pt-2 border-t rounded-xl px-2 pb-1 flex items-center gap-2 min-h-0 h-10 ${theme === 'dark' ? 'border-orange-500/20 bg-orange-500/10 border' : 'border-orange-300 bg-orange-100 border'}`}>
+                className={`mt-2 pt-2 border-t rounded-xl px-2 pb-1 flex items-center gap-2 min-h-0 h-10 ${footerTheme}`}>
                 <span className="flex items-center gap-1">
                     <img src={TargetIcon} alt="Hedef" className="w-4 h-4 inline-block"/>
                     <span
-                        className={`text-xs font-bold truncate ${theme === 'dark' ? '' : 'text-slate-900'}`}>{targetStop.durak_adi}</span>
+                        className={`text-xs font-bold truncate ${durakAdiTheme}`}>{targetStop.durak_adi}</span>
                 </span>
             </footer>
         );
@@ -86,6 +90,18 @@ const MobileSideBar: React.FC<MobileSideBarProps> = ({theme}) => {
         }
     }, [isSidebarOpen]);
 
+    const toggleButton = useMemo(() => {
+        return (
+            <button
+                onClick={toggleSidebar}
+                className="absolute right-4 top-2 w-8 h-8 glass flex items-center justify-center transition-colors"
+                aria-label="Menüyü Kapat"
+            >
+                {barIcon}
+            </button>
+        );
+    }, [barIcon]);
+
     return (
         <aside className={`fixed left-0 bottom-0 z-[999] w-full max-w-full glass border-t transition-transform duration-500 ease-in-out
         ${theme === 'dark' ? 'border-white/10 bg-slate-900' : 'border-slate-200 bg-white'}
@@ -98,14 +114,7 @@ const MobileSideBar: React.FC<MobileSideBarProps> = ({theme}) => {
                 </div>
                 {getFooter()}
             </div>
-            {/* Toggle Button */}
-            <button
-                onClick={toggleSidebar}
-                className="absolute right-4 top-2 w-8 h-8 glass flex items-center justify-center transition-colors"
-                aria-label="Menüyü Kapat"
-            >
-                {barIcon}
-            </button>
+            {toggleButton}
         </aside>
     );
 };
