@@ -50,6 +50,28 @@ export const useCommonTravel = () => {
         }
     };
 
+    const handleSelectIstasyon = async () => {
+        if (!currentStop.durak_type) return;
+        const durakTipi = currentStop.durak_type;
+        setLoading(true);
+        setSelectedLine(null);
+        setSelectedDirection(null);
+        setAvailableLines([]);
+
+        try {
+            let stops = [] as Stop[];
+            if (durakTipi === TasitTip.METRO) {
+                stops = await metroService.getOrderedStops();
+            }
+            setAvailableStops(stops);
+        } catch (error) {
+            setAvailableStops([]);
+            console.error("Line selection failed", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const fetchNearby = async () => {
         if (!currentStop.durak_id) return;
         setLoading(true);
@@ -139,6 +161,7 @@ export const useCommonTravel = () => {
         fetchNearby,
         fetchLines,
         handleTravelToStop,
-        getStopIcon
+        getStopIcon,
+        handleSelectIstasyon
     }
 };

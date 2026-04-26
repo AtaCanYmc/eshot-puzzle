@@ -3,7 +3,9 @@ import {useGameStore} from "../../../../store/gameStore";
 import WalkIcon from "../../../../assets/svg/walk.svg";
 import MapIcon from "../../../../assets/svg/map.svg";
 import EshotIcon from "../../../../assets/svg/eshot.svg";
+import MetroIcon from "../../../../assets/svg/metro.svg";
 import {TasitButton} from "../../../button/TasitButton";
+import {TasitTip} from "../../../../types/supabaseTypes";
 
 interface IProps {
     theme: string;
@@ -12,6 +14,7 @@ interface IProps {
 export const OptionSlider = (props: IProps) => {
     const {theme} = props;
     const {
+        currentStop,
         sliderIndex,
         setSliderIndex,
         availableLines
@@ -20,8 +23,9 @@ export const OptionSlider = (props: IProps) => {
     const items = [
         <TasitButton identifier={'harita'} icon={MapIcon} text={'Harita'}/>,
         <TasitButton identifier={'walk'} icon={WalkIcon} text={'Yürü'}/>,
-        ...availableLines.map(line => <TasitButton identifier={line} icon={EshotIcon} text={`Hat ${line}`}/>)
-    ]
+        ...availableLines.map(line => <TasitButton identifier={line} icon={EshotIcon} text={`Hat ${line}`}/>),
+        currentStop.durak_type === TasitTip.METRO && <TasitButton identifier={'metro'} icon={MetroIcon} text={'İzmir Metro'}/>
+    ].filter(Boolean);
 
     const handlePrev = () => {
         setSliderIndex((sliderIndex - 1 + items.length) % items.length);

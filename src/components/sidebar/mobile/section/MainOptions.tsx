@@ -1,9 +1,11 @@
 import WalkIcon from "../../../../assets/svg/walk.svg";
 import EshotIcon from "../../../../assets/svg/eshot.svg";
+import MetroIcon from "../../../../assets/svg/metro.svg";
 import * as React from "react";
 import {useCommonTravel} from "../../../../hooks/useCommonTravel";
 import {useGameStore} from "../../../../store/gameStore";
 import {TasitButton} from "../../../button/TasitButton";
+import {TasitTip} from "../../../../types/supabaseTypes";
 
 interface IProps {
     theme: string;
@@ -11,8 +13,9 @@ interface IProps {
 
 export const MainOptions = (props: IProps) => {
     const {theme} = props;
-    const {handleSelectLine} = useCommonTravel();
+    const {handleSelectLine, handleSelectIstasyon} = useCommonTravel();
     const {
+        currentStop,
         availableLines,
         setSliderIndex
     } = useGameStore();
@@ -39,16 +42,30 @@ export const MainOptions = (props: IProps) => {
         );
     };
 
+    const getMetroButton = () => {
+        if (currentStop.durak_type !== TasitTip.METRO) return;
+        return (
+            <TasitButton identifier={"metro"}
+                         icon={MetroIcon}
+                         text={"İzmir Metro"}
+                         onClick={() => {
+                             handleSelectIstasyon().then(r => r);
+                             setSliderIndex(2);
+                         }}
+            />
+        );
+    };
+
     const getEshotButtons = () => {
         return availableLines.map(getEshotButton);
     };
 
     return (
         <section>
-            <h3 className={`text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2 ${theme === 'dark' ? 'text-primary' : 'text-blue-700'}`}>Geçen
-                Hatlar</h3>
+            <h3 className={`text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2 ${theme === 'dark' ? 'text-primary' : 'text-blue-700'}`}>Seçenekler</h3>
             <div className="grid grid-cols-2 gap-2 mb-2">
                 {getWalkingButton()}
+                {getMetroButton()}
                 {getEshotButtons()}
             </div>
         </section>
