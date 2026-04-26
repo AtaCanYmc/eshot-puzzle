@@ -58,7 +58,7 @@ export const EshotDurakOptions = (props: IProps) => {
         handleSelectLine(hatNo).then(r => r);
     }, []);
 
-    if (currentStop.durak_type !== TasitTip.ESHOT) return null;
+    if (currentStop.durak_type ?? 'ESHOT' !== TasitTip.ESHOT) return null;
     return (
         <section>
             <h3 className={`text-xs font-bold uppercase tracking-widest mb-2 ${theme === 'dark' ? 'text-primary' : 'text-blue-700'}`}>Hat

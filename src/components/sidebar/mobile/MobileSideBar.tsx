@@ -7,6 +7,7 @@ import TargetIcon from "../../../assets/svg/target.svg";
 import {OptionSlider} from "./slider/OptionSlider";
 import {useGameStore} from '../../../store/gameStore';
 import {useCommonTravel} from "../../../hooks/useCommonTravel";
+import {TasitTip} from "../../../types/supabaseTypes";
 import {MetroDurakOptions} from "./section/MetroDurakOptions";
 import {IzbanDurakOptions} from "./section/IzbanDurakOptions";
 
@@ -30,15 +31,6 @@ const MobileSideBar: React.FC<MobileSideBarProps> = ({theme}) => {
     const durakAdiTheme = theme === 'dark' ? '' : 'text-slate-900';
     const footerTheme = theme === 'dark' ? 'border-orange-500/20 bg-orange-500/10 border' : 'border-orange-300 bg-orange-100 border';
 
-    const sliderContents = useMemo(() => {
-        const map = <MainOptions theme={theme}/>;
-        const walk = <WalkingDurakOptions theme={theme}/>;
-        const eshot = availableLines.map(line => <EshotDurakOptions key={line} hatNo={line} theme={theme}/>);
-        const metro = <MetroDurakOptions theme={theme}/>;
-        const izban = <IzbanDurakOptions theme={theme}/>;
-        return [map, walk, metro, izban, ...eshot].filter(Boolean);
-    }, [currentStop, availableLines]);
-
     const getHeader = () => {
         if (!currentStop) return null;
         return (
@@ -46,7 +38,8 @@ const MobileSideBar: React.FC<MobileSideBarProps> = ({theme}) => {
                 <div className={"w-full mt-1 flex flex-row gap-4 items-center"}>
                     <img src={getStopIcon(currentStop.durak_type)} alt="tasit" className="w-12 h-12"/>
                     <div className={"w-full mt-1"}>
-                        <h2 className={`text-xs font-black uppercase tracking-widest mb-1 ${headerTheme}`}>Şu Anki Durak</h2>
+                        <h2 className={`text-xs font-black uppercase tracking-widest mb-1 ${headerTheme}`}>Şu Anki
+                            Durak</h2>
                         <p className={`text-lg font-bold leading-tight line-clamp-2 ${durakAdiTheme}`}>{currentStop.durak_adi}</p>
                         <span className="text-xs font-mono text-primary opacity-70">{currentStop.durak_id}</span>
                     </div>
@@ -102,6 +95,27 @@ const MobileSideBar: React.FC<MobileSideBarProps> = ({theme}) => {
         );
     }, [barIcon]);
 
+    const getTravelContent = () => {
+        const type = currentStop.durak_type ?? 'ESHOT';
+        switch (type) {
+            case TasitTip.ESHOT:
+                const line = availableLines[sliderIndex - 2];
+                return <EshotDurakOptions key={line} hatNo={line} theme={theme}/>;
+            case TasitTip.METRO:
+                return <MetroDurakOptions theme={theme}/>;
+            case TasitTip.IZBAN:
+                return <IzbanDurakOptions theme={theme}/>;
+            default:
+                return null;
+        }
+    };
+
+    const getContent = () => {
+        if (sliderIndex === 0) return <MainOptions theme={theme}/>;
+        else if (sliderIndex === 1) return <WalkingDurakOptions theme={theme}/>;
+        else return getTravelContent();
+    };
+
     return (
         <aside className={`fixed left-0 bottom-0 z-[999] w-full max-w-full glass border-t transition-transform duration-500 ease-in-out
         ${theme === 'dark' ? 'border-white/10 bg-slate-900' : 'border-slate-200 bg-white'}
@@ -110,7 +124,7 @@ const MobileSideBar: React.FC<MobileSideBarProps> = ({theme}) => {
             <div className="p-4 h-full flex flex-col">
                 {getHeader()}
                 <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar relative">
-                    {sliderContents[sliderIndex]}
+                    {getContent()}
                 </div>
                 {getFooter()}
             </div>
