@@ -19,7 +19,7 @@ export const EshotDurakOptions = (props: IProps) => {
         availableStops,
     } = useGameStore();
 
-    const {handleTravelToStop, handleSelectLine} = useCommonTravel();
+    const {handleTravelToStop, handleSelectLine, handleGuzergahPoints} = useCommonTravel();
 
     const getDurakBulunamadi = () => {
         return (
@@ -56,6 +56,7 @@ export const EshotDurakOptions = (props: IProps) => {
 
     useEffect(() => {
         handleSelectLine(hatNo).then(r => r);
+        handleGuzergahPoints().then(r => r);
     }, []);
 
     if (currentStop.durak_type ?? 'ESHOT' !== TasitTip.ESHOT) return null;

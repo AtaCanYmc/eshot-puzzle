@@ -52,7 +52,8 @@ const MapComponent: React.FC<MapComponentProps> = (props: MapComponentProps) => 
         currentStop,
         targetStop,
         availableStops,
-        sliderIndex
+        sliderIndex,
+        selectedGuzergahPoints
     } = useGameStore();
 
     const darkTile = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
@@ -62,15 +63,13 @@ const MapComponent: React.FC<MapComponentProps> = (props: MapComponentProps) => 
     const zoom = 14;
 
     const getGuzergah = () => {
-        if (sliderIndex <= 1) return <></>;
-        const polylinePositions = (availableStops && availableStops.length > 1) ? availableStops.map(stop => [stop.enlem, stop.boylam]) : [];
-        if (polylinePositions.length < 1) return <></>;
+        if (sliderIndex <= 1 || selectedGuzergahPoints.length < 1) return <></>;
         const color = theme === 'dark' ? '#38bdf8' : '#0ea5e9';
-        const bgColor = theme === 'dark' ? '#fff' : '#000';
+        const bgColor = theme === 'dark' ? '#000' : '#fff';
         return (
             <>
                 <Polyline
-                    positions={polylinePositions as [number, number][]}
+                    positions={selectedGuzergahPoints as [number, number][]}
                     pathOptions={{
                         color: bgColor,
                         weight: 6,
@@ -78,7 +77,7 @@ const MapComponent: React.FC<MapComponentProps> = (props: MapComponentProps) => 
                     }}
                 />
                 <Polyline
-                    positions={polylinePositions as [number, number][]}
+                    positions={selectedGuzergahPoints as [number, number][]}
                     pathOptions={{
                         color: color,
                         weight: 6,

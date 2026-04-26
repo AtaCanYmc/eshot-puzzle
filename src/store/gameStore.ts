@@ -29,6 +29,10 @@ interface GameState {
     setSelectedLine: (line: string | null) => void;
     setSelectedDirection: (dir: number | null) => void;
 
+    // guzergah
+    selectedGuzergahPoints: number[][];
+    setSelectedGuzergahPoints: (guzergahPoints: number[][]) => void;
+
     // haritada gözükecek duraklar
     availableStops: Stop[];
     setAvailableStops: (stops: Stop[]) => void;
@@ -77,6 +81,7 @@ export const useGameStore = create<GameState>((set) => ({
     loadingMessage: '',
     isSidebarOpen: true,
     availableStops: [],
+    selectedGuzergahPoints: [],
     setCurrentStop: (stop) => set(() => ({currentStop: stop})),
     setTargetStop: (stop) => set(() => ({targetStop: stop})),
     setHistory: (history) => set(() => ({history})),
@@ -92,6 +97,7 @@ export const useGameStore = create<GameState>((set) => ({
     toggleSidebar: () => set((state) => ({isSidebarOpen: !state.isSidebarOpen})),
     setAvailableStops: (stops) => set(() => ({availableStops: stops})),
     setSidebarContent: (content) => set(() => ({sidebarContent: content})),
+    setSelectedGuzergahPoints: (guzergahPoints: number[][]) => set(() => ({selectedGuzergahPoints: guzergahPoints})),
     reset: (firstStop) => set(() => ({
         currentStop: firstStop,
         history: [{stop: firstStop}],

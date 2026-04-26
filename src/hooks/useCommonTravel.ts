@@ -19,6 +19,7 @@ export const useCommonTravel = () => {
         selectedLine,
         history,
         availableStops,
+        selectedGuzergahPoints,
         setAvailableStops,
         setLoading,
         setLoadingIcon,
@@ -28,7 +29,8 @@ export const useCommonTravel = () => {
         setSteps,
         setCurrentStop,
         setHistory,
-        setSliderIndex
+        setSliderIndex,
+        setSelectedGuzergahPoints
     } = useGameStore();
 
     const handleSelectLine = async (hatNo: string) => {
@@ -52,8 +54,8 @@ export const useCommonTravel = () => {
     };
 
     const handleSelectIstasyon = async () => {
-        if (!currentStop.durak_type) return;
-        const durakTipi = currentStop.durak_type;
+        if (!currentStop.durak_id) return;
+        const durakTipi = currentStop.durak_type ?? TasitTip.ESHOT;
         setLoading(true);
         setSelectedLine(null);
         setSelectedDirection(null);
@@ -161,12 +163,30 @@ export const useCommonTravel = () => {
         }
     };
 
+    const handleGuzergahPoints = async () => {
+        if (!currentStop.durak_id) {
+            setSelectedGuzergahPoints([]);
+            return;
+        }
+
+        const durakTipi = currentStop.durak_type ?? TasitTip.ESHOT;
+        if (durakTipi === TasitTip.ESHOT && selectedLine && selectedDirection) {
+            const guzergahArr = await eshotService.getRoutePoints(selectedLine, selectedDirection);
+            const points = guzergahArr.map(konum => [konum.enlem, konum.boylam]);
+            setSelectedGuzergahPoints(points);
+        } else {
+            const points = availableStops.map(stop => [stop.enlem, stop.boylam]);
+            setSelectedGuzergahPoints(points);
+        }
+    };
+
     return {
         handleSelectLine,
         fetchNearby,
         fetchLines,
         handleTravelToStop,
         getStopIcon,
-        handleSelectIstasyon
+        handleSelectIstasyon,
+        handleGuzergahPoints
     }
 };
