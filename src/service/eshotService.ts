@@ -79,10 +79,10 @@ export const eshotService = {
      * İki rastgele durak döndürür, aralarındaki mesafe en az belirtilen kadar (default 25km) olur.
      * @param distance
      */
-    async getTwoRandomStops(distance: number = 25000): Promise<[Stop, Stop]> {
+    async getTwoRandomStops(distance: number = 5000): Promise<[Stop, Stop]> {
         // 1. rastgele durak
         const stop1 = await this.getRandomDurakFarAway(null, null, 0);
-        // 2. durak: 25km (25000m) uzağında rastgele bir durak
+        // 2. durak: 5km (5000m) uzağında rastgele bir durak
         const stop2 = await this.getRandomDurakFarAway(stop1.enlem, stop1.boylam, distance);
         return [stop1, stop2];
     },

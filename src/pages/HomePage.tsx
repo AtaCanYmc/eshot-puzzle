@@ -23,7 +23,7 @@ const HomePage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const result = await eshotService.getTwoRandomStops();
+      const result = await eshotService.getTwoRandomStops(5000);
       setStops(result as [Stop, Stop]);
       setModalOpen(true);
     } catch (e) {
