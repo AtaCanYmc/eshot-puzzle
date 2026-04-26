@@ -7,6 +7,7 @@ import TargetIcon from "../../../assets/svg/target.svg";
 import {OptionSlider} from "./slider/OptionSlider";
 import {useGameStore} from '../../../store/gameStore';
 import {useCommonTravel} from "../../../hooks/useCommonTravel";
+import {MetroDurakOptions} from "./section/MetroDurakOptions";
 
 interface MobileSideBarProps {
     theme: string;
@@ -28,7 +29,8 @@ const MobileSideBar: React.FC<MobileSideBarProps> = ({theme}) => {
         const map = <MainOptions theme={theme}/>;
         const walk = <WalkingDurakOptions theme={theme}/>;
         const eshot = availableLines.map(line => <EshotDurakOptions key={line} hatNo={line} theme={theme}/>);
-        return [map, walk, ...eshot];
+        const metro = <MetroDurakOptions theme={theme}/>;
+        return [map, walk, metro, ...eshot].filter(Boolean);
     }, [availableLines]);
 
     const getHeader = () => {

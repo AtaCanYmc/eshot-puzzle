@@ -1,4 +1,4 @@
-import type {Stop} from "../../../../types/supabaseTypes";
+import {Stop, TasitTip} from "../../../../types/supabaseTypes";
 import * as React from "react";
 import eshotSound from '../../../../assets/sound/eshot-travel-sound.mp3';
 import MetroIcon from '../../../../assets/svg/metro.svg';
@@ -56,6 +56,7 @@ export const MetroDurakOptions = (props: IProps) => {
         handleSelectIstasyon().then(r => r);
     }, []);
 
+    if (currentStop.durak_type !== TasitTip.METRO) return null;
     return (
         <section>
             <h3 className={`text-xs font-bold uppercase tracking-widest mb-2 ${theme === 'dark' ? 'text-primary' : 'text-blue-700'}`}>Metro Durakları</h3>
