@@ -62,6 +62,10 @@ export const useCommonTravel = () => {
             let stops = [] as Stop[];
             if (durakTipi === TasitTip.METRO) {
                 stops = await metroService.getOrderedStops();
+            } else if (durakTipi === TasitTip.IZBAN) {
+                stops = await izbanService.getOrderedStops();
+            } else {
+                throw new Error("Invalid stop type for station selection");
             }
             setAvailableStops(stops);
         } catch (error) {
