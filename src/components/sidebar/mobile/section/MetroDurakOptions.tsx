@@ -18,7 +18,7 @@ export const MetroDurakOptions = (props: IProps) => {
         availableStops,
     } = useGameStore();
 
-    const {handleTravelToStop, handleSelectIstasyon} = useCommonTravel();
+    const {handleTravelToStop, handleSelectIstasyon, handleGuzergahPoints} = useCommonTravel();
 
     const getDurakBulunamadi = () => {
         return (
@@ -53,6 +53,7 @@ export const MetroDurakOptions = (props: IProps) => {
 
     useEffect(() => {
         handleSelectIstasyon().then(r => r);
+        handleGuzergahPoints().then(r => r);
     }, []);
 
     if (currentStop.durak_type !== TasitTip.METRO) return null;

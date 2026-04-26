@@ -18,7 +18,7 @@ export const IzbanDurakOptions = (props: IProps) => {
         availableStops,
     } = useGameStore();
 
-    const {handleTravelToStop, handleSelectIstasyon} = useCommonTravel();
+    const {handleTravelToStop, handleSelectIstasyon, handleGuzergahPoints} = useCommonTravel();
 
     const getDurakBulunamadi = () => {
         return (
@@ -53,6 +53,7 @@ export const IzbanDurakOptions = (props: IProps) => {
 
     useEffect(() => {
         handleSelectIstasyon().then(r => r);
+        handleGuzergahPoints().then(r => r);
     }, []);
 
     if (currentStop.durak_type !== TasitTip.IZBAN) return null;
