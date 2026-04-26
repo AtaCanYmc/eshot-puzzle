@@ -53,6 +53,7 @@ const MobileSideBar: React.FC<MobileSideBarProps> = ({theme}) => {
     };
 
     const getFooter = () => {
+        if (!targetStop.durak_id) return null;
         return (
             <footer
                 className={`mt-2 pt-2 border-t rounded-xl px-2 pb-1 flex items-center gap-2 min-h-0 h-10 ${theme === 'dark' ? 'border-orange-500/20 bg-orange-500/10 border' : 'border-orange-300 bg-orange-100 border'}`}>
