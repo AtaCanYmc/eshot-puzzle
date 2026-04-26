@@ -66,11 +66,27 @@ const MapComponent: React.FC<MapComponentProps> = (props: MapComponentProps) => 
         const polylinePositions = (availableStops && availableStops.length > 1) ? availableStops.map(stop => [stop.enlem, stop.boylam]) : [];
         if (polylinePositions.length < 1) return <></>;
         const color = theme === 'dark' ? '#38bdf8' : '#0ea5e9';
+        const bgColor = theme === 'dark' ? '#fff' : '#000';
         return (
-            <Polyline
-                positions={polylinePositions as [number, number][]}
-                pathOptions={{color: color, weight: 6, opacity: 0.7}}
-            />
+            <>
+                <Polyline
+                    positions={polylinePositions as [number, number][]}
+                    pathOptions={{
+                        color: bgColor,
+                        weight: 6,
+                        opacity: 0.7,
+                    }}
+                />
+                <Polyline
+                    positions={polylinePositions as [number, number][]}
+                    pathOptions={{
+                        color: color,
+                        weight: 6,
+                        opacity: 0.7,
+                        dashArray: '5, 10',
+                    }}
+                />
+            </>
         );
     };
 
