@@ -41,7 +41,6 @@ export const MetroDurakOptions = (props: IProps) => {
                 <span className={`w-2 h-2 rounded-full shrink-0 ${isCurrent ? 'bg-green-500' : 'bg-primary'}`}></span>
                 <span className="flex flex-col">
                         <span className="text-xs font-semibold truncate max-w-[200px]">{stop.durak_adi}</span>
-                        <span className="text-[10px] font-mono text-primary opacity-70">{stop.durak_id}</span>
                       </span>
             </button>
         );
