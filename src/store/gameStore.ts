@@ -37,10 +37,6 @@ interface GameState {
     availableLines: string[];
     setAvailableLines: (lines: string[]) => void;
 
-    // nearby stops
-    nearbyStops: Stop[];
-    setNearbyStops: (stops: Stop[]) => void;
-
     // Slider
     sliderIndex: number;
     setSliderIndex: (index: number) => void;
@@ -80,7 +76,6 @@ export const useGameStore = create<GameState>((set) => ({
     loadingIcon: null,
     loadingMessage: '',
     isSidebarOpen: true,
-    nearbyStops: [],
     availableStops: [],
     setCurrentStop: (stop) => set(() => ({currentStop: stop})),
     setTargetStop: (stop) => set(() => ({targetStop: stop})),
@@ -95,7 +90,6 @@ export const useGameStore = create<GameState>((set) => ({
     setLoadingMessage: (message) => set(() => ({loadingMessage: message})),
     setIsSidebarOpen: (val) => set(() => ({isSidebarOpen: val})),
     toggleSidebar: () => set((state) => ({isSidebarOpen: !state.isSidebarOpen})),
-    setNearbyStops: (stops) => set(() => ({nearbyStops: stops})),
     setAvailableStops: (stops) => set(() => ({availableStops: stops})),
     setSidebarContent: (content) => set(() => ({sidebarContent: content})),
     reset: (firstStop) => set(() => ({
@@ -109,7 +103,6 @@ export const useGameStore = create<GameState>((set) => ({
         availableLines: [],
         loading: false,
         isSidebarOpen: true,
-        nearbyStops: [],
     })),
 }));
 
