@@ -4,6 +4,7 @@ import WalkIcon from "../../../../assets/svg/walk.svg";
 import MapIcon from "../../../../assets/svg/map.svg";
 import EshotIcon from "../../../../assets/svg/eshot.svg";
 import MetroIcon from "../../../../assets/svg/metro.svg";
+import IzbanIcon from "../../../../assets/svg/izban.svg";
 import {TasitButton} from "../../../button/TasitButton";
 import {TasitTip} from "../../../../types/supabaseTypes";
 
@@ -24,7 +25,8 @@ export const OptionSlider = (props: IProps) => {
         <TasitButton identifier={'harita'} icon={MapIcon} text={'Harita'}/>,
         <TasitButton identifier={'walk'} icon={WalkIcon} text={'Yürü'}/>,
         ...availableLines.map(line => <TasitButton identifier={line} icon={EshotIcon} text={`Hat ${line}`}/>),
-        currentStop.durak_type === TasitTip.METRO && <TasitButton identifier={'metro'} icon={MetroIcon} text={'İzmir Metro'}/>
+        currentStop.durak_type === TasitTip.METRO && <TasitButton identifier={'metro'} icon={MetroIcon} text={'İzmir Metro'}/>,
+        currentStop.durak_type === TasitTip.IZBAN && <TasitButton identifier={'izban'} icon={IzbanIcon} text={'Banliyö'}/>,
     ].filter(Boolean);
 
     const handlePrev = () => {

@@ -1,6 +1,7 @@
 import WalkIcon from "../../../../assets/svg/walk.svg";
 import EshotIcon from "../../../../assets/svg/eshot.svg";
 import MetroIcon from "../../../../assets/svg/metro.svg";
+import IzbanIcon from "../../../../assets/svg/izban.svg";
 import * as React from "react";
 import {useCommonTravel} from "../../../../hooks/useCommonTravel";
 import {useGameStore} from "../../../../store/gameStore";
@@ -56,6 +57,20 @@ export const MainOptions = (props: IProps) => {
         );
     };
 
+    const getIzbanButton = () => {
+        if (currentStop.durak_type !== TasitTip.IZBAN) return;
+        return (
+            <TasitButton identifier={"izban"}
+                         icon={IzbanIcon}
+                         text={"Banliyö"}
+                         onClick={() => {
+                             handleSelectIstasyon().then(r => r);
+                             setSliderIndex(2);
+                         }}
+            />
+        );
+    };
+
     const getEshotButtons = () => {
         return availableLines.map(getEshotButton);
     };
@@ -66,6 +81,7 @@ export const MainOptions = (props: IProps) => {
             <div className="grid grid-cols-2 gap-2 mb-2">
                 {getWalkingButton()}
                 {getMetroButton()}
+                {getIzbanButton()}
                 {getEshotButtons()}
             </div>
         </section>
