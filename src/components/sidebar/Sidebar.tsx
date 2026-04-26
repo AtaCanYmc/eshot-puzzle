@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {useGameStore} from '../../store/gameStore';
-import {useMemo} from "react";
 import {MainOptions} from "./mobile/section/MainOptions";
 import {WalkingDurakOptions} from "./mobile/section/WalkingDurakOptions";
 import {EshotDurakOptions} from "./mobile/section/EshotDurakOptions";
@@ -8,6 +7,7 @@ import {OptionSlider} from "./mobile/slider/OptionSlider";
 import TargetIcon from "../../assets/svg/target.svg";
 import {MetroDurakOptions} from "./mobile/section/MetroDurakOptions";
 import {IzbanDurakOptions} from "./mobile/section/IzbanDurakOptions";
+import {TasitTip} from "../../types/supabaseTypes";
 
 interface SidebarProps {
     theme: string;
@@ -22,15 +22,6 @@ const Sidebar: React.FC<SidebarProps> = ({theme}) => {
         availableLines,
         sliderIndex
     } = useGameStore();
-
-    const sliderContents = useMemo(() => {
-        const map = <MainOptions theme={theme}/>;
-        const walk = <WalkingDurakOptions theme={theme}/>;
-        const eshot = availableLines.map(line => <EshotDurakOptions key={line} hatNo={line} theme={theme}/>);
-        const metro = <MetroDurakOptions theme={theme}/>;
-        const izban = <IzbanDurakOptions theme={theme}/>;
-        return [map, walk, metro, izban, ...eshot].filter(Boolean);
-    }, [currentStop, availableLines]);
 
     const getAsideHeader = () => {
         if (!currentStop.durak_id) return null;
@@ -57,6 +48,27 @@ const Sidebar: React.FC<SidebarProps> = ({theme}) => {
         );
     };
 
+    const getTravelContent = () => {
+        const type = currentStop.durak_type ?? 'ESHOT';
+        switch (type) {
+            case TasitTip.ESHOT:
+                const line = availableLines[sliderIndex - 2];
+                return <EshotDurakOptions key={line} hatNo={line} theme={theme}/>;
+            case TasitTip.METRO:
+                return <MetroDurakOptions theme={theme}/>;
+            case TasitTip.IZBAN:
+                return <IzbanDurakOptions theme={theme}/>;
+            default:
+                return null;
+        }
+    };
+
+    const getContent = () => {
+        if (sliderIndex === 0) return <MainOptions theme={theme}/>;
+        else if (sliderIndex === 1) return <WalkingDurakOptions theme={theme}/>;
+        else return getTravelContent();
+    };
+
     return (
         <aside
             className={`absolute left-0 top-0 bottom-0 z-[999] w-80 glass border-r transition-transform duration-500 ease-in-out
@@ -66,7 +78,7 @@ const Sidebar: React.FC<SidebarProps> = ({theme}) => {
             <div className="p-6 h-full flex flex-col">
                 {getAsideHeader()}
                 <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar relative">
-                    {sliderContents[sliderIndex]}
+                    {getContent()}
                 </div>
                 {getFooter()}
             </div>
