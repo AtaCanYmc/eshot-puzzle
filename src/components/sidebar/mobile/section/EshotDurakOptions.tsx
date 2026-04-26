@@ -1,4 +1,4 @@
-import type {Stop} from "../../../../types/supabaseTypes";
+import {Stop, TasitTip} from "../../../../types/supabaseTypes";
 import * as React from "react";
 import eshotSound from '../../../../assets/sound/eshot-travel-sound.mp3';
 import EshotIcon from '../../../../assets/svg/eshot.svg';
@@ -15,6 +15,7 @@ export const EshotDurakOptions = (props: IProps) => {
     const {hatNo, theme} = props;
 
     const {
+        currentStop,
         availableStops,
     } = useGameStore();
 
@@ -55,8 +56,9 @@ export const EshotDurakOptions = (props: IProps) => {
 
     useEffect(() => {
         handleSelectLine(hatNo).then(r => r);
-    }, [hatNo]);
+    }, []);
 
+    if (currentStop.durak_type !== TasitTip.ESHOT) return null;
     return (
         <section>
             <h3 className={`text-xs font-bold uppercase tracking-widest mb-2 ${theme === 'dark' ? 'text-primary' : 'text-blue-700'}`}>Hat
