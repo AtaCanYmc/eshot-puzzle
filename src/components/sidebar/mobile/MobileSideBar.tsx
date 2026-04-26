@@ -33,7 +33,7 @@ const MobileSideBar: React.FC<MobileSideBarProps> = ({theme}) => {
         const metro = <MetroDurakOptions theme={theme}/>;
         const izban = <IzbanDurakOptions theme={theme}/>;
         return [map, walk, metro, izban, ...eshot].filter(Boolean);
-    }, [availableLines]);
+    }, [currentStop, availableLines]);
 
     const getHeader = () => {
         if (!currentStop) return null;

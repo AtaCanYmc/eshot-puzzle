@@ -6,6 +6,8 @@ import {WalkingDurakOptions} from "./mobile/section/WalkingDurakOptions";
 import {EshotDurakOptions} from "./mobile/section/EshotDurakOptions";
 import {OptionSlider} from "./mobile/slider/OptionSlider";
 import TargetIcon from "../../assets/svg/target.svg";
+import {MetroDurakOptions} from "./mobile/section/MetroDurakOptions";
+import {IzbanDurakOptions} from "./mobile/section/IzbanDurakOptions";
 
 interface SidebarProps {
     theme: string;
@@ -25,8 +27,10 @@ const Sidebar: React.FC<SidebarProps> = ({theme}) => {
         const map = <MainOptions theme={theme}/>;
         const walk = <WalkingDurakOptions theme={theme}/>;
         const eshot = availableLines.map(line => <EshotDurakOptions key={line} hatNo={line} theme={theme}/>);
-        return [map, walk, ...eshot];
-    }, [availableLines]);
+        const metro = <MetroDurakOptions theme={theme}/>;
+        const izban = <IzbanDurakOptions theme={theme}/>;
+        return [map, walk, metro, izban, ...eshot].filter(Boolean);
+    }, [currentStop, availableLines]);
 
     const getAsideHeader = () => {
         if (!currentStop.durak_id) return null;
