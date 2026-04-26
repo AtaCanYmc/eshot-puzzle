@@ -86,7 +86,7 @@ export const useCommonTravel = () => {
             const metro = await metroService.getNearbyStations(enlem, boylam, 500);
             const izban = await izbanService.getNearbyStations(enlem, boylam, 500);
             const data = [...eshot, ...metro, ...izban];
-            const filtered = data.filter((s: Stop) => s.durak_id !== durak_id);
+            const filtered = data.filter((s: Stop) => s.durak_type !== currentStop.durak_type || s.durak_id !== durak_id);
             setAvailableStops(filtered);
         } catch (e) {
             setAvailableStops([]);
