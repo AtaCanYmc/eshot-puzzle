@@ -35,10 +35,11 @@ export const useCommonTravel = () => {
         if (!currentStop.durak_id) return;
         setLoading(true);
         try {
-            const dir = await eshotService.getAvailableDirections(currentStop.durak_id, hatNo)
-            const stops = await eshotService.getOrderedStops(hatNo, dir[0].smart_yon, currentStop.durak_id);
+            const directions = await eshotService.getAvailableDirections(currentStop.durak_id, hatNo);
+            const activeDirection = directions[0];
+            const stops = await eshotService.getOrderedStops(hatNo, activeDirection.smart_yon, currentStop.durak_id);
             setSelectedLine(hatNo);
-            setSelectedDirection(dir[0].smart_yon);
+            setSelectedDirection(activeDirection.smart_yon);
             setAvailableStops(stops);
         } catch (error) {
             setSelectedLine(null);
