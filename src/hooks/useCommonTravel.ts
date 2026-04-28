@@ -10,6 +10,7 @@ import IzbanStopIcon from "../assets/svg/metro-stop.svg";
 import TramvayStopIcon from "../assets/svg/tram-stop.svg";
 import FerryStopIcon from "../assets/svg/anchor.svg";
 import EshotStopIcon from "../assets/svg/bus-stop.svg";
+import {vapurService} from "../service/vapurService";
 
 export const useCommonTravel = () => {
     const {
@@ -88,7 +89,8 @@ export const useCommonTravel = () => {
             const eshot = await eshotService.getNearbyStops(enlem, boylam, 200);
             const metro = await metroService.getNearbyStations(enlem, boylam, 500);
             const izban = await izbanService.getNearbyStations(enlem, boylam, 500);
-            const data = [...eshot, ...metro, ...izban];
+            const vapur = await vapurService.getNearbyStations(enlem, boylam, 500);
+            const data = [...eshot, ...metro, ...izban, ...vapur];
             const filtered = data.filter((s: Stop) => s.durak_type !== currentStop.durak_type || s.durak_id !== durak_id);
             setAvailableStops(filtered);
         } catch (e) {
