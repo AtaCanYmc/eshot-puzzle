@@ -8,6 +8,7 @@ import TargetIcon from "../../assets/svg/target.svg";
 import {MetroDurakOptions} from "./mobile/section/MetroDurakOptions";
 import {IzbanDurakOptions} from "./mobile/section/IzbanDurakOptions";
 import {TasitTip} from "../../types/supabaseTypes";
+import {VapurDurakOptions} from "./mobile/section/VapurDurakOptions";
 
 interface SidebarProps {
     theme: string;
@@ -49,7 +50,7 @@ const Sidebar: React.FC<SidebarProps> = ({theme}) => {
     };
 
     const getTravelContent = () => {
-        const type = currentStop.durak_type ?? 'ESHOT';
+        const type = currentStop.durak_type ?? TasitTip.ESHOT;
         switch (type) {
             case TasitTip.ESHOT:
                 const line = availableLines[sliderIndex - 2];
@@ -58,6 +59,8 @@ const Sidebar: React.FC<SidebarProps> = ({theme}) => {
                 return <MetroDurakOptions theme={theme}/>;
             case TasitTip.IZBAN:
                 return <IzbanDurakOptions theme={theme}/>;
+            case TasitTip.VAPUR:
+                return <VapurDurakOptions theme={theme}/>;
             default:
                 return null;
         }

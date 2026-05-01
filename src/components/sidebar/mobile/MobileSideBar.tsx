@@ -10,6 +10,7 @@ import {useCommonTravel} from "../../../hooks/useCommonTravel";
 import {TasitTip} from "../../../types/supabaseTypes";
 import {MetroDurakOptions} from "./section/MetroDurakOptions";
 import {IzbanDurakOptions} from "./section/IzbanDurakOptions";
+import {VapurDurakOptions} from "./section/VapurDurakOptions";
 
 interface MobileSideBarProps {
     theme: string;
@@ -96,7 +97,7 @@ const MobileSideBar: React.FC<MobileSideBarProps> = ({theme}) => {
     }, [barIcon]);
 
     const getTravelContent = () => {
-        const type = currentStop.durak_type ?? 'ESHOT';
+        const type = currentStop.durak_type ?? TasitTip.ESHOT;
         switch (type) {
             case TasitTip.ESHOT:
                 const line = availableLines[sliderIndex - 2];
@@ -105,6 +106,8 @@ const MobileSideBar: React.FC<MobileSideBarProps> = ({theme}) => {
                 return <MetroDurakOptions theme={theme}/>;
             case TasitTip.IZBAN:
                 return <IzbanDurakOptions theme={theme}/>;
+            case TasitTip.VAPUR:
+                return <VapurDurakOptions theme={theme}/>;
             default:
                 return null;
         }

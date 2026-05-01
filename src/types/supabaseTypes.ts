@@ -7,6 +7,13 @@ export enum TasitTip {
     YURUME = 'YURUME',
 }
 
+export interface VapurStop extends Stop{
+    sefer_sayisi: number;
+    ilk_sefer: string;
+    son_sefer: string;
+    sefer_saatleri: string;
+}
+
 export interface Stop {
     durak_id: number;
     durak_adi: string;

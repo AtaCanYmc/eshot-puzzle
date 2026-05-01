@@ -2,6 +2,7 @@ import WalkIcon from "../../../../assets/svg/walk.svg";
 import EshotIcon from "../../../../assets/svg/eshot.svg";
 import MetroIcon from "../../../../assets/svg/metro.svg";
 import IzbanIcon from "../../../../assets/svg/izban.svg";
+import VapurIcon from "../../../../assets/svg/ferry.svg";
 import * as React from "react";
 import {useCommonTravel} from "../../../../hooks/useCommonTravel";
 import {useGameStore} from "../../../../store/gameStore";
@@ -14,7 +15,7 @@ interface IProps {
 
 export const MainOptions = (props: IProps) => {
     const {theme} = props;
-    const {handleSelectLine, handleSelectIstasyon} = useCommonTravel();
+    const {handleSelectLine, handleSelectIstasyon, handleSelectIskele} = useCommonTravel();
     const {
         currentStop,
         availableLines,
@@ -71,6 +72,20 @@ export const MainOptions = (props: IProps) => {
         );
     };
 
+    const getVapurButton = () => {
+        if (currentStop.durak_type !== TasitTip.VAPUR) return;
+        return (
+            <TasitButton identifier={"vapur"}
+                         icon={VapurIcon}
+                         text={"Vapur"}
+                         onClick={() => {
+                             handleSelectIskele().then(r => r);
+                             setSliderIndex(2);
+                         }}
+            />
+        );
+    };
+
     const getEshotButtons = () => {
         return availableLines.map(getEshotButton);
     };
@@ -83,6 +98,7 @@ export const MainOptions = (props: IProps) => {
                 {getMetroButton()}
                 {getIzbanButton()}
                 {getEshotButtons()}
+                {getVapurButton()}
             </div>
         </section>
     );

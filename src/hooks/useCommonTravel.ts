@@ -20,7 +20,6 @@ export const useCommonTravel = () => {
         selectedLine,
         history,
         availableStops,
-        selectedGuzergahPoints,
         setAvailableStops,
         setLoading,
         setLoadingIcon,
@@ -68,6 +67,31 @@ export const useCommonTravel = () => {
                 stops = await metroService.getOrderedStops();
             } else if (durakTipi === TasitTip.IZBAN) {
                 stops = await izbanService.getOrderedStops();
+            } else {
+                throw new Error("Invalid stop type for station selection");
+            }
+            setAvailableStops(stops);
+        } catch (error) {
+            setAvailableStops([]);
+            console.error("Line selection failed", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+    const handleSelectIskele = async () => {
+        if (!currentStop.durak_id) return;
+        const durakTipi = currentStop.durak_type ?? TasitTip.ESHOT;
+        setLoading(true);
+        setSelectedLine(null);
+        setSelectedDirection(null);
+        setAvailableLines([]);
+
+        try {
+            let stops = [] as Stop[];
+            if (durakTipi === TasitTip.VAPUR) {
+                stops = await vapurService.getVarisYerleri(currentStop.durak_id, 0);
             } else {
                 throw new Error("Invalid stop type for station selection");
             }
@@ -189,6 +213,7 @@ export const useCommonTravel = () => {
         handleTravelToStop,
         getStopIcon,
         handleSelectIstasyon,
+        handleSelectIskele,
         handleGuzergahPoints
     }
 };

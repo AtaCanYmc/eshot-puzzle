@@ -23,7 +23,7 @@ export const MetroDurakOptions = (props: IProps) => {
     const getDurakBulunamadi = () => {
         return (
             <div className={`text-xs italic ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>
-                Hatta ait durak bulunamadı.
+                Metroya ait durak bulunamadı.
             </div>
         );
     };
