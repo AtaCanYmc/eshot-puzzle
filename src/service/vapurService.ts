@@ -17,7 +17,7 @@ export const vapurService = {
         return data || [];
     },
 
-    async getVarisYerleri(iskeleId: number, gunId: number): Promise<VapurStop[]> {
+    async getVarisYerleri(iskeleId: number, gunId: number = 0): Promise<VapurStop[]> {
         const { data, error } = await supabase.rpc('iskele_varis_yerleri', {
             p_iskele_id: iskeleId,
             p_gun_id: gunId

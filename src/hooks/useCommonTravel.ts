@@ -91,7 +91,7 @@ export const useCommonTravel = () => {
         try {
             let stops = [] as Stop[];
             if (durakTipi === TasitTip.VAPUR) {
-                stops = await vapurService.getVarisYerleri(currentStop.durak_id, 0);
+                stops = await vapurService.getVarisYerleri(currentStop.durak_id);
             } else {
                 throw new Error("Invalid stop type for station selection");
             }
