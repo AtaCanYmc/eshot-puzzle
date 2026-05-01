@@ -19,7 +19,7 @@ function GamePageWithState() {
 
 function App() {
     useEffect(() => {
-        preloadSounds(eshotSound);
+        preloadSounds();
     }, []);
     return (
         <Router basename={import.meta.env.BASE_URL}>

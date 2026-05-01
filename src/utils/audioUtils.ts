@@ -1,4 +1,17 @@
 import { Howl, Howler } from 'howler';
+import eshotSound from '../assets/sound/eshot-travel-sound.mp3';
+import metroSound from '../assets/sound/metro.mp3';
+import izbanSound from '../assets/sound/izban.mp3';
+import vapurSound from '../assets/sound/ferry.mp3';
+import walkSound from '../assets/sound/walk.mp3';
+
+export const sounds = [
+    eshotSound,
+    vapurSound,
+    metroSound,
+    izbanSound,
+    walkSound
+];
 
 /**
  * Belirtilen ses dosyasını çalar.
@@ -27,7 +40,7 @@ export function stopAllSounds() {
  * @param srcList Tek bir string veya string dizisi olarak ses dosyası yolu/isimleri
  * @returns Howl örneği veya örnekleri
  */
-export function preloadSounds(srcList: string | string[]): Howl | Howl[] {
+export function preloadSounds(srcList: string | string[] = sounds): Howl | Howl[] {
   if (Array.isArray(srcList)) {
     return srcList.map(src => new Howl({ src: [src], preload: true }));
   }
