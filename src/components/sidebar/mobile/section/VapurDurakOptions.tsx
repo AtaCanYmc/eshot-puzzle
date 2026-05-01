@@ -1,7 +1,7 @@
 import {Stop, TasitTip} from "../../../../types/supabaseTypes";
 import * as React from "react";
-import MetroSound from '../../../../assets/sound/metro.mp3';
-import MetroIcon from '../../../../assets/svg/metro.svg';
+import VapurIcon from '../../../../assets/svg/ferry.svg';
+import VapurSound from '../../../../assets/sound/ferry.mp3';
 import {useGameStore} from "../../../../store/gameStore";
 import {useEffect} from "react";
 import {useCommonTravel} from "../../../../hooks/useCommonTravel";
@@ -34,7 +34,7 @@ export const VapurDurakOptions = (props: IProps) => {
         return (
             <button
                 key={stop.durak_id}
-                onClick={() => handleTravelToStop(stop, MetroIcon, MetroSound)}
+                onClick={() => handleTravelToStop(stop, VapurIcon, VapurSound)}
                 className={`w-full p-2 rounded-xl text-left border flex items-center gap-2 transition-all
                         ${isCurrent ? 'bg-green-100 border-green-500 text-green-700 font-black' : 'bg-primary/10 border-primary text-primary hover:bg-primary/20'}`}
             >
