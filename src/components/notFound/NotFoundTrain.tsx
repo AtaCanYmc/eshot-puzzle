@@ -308,8 +308,7 @@ const StyledWrapper = styled.div`
         align-self: center;
         justify-self: center;
         position: absolute;
-        top: 50%;
-        bottom: 50%;
+        left: 0;
         margin: 0;
     }
 
