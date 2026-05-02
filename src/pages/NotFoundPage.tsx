@@ -1,12 +1,31 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import NotFoundTrain from "../components/notFound/NotFoundTrain";
+
+const REDIRECT_SECONDS = 5;
 
 interface NotFoundPageProps {
     message?: string;
 }
 
 const NotFoundPage = (props: NotFoundPageProps) => {
+    const navigate = useNavigate();
+    const [countdown, setCountdown] = useState(REDIRECT_SECONDS);
 
     const { message } = props;
+
+    useEffect(() => {
+      if (countdown <= 0) {
+        navigate('/', { replace: true });
+        return;
+      }
+
+      const timeoutId = window.setTimeout(() => {
+        setCountdown((prevCountdown) => prevCountdown - 1);
+      }, 1000);
+
+      return () => window.clearTimeout(timeoutId);
+    }, [countdown, navigate]);
     
     const getMessageComp = () => {
       if (!message) return null;
@@ -22,11 +41,29 @@ const NotFoundPage = (props: NotFoundPageProps) => {
         </div>
       );
     };
+
+    const getCountDown = () => {
+        return (
+            <div className="mt-6 px-6 py-4 rounded-2xl bg-white/80 dark:bg-slate-900/80 shadow-lg border border-slate-200/80 dark:border-slate-700/80 backdrop-blur-sm">
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                    {countdown} saniye içinde anasayfaya yönlendirileceksiniz.
+                </p>
+                <button
+                    type="button"
+                    onClick={() => navigate('/', { replace: true })}
+                    className="mt-3 inline-flex items-center justify-center rounded-xl bg-primary px-4 py-2 text-sm font-bold text-white shadow-md transition-transform hover:scale-105"
+                >
+                    Şimdi anasayfaya dön
+                </button>
+            </div>
+        );
+    }
     
     return (
         <div className="flex flex-col items-center justify-center min-h-[60vh] p-4 text-center">
             <NotFoundTrain/>
             {getMessageComp()}
+            {getCountDown()}
         </div>
     )
 };
